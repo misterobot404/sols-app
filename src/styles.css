@@ -1,0 +1,143 @@
+/* Navbar */
+.navbar-active-link h2 {
+    color: #1976D3 !important;
+}
+
+.navbar-active-link .material-icons {
+    color: #1976D3 !important;
+}
+
+.navbar-link {
+    color: rgba(0, 0, 0, 0.48) !important;
+    transition: color 0.18s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
+}
+
+.navbar-link:hover {
+    color: rgba(0, 0, 0, 0.68) !important;
+}
+
+.navbar-link:hover .material-icons {
+    color: rgba(0, 0, 0, 0.68);
+}
+
+/* После адаптации интерфейса под более низкие разрешения, изменить min values */
+html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-family: Inter-Medium, "Roboto", sans-serif;
+    min-width: 360px;
+    background: #ECECF9;
+}
+
+label {
+    font-family: Inter-Medium, "Roboto", sans-serif;
+}
+
+h1, h2, h3, h4 {
+    font-family: Inter-Medium, sans-serif;
+}
+
+h1 {
+    font-size: 40px;
+    line-height: 48px;
+    font-weight: 500;
+}
+
+h2 {
+    font-size: 22px;
+    line-height: 27px;
+    font-weight: 500;
+}
+
+h3 {
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 500;
+}
+
+h4 {
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 400;
+}
+
+a {
+    text-decoration: none;
+}
+
+table {
+    font-family: Inter-Regular, sans-serif;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.h1 {
+    font-family: Inter-Medium, sans-serif;
+    font-size: 40px;
+    line-height: 48px;
+    font-weight: 500;
+}
+
+.h2 {
+    font-family: Inter-Medium, sans-serif;
+    font-size: 22px;
+    line-height: 27px;
+    font-weight: 500;
+}
+
+.h4 {
+    font-family: Inter-Medium, sans-serif;
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 500;
+}
+
+.p-14-medium {
+    font-family: Inter-Medium, sans-serif;
+    font-size: 14px;
+}
+
+.p-14-regular {
+    font-family: Inter-Regular, sans-serif;
+    font-size: 14px;
+}
+
+.p-14-light {
+    font-family: Inter-Light, sans-serif;
+    font-size: 14px;
+}
+
+.p-12-regular {
+    font-family: Inter-Regular, sans-serif;
+    font-size: 12px;
+}
+
+.cursor-pointer {
+    cursor: pointer
+}
+
+.fill-layout {
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: Inter-ExtraBold;
+    src: url(assets/fonts/Inter-ExtraBold.ttf);
+}
+
+@font-face {
+    font-family: Inter-Medium;
+    src: url(assets/fonts/Inter-Medium.ttf);
+}
+
+@font-face {
+    font-family: Inter-Regular;
+    src: url(assets/fonts/Inter-Regular.ttf);
+}
+
+@font-face {
+    font-family: Inter-Light;
+    src: url(assets/fonts/Inter-Light.ttf);
+}
