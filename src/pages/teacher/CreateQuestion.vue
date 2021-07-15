@@ -83,8 +83,8 @@
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12">
-            <component v-if="answerTypes" :is="selectedAnswerType.component"/>
+          <v-col cols="12" v-if="selectedAnswerType">
+            <component :is="selectedAnswerType.component"/>
           </v-col>
           <v-btn class="success rounded-lg h4 mx-auto mt-6" x-large type="submit">Сохранить</v-btn>
         </v-row>
