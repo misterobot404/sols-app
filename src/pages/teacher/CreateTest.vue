@@ -11,9 +11,9 @@
     </v-row>
     <!-- Body -->
     <form @submit.prevent="createTest()" class="rounded-lg d-flex flex-column align-center align-center py-8" style="margin-top: 30px; background: #FEFEFF;" >
-      <v-col cols="12" md="10" xl="8">
+      <v-col cols="11" md="10" xl="8">
         <v-row class="align-center justify-center">
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Тип опросника*</h4>
             <v-select
                 v-model="selectedType"
@@ -26,7 +26,7 @@
                 hint="Выберите тип"
             />
           </v-col>
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Название*</h4>
             <v-text-field
                 v-model="name"
@@ -38,7 +38,7 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Дата начала*</h4>
             <v-text-field
                 id="dateBeginning"
@@ -52,7 +52,7 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Дата окончания*</h4>
             <v-text-field
                 id="dateEnd"
@@ -65,7 +65,7 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Количество вопросов*</h4>
             <v-text-field
                 required
@@ -78,7 +78,7 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Время для прохождения*</h4>
             <v-text-field
                 v-model="testTime"
@@ -91,7 +91,7 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="11" md="6">
+          <v-col cols="12" md="6">
             <h4>Категории</h4>
             <v-select
                 v-model="selectedQuestionCategories"
@@ -106,7 +106,7 @@
                 class="mt-2 mb-1 rounded-lg"
             />
           </v-col>
-          <v-col align-self="start" cols="11" md="6">
+          <v-col align-self="start" cols="12" md="6">
             <h4>Пароль</h4>
             <v-text-field
                 required

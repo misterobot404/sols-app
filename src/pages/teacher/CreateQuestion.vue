@@ -10,7 +10,11 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <form @submit.prevent="createQuestion()" class="rounded-lg d-flex flex-column align-center align-center py-6" style="margin-top: 30px; background: #FEFEFF;">
+    <v-form ref="form"
+            v-model="valid"
+            class="rounded-lg d-flex flex-column align-center align-center py-8"
+            style="margin-top: 30px; background: #FEFEFF;"
+    >
       <v-col cols="11" md="10" xl="8">
         <v-row class="align-center justify-center">
           <v-col cols="12">
@@ -20,8 +24,9 @@
                 :items="questionCategories"
                 :item-text="'name'"
                 :item-value="'id'"
-                outlined
                 hide-details
+                outlined
+                :rules="[(v) => !!v ||  '']"
                 class="mt-2 mb-1 rounded-lg"
             />
           </v-col>
@@ -32,7 +37,7 @@
                 class="mt-3"
                 :toolbar-attributes="{ color: 'rgba(0, 0, 0, 0.04)' }"
                 :extensions="extensions"
-                :card-props="{ outlined: true, style: 'width: 100%; border-radius: 8px; border-color: rgba(0, 0, 0, 0.42); overflow: hidden' }"
+                :card-props="{ outlined: true, class: 'html-editor rounded-lg' }"
             />
           </v-col>
           <v-col cols="12">
@@ -49,25 +54,35 @@
           </v-col>
           <v-col cols="12" md="6">
             <h4>Уровень сложности</h4>
-            <v-radio-group v-model="selectedQuestionLevel" row>
+            <v-radio-group
+                v-model="selectedQuestionLevel"
+                row
+                :rules="[ !!selectedQuestionLevel || '']"
+            >
               <v-radio
                   v-for="n in questionLevels"
                   :key="n"
                   :label="n"
                   :value="n"
-                  class="mr-6 my-1"
+                  required
+                  class="mr-8 my-2"
               />
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="6" align-self="start">
             <h4>Тип вопроса</h4>
-            <v-radio-group v-model="selectedQuestionType" row>
+            <v-radio-group
+                v-model="selectedQuestionType"
+                row
+                :rules="[ !!selectedQuestionType || '']"
+            >
               <v-radio
                   v-for="n in testTypes"
                   :key="n"
                   :label="n"
                   :value="n"
-                  class="mr-6 my-1"
+                  required
+                  class="mr-8 my-2"
               />
             </v-radio-group>
           </v-col>
@@ -79,17 +94,16 @@
                   :key="n.name"
                   :label="n.name"
                   :value="n"
-                  class="mr-6 my-1"
+                  class="mr-7 my-2"
               />
             </v-radio-group>
           </v-col>
           <v-col cols="12" v-if="selectedAnswerType">
-            <component :is="selectedAnswerType.component"/>
+            <component :is="selectedAnswerType.component" @done='createQuestion'/>
           </v-col>
-          <v-btn class="success rounded-lg h4 mx-auto mt-6" x-large type="submit">Сохранить</v-btn>
         </v-row>
       </v-col>
-    </form>
+    </v-form>
     <!-- Footer -->
     <div class="text-center d-flex justify-center p-14-medium pt-5 pb-2 mt-auto align-center">
       <router-link to="/" class="mx-xl-10 mx-5 black--text text-no-wrap">
@@ -105,11 +119,11 @@
 <script>
 import {mapState} from 'vuex'
 // import answer types
-import AlternativeAnswer from "../../components/AnswerTypes/AlternativeAnswer";
-import ChoiceAnswer from "../../components/AnswerTypes/ChoiceAnswer";
-import ConformityAnswer from "../../components/AnswerTypes/ConformityAnswer";
-import RangingAnswer from "../../components/AnswerTypes/RangingAnswer";
-import TextAnswer from "../../components/AnswerTypes/TextAnswer";
+import AlternativeAnswer from "../../components/AnswerTypes/Create/AlternativeAnswer";
+import ChoiceAnswer from "../../components/AnswerTypes/Create/ChoiceAnswer";
+import ConformityAnswer from "../../components/AnswerTypes/Create/ConformityAnswer";
+import RangingAnswer from "../../components/AnswerTypes/Create/RangingAnswer";
+import TextAnswer from "../../components/AnswerTypes/Create/TextAnswer";
 // import TipTap - html editor
 import Vue from 'vue'
 import vuetify from "@/plugins/vuetify"
@@ -153,6 +167,8 @@ export default {
   },
   data() {
     return {
+      valid: false,
+
       selectedCategories: null,
       text: "",
       commentary: "",
@@ -189,7 +205,25 @@ export default {
     ...mapState('data', ["questionCategories","questionLevels","testTypes","answerTypes"])
   },
   methods: {
-    createQuestion() {}
+    /* Method called only from AnswerTypes/Create*/
+    createQuestion(answers) {
+      let htmlEditorValidation = true;
+      if (!this.text) {
+        htmlEditorValidation = false;
+        let el = this.$el.querySelector(".html-editor");
+        el.classList.add('html-editor--error');
+      }
+
+      if (this.$refs.form.validate() && htmlEditorValidation) {
+        console.log(answers);
+      }
+      else {
+        this.$nextTick(() => {
+          let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
+          this.$vuetify.goTo(el, {offset: 60});
+        });
+      }
+    }
   }
 }
 </script>
@@ -218,5 +252,18 @@ export default {
     font-size: 22px;
     line-height: 27px;
   }
+}
+</style>
+
+<style>
+.html-editor {
+  width: 100%;
+  border-color: rgba(0, 0, 0, 0.42) !important;
+  overflow: hidden;
+}
+
+.html-editor--error {
+  border-color: #ff5252 !important;
+  border-width: 2px !important;
 }
 </style>
