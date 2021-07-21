@@ -21,7 +21,7 @@
                 @click="removeAnswer(index)"
                 icon
             >
-              <v-icon>remove_circle_outline</v-icon>
+              <v-icon>close</v-icon>
             </v-btn>
           </template>
           <span>Удалить ответ</span>
@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import {mapMutations} from "vuex";
+
 export default {
   name: "ChoiceAnswer",
   data() {
@@ -70,7 +72,34 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     done() {
+      // check empty answer
+      let emptyAnswerFound = false;
+      this.answers.forEach((el) => {
+        if (el.text === "") {
+          emptyAnswerFound = true;
+        }
+      });
+      if (emptyAnswerFound) {
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
+        return;
+      }
+      // check answer count
+      if (this.answers.length < 2) {
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 2"});
+        return;
+      }
+      // check true answer
+      let trueAnswerNotFound = true;
+      this.answers.forEach((el) => {
+        if (el.correct === true) trueAnswerNotFound = false;
+      })
+      if (trueAnswerNotFound) {
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите хотя бы один правильный ответ"});
+        return;
+      }
+      // emit answers to parent
       this.$emit('done', this.answers)
     },
     addAnswer() {
@@ -85,7 +114,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-height: 100%" class="d-flex flex-column px-4 px-lg-8 px-xl-12">
+  <v-container class="px-4 px-lg-8 px-xl-12">
     <!-- Logo -->
     <v-row class="mt-4 mt-xl-5 justify-center align-center flex-grow-0">
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-end">
@@ -10,7 +10,7 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <form @submit.prevent="createTest()" class="rounded-lg d-flex flex-column align-center align-center py-8" style="margin-top: 30px; background: #FEFEFF;" >
+    <form @submit.prevent="createTest()" class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8" style="margin-top: 30px; background: #FEFEFF;" >
       <v-col cols="11" md="10" xl="8">
         <v-row class="align-center justify-center">
           <v-col cols="12" md="6">
@@ -71,6 +71,7 @@
                 required
                 v-model="numberQuestions"
                 type="number"
+                min="0"
                 append-icon="format_list_numbered"
                 hide-details
                 outlined
@@ -79,7 +80,7 @@
             />
           </v-col>
           <v-col cols="12" md="6">
-            <h4>Время для прохождения*</h4>
+            <h4>Время для прохождения (в минутах)*</h4>
             <v-text-field
                 v-model="testTime"
                 required
@@ -87,6 +88,7 @@
                 hide-details
                 outlined
                 type="number"
+                min="0"
                 class="mt-2 mb-1 rounded-lg"
                 background-color="white"
             />
@@ -109,7 +111,6 @@
           <v-col align-self="start" cols="12" md="6">
             <h4>Пароль</h4>
             <v-text-field
-                required
                 hide-details
                 outlined
                 type="password"
@@ -122,20 +123,11 @@
         </v-row>
       </v-col>
     </form>
-    <!-- Footer -->
-    <div class="text-center d-flex justify-center p-14-medium pt-5 pb-2 mt-auto align-center">
-      <router-link to="/" class="mx-xl-10 mx-5 black--text text-no-wrap">
-        О сайте
-      </router-link>
-      <router-link to="/" class="mx-xl-10 mx-5 black--text">
-        Служба поддержки
-      </router-link>
-    </div>
   </v-container>
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 
 export default {
   name: "CreateTest",
@@ -155,7 +147,21 @@ export default {
     ...mapState('data', ["questionCategories", "testTypes"])
   },
   methods: {
+    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('data', ['CREATE_TEST']),
     createTest() {
+      let test = {
+        selectedType: this.selectedType,
+        name: this.name,
+        dateBeginning: this.dateBeginning,
+        dateEnd: this.dateEnd,
+        numberQuestions: this.numberQuestions,
+        testTime: this.testTime,
+        selectedQuestionCategories: this.selectedQuestionCategories,
+        password: this.password
+      }
+      this.CREATE_TEST(test);
+      this.SHOW_MSG_DIALOG({type: 'primary', text: "Тест успешно создан"});
     }
   },
   mounted() {

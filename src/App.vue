@@ -9,9 +9,13 @@
         absolute
         style="z-index: 10"
     />
+    <!-- Popup msg -->
+    <PopUpMsg/>
     <v-main>
+      <!-- Navigation -->
       <NavigationTeacher v-if="role === 'teacher'"/>
       <NavigationStudent v-else-if="role === 'student'"/>
+      <!-- Page -->
       <keep-alive>
         <router-view/>
       </keep-alive>
@@ -23,16 +27,14 @@
 import {mapState} from 'vuex'
 import NavigationTeacher from "./components/NavigationTeacher";
 import NavigationStudent from "./components/NavigationStudent";
+import PopUpMsg from "@/components/PopUpMsg";
 
 export default {
   name: 'App',
-  components: {NavigationStudent, NavigationTeacher},
-  data() {
-    return {}
-  },
+  components: {PopUpMsg, NavigationStudent, NavigationTeacher},
   computed: {
     ...mapState('auth', ["role"]),
-    ...mapState('layout', ["pageLoading"])
+    ...mapState('layout', ["pageLoading"]),
   }
 }
 </script>

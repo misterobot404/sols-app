@@ -30,23 +30,34 @@ export default {
         questionCategories: [
             {
                 id: "1",
-                name: "Математика"
+                name: "Математика",
+                questions: []
             },
             {
                 id: "2",
-                name: "Программирование"
+                name: "Программирование",
+                questions: []
             },
             {
                 id: "3",
-                name: "История"
+                name: "История",
+                questions: []
             },
             {
                 id: "4",
-                name: "География"
+                name: "География",
+                questions: []
             }
         ],
     },
     mutations: {
+        CREATE_TEST(state, test) {
+            state.tests.push(test);
+        },
+        ADD_QUESTION_TO_CATEGORY(state, payload) {
+            let selectedCategories = state.questionCategories.find(el => el.id === payload.selectedCategoriesId);
+            selectedCategories.questions.push(payload);
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-height: 100%" class="d-flex flex-column px-8 px-xl-12">
+  <v-container class="px-8 px-xl-12">
     <!-- Logo -->
     <v-row class="mt-4 mt-xl-5 justify-center align-center flex-grow-0">
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-end">
@@ -12,15 +12,15 @@
     <!-- Body -->
     <v-form ref="form"
             v-model="valid"
-            class="rounded-lg d-flex flex-column align-center align-center py-8"
+            class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
             style="margin-top: 30px; background: #FEFEFF;"
     >
-      <v-col cols="11" md="10" xl="8">
+      <v-col cols="11" md="10" xl="9">
         <v-row class="align-center justify-center">
           <v-col cols="12">
             <h4>Выберите категорию</h4>
             <v-select
-                v-model="selectedCategories"
+                v-model="selectedCategoriesId"
                 :items="questionCategories"
                 :item-text="'name'"
                 :item-value="'id'"
@@ -93,7 +93,7 @@
                   v-for="n in answerTypes"
                   :key="n.name"
                   :label="n.name"
-                  :value="n"
+                  :value="n.component"
                   class="mr-7 my-2"
               />
             </v-radio-group>
@@ -104,20 +104,11 @@
         </v-row>
       </v-col>
     </v-form>
-    <!-- Footer -->
-    <div class="text-center d-flex justify-center p-14-medium pt-5 pb-2 mt-auto align-center">
-      <router-link to="/" class="mx-xl-10 mx-5 black--text text-no-wrap">
-        О сайте
-      </router-link>
-      <router-link to="/" class="mx-xl-10 mx-5 black--text">
-        Служба поддержки
-      </router-link>
-    </div>
   </v-container>
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 // import answer types
 import AlternativeAnswer from "../../components/AnswerTypes/Create/AlternativeAnswer";
 import ChoiceAnswer from "../../components/AnswerTypes/Create/ChoiceAnswer";
@@ -168,8 +159,8 @@ export default {
   data() {
     return {
       valid: false,
-
-      selectedCategories: null,
+      // question data
+      selectedCategoriesId: null,
       text: "",
       commentary: "",
       selectedQuestionLevel: null,
@@ -205,7 +196,9 @@ export default {
     ...mapState('data', ["questionCategories","questionLevels","testTypes","answerTypes"])
   },
   methods: {
-    /* Method called only from AnswerTypes/Create*/
+    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('data', ['ADD_QUESTION_TO_CATEGORY']),
+    /* Method called only from AnswerTypes/Create */
     createQuestion(answers) {
       let htmlEditorValidation = true;
       if (!this.text) {
@@ -215,14 +208,31 @@ export default {
       }
 
       if (this.$refs.form.validate() && htmlEditorValidation) {
-        console.log(answers);
+        let question = {
+          selectedCategoriesId: this.selectedCategoriesId,
+          text: this.text,
+          commentary: this.commentary,
+          selectedQuestionLevel: this.selectedQuestionLevel,
+          selectedQuestionType: this.selectedQuestionType,
+          selectedAnswerType: this.selectedAnswerType,
+          answers: answers
+        }
+        this.ADD_QUESTION_TO_CATEGORY(question);
+        this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
       }
       else {
+        /* scroll to error */
         this.$nextTick(() => {
           let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
-          this.$vuetify.goTo(el, {offset: 60});
+          this.$vuetify.goTo(el, {offset: 54});
         });
       }
+    }
+  },
+  watch: {
+    text() {
+      let el = this.$el.querySelector(".html-editor--error");
+      if(el) el.classList.remove('html-editor--error');
     }
   }
 }

@@ -56,21 +56,17 @@
         </div>
       </v-row>
     </div>
-    <!-- Footer -->
-    <div class="text-center d-flex justify-center p-14-medium pt-5 pb-2 mt-auto align-center">
-      <router-link to="/" class="mx-xl-10 mx-5 black--text text-no-wrap">
-        О сайте
-      </router-link>
-      <router-link to="/" class="mx-xl-10 mx-5 black--text">
-        Служба поддержки
-      </router-link>
-    </div>
+    <!-- Feedback -->
+    <Feedback/>
   </v-container>
 </template>
 
 <script>
+import Feedback from "@/components/Feedback";
+
 export default {
   name: "Home",
+  components: {Feedback},
   data() {
     return {
       help: [
