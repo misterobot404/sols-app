@@ -31,6 +31,7 @@
             </v-toolbar>
           </template>
         </v-data-table>
+        <div v-for="(question,index) in questionCategories" :key="index" v-text="question"/>
       </v-col>
     </div>
   </v-container>

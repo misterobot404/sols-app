@@ -11,7 +11,6 @@
     </v-row>
     <!-- Body -->
     <v-form ref="form"
-            v-model="valid"
             class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
             style="margin-top: 30px; background: #FEFEFF;"
     >
@@ -99,7 +98,7 @@
             </v-radio-group>
           </v-col>
           <v-col cols="12" v-if="selectedAnswerType">
-            <component :is="selectedAnswerType.component" @done='createQuestion'/>
+            <component :is="selectedAnswerType" @done='createQuestion'/>
           </v-col>
         </v-row>
       </v-col>
@@ -158,7 +157,6 @@ export default {
   },
   data() {
     return {
-      valid: false,
       // question data
       selectedCategoriesId: null,
       text: "",

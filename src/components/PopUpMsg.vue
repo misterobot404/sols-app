@@ -7,7 +7,7 @@
       app
       class="h4"
       content-class="text-center"
-      timeout="2000"
+      timeout="3000"
   >
     {{ popupMsg.text }}
   </v-snackbar>

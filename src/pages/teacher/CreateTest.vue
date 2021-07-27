@@ -10,16 +10,21 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <form @submit.prevent="createTest()" class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8" style="margin-top: 30px; background: #FEFEFF;" >
+    <v-form
+        ref="form"
+        class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8"
+        style="margin-top: 30px; background: #FEFEFF;"
+    >
       <v-col cols="11" md="10" xl="8">
         <v-row class="align-center justify-center">
           <v-col cols="12" md="6">
             <h4>Тип опросника*</h4>
             <v-select
-                v-model="selectedType"
+                v-model="type"
                 required
                 hide-details
                 :items="testTypes"
+                :rules="[(v) => !!v ||  '']"
                 outlined
                 class="mt-2 mb-1 rounded-lg"
                 background-color="white"
@@ -31,6 +36,7 @@
             <v-text-field
                 v-model="name"
                 required
+                :rules="[(v) => !!v ||  '']"
                 hide-details
                 append-icon="title"
                 outlined
@@ -38,38 +44,67 @@
                 background-color="white"
             />
           </v-col>
+          <v-col cols="12">
+            <DatePicker v-model="range" is-range mode='dateTime'>
+            </DatePicker>
+          </v-col>
           <v-col cols="12" md="6">
             <h4>Дата начала*</h4>
-            <v-text-field
-                id="dateBeginning"
-                required
-                hide-details
-                v-model="dateBeginning"
-                outlined
-                type="date"
-                min=""
-                class="mt-2 mb-1 rounded-lg"
-                background-color="white"
-            />
+            <v-datetime-picker
+                ref="dateTimePickerStart"
+                v-model="startDate"
+                :date-picker-props="{
+                  min: new Date().toISOString().split('T')[0],
+                  locale: 'ru-RU',
+                  firstDayOfWeek: 1
+                }"
+                :time-picker-props="{
+                  format: '24hr',
+                  min: minStartTime
+                }"
+                :text-field-props="{
+                  required: true,
+                  rules: [(v) => !!v || ''],
+                  hideDetails: true,
+                  outlined: true,
+                  class: 'mt-2 mb-1 rounded-lg',
+                  appendIcon: 'calendar_today'
+                }"
+            >
+              <template slot="actions" slot-scope="{ parent }">
+                <v-btn @click="parent.okHandler" class="primary rounded-lg h4 mb-2 px-4">Подтвердить</v-btn>
+              </template>
+            </v-datetime-picker>
           </v-col>
           <v-col cols="12" md="6">
             <h4>Дата окончания*</h4>
-            <v-text-field
-                id="dateEnd"
-                v-model="dateEnd"
-                required
-                type="date"
-                hide-details
-                outlined
-                class="mt-2 mb-1 rounded-lg"
-                background-color="white"
+            <v-datetime-picker
+                ref="dateTimePickerEnd"
+                v-model="endDate"
+                :date-picker-props="{
+                  min: minEndDate,
+                  locale: 'ru-RU',
+                  firstDayOfWeek: 1
+                }"
+                :time-picker-props="{
+                  format: '24hr',
+                  min: minEndTime
+                }"
+                :text-field-props="{
+                  required: true,
+                  rules: [(v) => !!v || ''],
+                  hideDetails: true,
+                  outlined: true, class: 'mt-2 mb-1 rounded-lg',
+                  appendIcon: 'calendar_today'
+                }"
             />
           </v-col>
           <v-col cols="12" md="6">
             <h4>Количество вопросов*</h4>
             <v-text-field
                 required
-                v-model="numberQuestions"
+                :rules="[(v) => !!v ||  '']"
+                v-model="amountQuestions"
                 type="number"
                 min="0"
                 append-icon="format_list_numbered"
@@ -82,7 +117,8 @@
           <v-col cols="12" md="6">
             <h4>Время для прохождения (в минутах)*</h4>
             <v-text-field
-                v-model="testTime"
+                v-model="duration"
+                :rules="[(v) => !!v ||  '']"
                 required
                 append-icon="timer"
                 hide-details
@@ -101,6 +137,8 @@
                 :item-text="'name'"
                 :item-value="'id'"
                 chips
+                required
+                :rules="[(v) => (!!v && v.length > 0) ||  '']"
                 outlined
                 hide-details
                 clearable
@@ -119,67 +157,143 @@
                 background-color="white"
             />
           </v-col>
-          <v-btn class="success rounded-lg h4 mx-auto mt-6" x-large type="submit">Создать</v-btn>
+          <v-btn @click="createTest()" class="success rounded-lg h4 mx-auto mt-6" x-large>Создать</v-btn>
         </v-row>
       </v-col>
-    </form>
+    </v-form>
   </v-container>
 </template>
 
 <script>
+import Vue from 'vue'
 import {mapMutations, mapState} from 'vuex'
+
+import Calendar from 'v-calendar/lib/components/calendar.umd'
+import DatePicker from 'v-calendar/lib/components/date-picker.umd'
+
+Vue.component('calendar', Calendar)
+Vue.component('date-picker', DatePicker)
+
+import DatetimePicker from 'vuetify-datetime-picker'
+
+Vue.use(DatetimePicker)
 
 export default {
   name: "CreateTest",
+  components: {
+    DatePicker
+  },
   data() {
     return {
-      selectedType: null,
+      range: {
+        start: new Date(2020, 0, 1),
+        end: new Date(2020, 0, 5)
+      },
+      valid: false,
+      // data from datetime-picker
+      datePickerStart: null,
+      timePickerStart: null,
+      datePickerEnd: null,
+      // test data
+      type: null,
       name: "",
-      dateBeginning: null,
-      dateEnd: null,
-      numberQuestions: null,
-      testTime: null,
+      startDate: null,
+      endDate: null,
+      amountQuestions: null,
+      duration: null,
       selectedQuestionCategories: null,
       password: "",
     }
   },
   computed: {
-    ...mapState('data', ["questionCategories", "testTypes"])
+    ...mapState('data', ["questionCategories", "testTypes"]),
+    minStartTime() {
+      // startDate is today
+      if (this.datePickerStart === new Date().toISOString().split('T')[0]) {
+        // set time limit
+        return new Date().getHours() + ':' + new Date().getMinutes()
+      }
+      // not set time limit
+      else return null;
+    },
+    minEndDate() {
+      // startDate set
+      if (this.startDate) {
+        // set date limit
+        return this.startDate.toISOString().split('T')[0];
+      }
+      // not set date limit
+      else return new Date().toISOString().split('T')[0];
+    },
+    minEndTime() {
+      // startDate set and startDate is today
+      if (this.startDate && this.datePickerEnd === this.startDate.toISOString().split('T')[0]) {
+        console.log(1);
+        // set time limits
+        return this.startDate.getHours() + ':' + this.startDate.getMinutes()
+      }
+      // startDate not set and endDate is today
+      else if (!this.startDate && this.datePickerEnd === new Date().toISOString().split('T')[0]) {
+        console.log(2);
+        // set time limit
+        return new Date().getHours() + ':' + new Date().getMinutes();
+      }
+      // Start date not set. Set time limits
+      else return null;
+    }
   },
+  watch: {},
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapMutations('data', ['CREATE_TEST']),
     createTest() {
-      let test = {
-        selectedType: this.selectedType,
-        name: this.name,
-        dateBeginning: this.dateBeginning,
-        dateEnd: this.dateEnd,
-        numberQuestions: this.numberQuestions,
-        testTime: this.testTime,
-        selectedQuestionCategories: this.selectedQuestionCategories,
-        password: this.password
+      if (this.$refs.form.validate()) {
+        let test = {
+          type: this.type,
+          name: this.name,
+          start_date: this.startDate,
+          end_date: this.endDate,
+          amount_questions: this.amountQuestions,
+          duration: this.duration,
+          is_active: true,
+          selected_question_categories: this.selectedQuestionCategories,
+          password: this.password
+        }
+        this.CREATE_TEST(test);
+        // Show msg
+        this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
       }
-      this.CREATE_TEST(test);
-      this.SHOW_MSG_DIALOG({type: 'primary', text: "Тест успешно создан"});
-    }
+    },
   },
   mounted() {
-    /* Set min date for dateBeginning and dateEnd*/
-    let today = new Date();
-    let dd = today.getDate();
-    let mm = today.getMonth()+1; //January is 0!
-    let yyyy = today.getFullYear();
-    if(dd<10){
-      dd='0'+dd
-    }
-    if(mm<10){
-      mm='0'+mm
-    }
-    today = yyyy+'-'+mm+'-'+dd;
-    document.getElementById("dateBeginning").setAttribute("min", today);
-    document.getElementById("dateEnd").setAttribute("min", today);
-  }
+    // Watch for changes date in dateTimePickerStart
+    this.$watch(
+        () => {
+          return this.$refs.dateTimePickerStart.date
+        },
+        (val) => {
+          this.datePickerStart = val;
+        }
+    )
+    // Watch for changes time in dateTimePickerStart
+    this.$watch(
+        () => {
+          return this.$refs.dateTimePickerStart.time
+        },
+        (val) => {
+          this.timePickerStart = val;
+        }
+    )
+    // Watch for changes date in dateTimePickerEnd
+    this.$watch(
+        () => {
+          return this.$refs.dateTimePickerEnd.date
+        },
+        (val) => {
+          this.datePickerEnd = val;
+        }
+    )
+  },
 }
 </script>
 
