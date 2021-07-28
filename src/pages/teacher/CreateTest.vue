@@ -12,13 +12,13 @@
     <!-- Body -->
     <v-form
         ref="form"
-        class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8"
+        class="rounded-lg d-flex flex-column align-center pt-12 pb-6 mb-8"
         style="margin-top: 30px; background: #FEFEFF;"
     >
       <v-col cols="11" md="10" xl="8">
-        <v-row class="align-center justify-center">
+        <v-row class="align-center">
           <v-col cols="12" md="6">
-            <h4>Тип опросника*</h4>
+            <h4>Тип опросника</h4>
             <v-select
                 v-model="type"
                 required
@@ -32,7 +32,7 @@
             />
           </v-col>
           <v-col cols="12" md="6">
-            <h4>Название*</h4>
+            <h4>Название</h4>
             <v-text-field
                 v-model="name"
                 required
@@ -44,63 +44,8 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="12">
-            <DatePicker v-model="range" is-range mode='dateTime'>
-            </DatePicker>
-          </v-col>
           <v-col cols="12" md="6">
-            <h4>Дата начала*</h4>
-            <v-datetime-picker
-                ref="dateTimePickerStart"
-                v-model="startDate"
-                :date-picker-props="{
-                  min: new Date().toISOString().split('T')[0],
-                  locale: 'ru-RU',
-                  firstDayOfWeek: 1
-                }"
-                :time-picker-props="{
-                  format: '24hr',
-                  min: minStartTime
-                }"
-                :text-field-props="{
-                  required: true,
-                  rules: [(v) => !!v || ''],
-                  hideDetails: true,
-                  outlined: true,
-                  class: 'mt-2 mb-1 rounded-lg',
-                  appendIcon: 'calendar_today'
-                }"
-            >
-              <template slot="actions" slot-scope="{ parent }">
-                <v-btn @click="parent.okHandler" class="primary rounded-lg h4 mb-2 px-4">Подтвердить</v-btn>
-              </template>
-            </v-datetime-picker>
-          </v-col>
-          <v-col cols="12" md="6">
-            <h4>Дата окончания*</h4>
-            <v-datetime-picker
-                ref="dateTimePickerEnd"
-                v-model="endDate"
-                :date-picker-props="{
-                  min: minEndDate,
-                  locale: 'ru-RU',
-                  firstDayOfWeek: 1
-                }"
-                :time-picker-props="{
-                  format: '24hr',
-                  min: minEndTime
-                }"
-                :text-field-props="{
-                  required: true,
-                  rules: [(v) => !!v || ''],
-                  hideDetails: true,
-                  outlined: true, class: 'mt-2 mb-1 rounded-lg',
-                  appendIcon: 'calendar_today'
-                }"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <h4>Количество вопросов*</h4>
+            <h4>Количество вопросов</h4>
             <v-text-field
                 required
                 :rules="[(v) => !!v ||  '']"
@@ -110,21 +55,6 @@
                 append-icon="format_list_numbered"
                 hide-details
                 outlined
-                class="mt-2 mb-1 rounded-lg"
-                background-color="white"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <h4>Время для прохождения (в минутах)*</h4>
-            <v-text-field
-                v-model="duration"
-                :rules="[(v) => !!v ||  '']"
-                required
-                append-icon="timer"
-                hide-details
-                outlined
-                type="number"
-                min="0"
                 class="mt-2 mb-1 rounded-lg"
                 background-color="white"
             />
@@ -146,7 +76,97 @@
                 class="mt-2 mb-1 rounded-lg"
             />
           </v-col>
-          <v-col align-self="start" cols="12" md="6">
+          <v-col cols="12">
+            <h4 class="mb-2">Дополнительные возможности:</h4>
+            <v-row>
+              <v-col>
+                <v-switch
+                    label="Ограничение доступа к тесту"
+                    v-model="showPassword"
+                    hide-details
+                    class="mr-8 my-2"
+                />
+              </v-col>
+              <v-col>
+                <v-switch
+                    label="Ограничение длительности прохождения"
+                    v-model="showDuration"
+                    hide-details
+                    class="mr-8 my-2"
+                />
+              </v-col>
+              <v-col>
+                <v-switch
+                    label="Ограничение времени прохождения"
+                    v-model="showRange"
+                    hide-details
+                    class="mr-8 my-2"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="pa-0" v-show="showRange">
+            <vc-date-picker
+                v-model="range"
+                is-range
+                mode='dateTime'
+                is24hr
+                :minute-increment="5"
+                :min-date='new Date()'
+                :firstDayOfWeek="2"
+                locale="ru"
+                class="d-flex flex-wrap"
+            >
+              <template v-slot="{ inputValue, inputEvents }">
+                <v-col cols="12" md="6">
+                  <h4>Дата начала</h4>
+                  <v-text-field
+                      ref="startDateTextField"
+                      :value="inputValue.start"
+                      v-on="inputEvents.start"
+                      required
+                      :rules="[(v) => !showRange || !!v || '']"
+                      hide-details
+                      outlined
+                      readonly
+                      class="mt-2 mb-1 rounded-lg"
+                      append-icon="calendar_today"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <h4>Дата окончания</h4>
+                  <v-text-field
+                      ref="endDateTextField"
+                      :value="inputValue.end"
+                      v-on="inputEvents.end"
+                      required
+                      readonly
+                      :rules="[(v) => !showRange || !!v || '']"
+                      hide-details
+                      outlined
+                      class="mt-2 mb-1 rounded-lg"
+                      append-icon="calendar_today"
+                  />
+                </v-col>
+              </template>
+            </vc-date-picker>
+          </v-col>
+          <v-col cols="12" md="6" v-show="showDuration">
+            <h4>Время для прохождения (в минутах)</h4>
+            <v-text-field
+                v-model="duration"
+                :rules="[(v) => !showDuration || !!v ||  '']"
+                required
+                append-icon="timer"
+                hide-details
+                outlined
+                type="number"
+                min="0"
+                class="mt-2 mb-1 rounded-lg"
+                background-color="white"
+            />
+          </v-col>
+          <v-col align-self="end" cols="12" md="6" v-show="showPassword">
             <h4>Пароль</h4>
             <v-text-field
                 hide-details
@@ -155,9 +175,12 @@
                 append-icon="vpn_key"
                 class="mt-2 mb-1 rounded-lg"
                 background-color="white"
+                :rules="[(v) => !showPassword || !!v ||  '']"
             />
           </v-col>
-          <v-btn @click="createTest()" class="success rounded-lg h4 mx-auto mt-6" x-large>Создать</v-btn>
+          <v-col align-self="end" class="d-flex justify-end mb-2">
+            <v-btn @click="createTest()" class="success rounded-lg h4" x-large>Создать</v-btn>
+          </v-col>
         </v-row>
       </v-col>
     </v-form>
@@ -167,97 +190,53 @@
 <script>
 import Vue from 'vue'
 import {mapMutations, mapState} from 'vuex'
+import VCalendar from 'v-calendar';
 
-import Calendar from 'v-calendar/lib/components/calendar.umd'
-import DatePicker from 'v-calendar/lib/components/date-picker.umd'
-
-Vue.component('calendar', Calendar)
-Vue.component('date-picker', DatePicker)
-
-import DatetimePicker from 'vuetify-datetime-picker'
-
-Vue.use(DatetimePicker)
+// Use v-calendar & v-date-picker components
+Vue.use(VCalendar, {
+  componentPrefix: 'vc'
+});
 
 export default {
   name: "CreateTest",
-  components: {
-    DatePicker
-  },
   data() {
     return {
-      range: {
-        start: new Date(2020, 0, 1),
-        end: new Date(2020, 0, 5)
-      },
       valid: false,
-      // data from datetime-picker
-      datePickerStart: null,
-      timePickerStart: null,
-      datePickerEnd: null,
+      showRange: true,
+      rangeHideError: true,
+      showDuration: true,
+      showPassword: false,
       // test data
       type: null,
-      name: "",
-      startDate: null,
-      endDate: null,
+      name: null,
+      range: {
+        start: null,
+        end: null
+      },
       amountQuestions: null,
       duration: null,
       selectedQuestionCategories: null,
-      password: "",
+      password: null,
     }
   },
   computed: {
     ...mapState('data', ["questionCategories", "testTypes"]),
-    minStartTime() {
-      // startDate is today
-      if (this.datePickerStart === new Date().toISOString().split('T')[0]) {
-        // set time limit
-        return new Date().getHours() + ':' + new Date().getMinutes()
-      }
-      // not set time limit
-      else return null;
-    },
-    minEndDate() {
-      // startDate set
-      if (this.startDate) {
-        // set date limit
-        return this.startDate.toISOString().split('T')[0];
-      }
-      // not set date limit
-      else return new Date().toISOString().split('T')[0];
-    },
-    minEndTime() {
-      // startDate set and startDate is today
-      if (this.startDate && this.datePickerEnd === this.startDate.toISOString().split('T')[0]) {
-        console.log(1);
-        // set time limits
-        return this.startDate.getHours() + ':' + this.startDate.getMinutes()
-      }
-      // startDate not set and endDate is today
-      else if (!this.startDate && this.datePickerEnd === new Date().toISOString().split('T')[0]) {
-        console.log(2);
-        // set time limit
-        return new Date().getHours() + ':' + new Date().getMinutes();
-      }
-      // Start date not set. Set time limits
-      else return null;
-    }
   },
-  watch: {},
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapMutations('data', ['CREATE_TEST']),
     createTest() {
       if (this.$refs.form.validate()) {
         let test = {
+          is_active: true,
           type: this.type,
           name: this.name,
-          start_date: this.startDate,
-          end_date: this.endDate,
           amount_questions: this.amountQuestions,
-          duration: this.duration,
-          is_active: true,
           selected_question_categories: this.selectedQuestionCategories,
-          password: this.password
+          start_date: this.showRange ? this.range.start : null,
+          end_date: this.showRange ? this.range.end : null,
+          duration: this.showDuration ? this.duration : null,
+          password: this.showPassword ? this.password : null
         }
         this.CREATE_TEST(test);
         // Show msg
@@ -266,34 +245,22 @@ export default {
     },
   },
   mounted() {
-    // Watch for changes date in dateTimePickerStart
+    // CRUTCH
+    // v-text-field inside date-picker call error on init
+    let dropError = true;
     this.$watch(
         () => {
-          return this.$refs.dateTimePickerStart.date
+          return this.$refs.startDateTextField.errorBucket
         },
-        (val) => {
-          this.datePickerStart = val;
-        }
-    )
-    // Watch for changes time in dateTimePickerStart
-    this.$watch(
         () => {
-          return this.$refs.dateTimePickerStart.time
+            if (dropError) {
+              this.$refs.startDateTextField.errorBucket = [];
+              this.$refs.endDateTextField.errorBucket = [];
+              dropError = false;
+            }
         },
-        (val) => {
-          this.timePickerStart = val;
-        }
-    )
-    // Watch for changes date in dateTimePickerEnd
-    this.$watch(
-        () => {
-          return this.$refs.dateTimePickerEnd.date
-        },
-        (val) => {
-          this.datePickerEnd = val;
-        }
-    )
-  },
+    );
+  }
 }
 </script>
 
