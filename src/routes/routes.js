@@ -4,7 +4,7 @@ export const routes = [
         path: '/',
         redirect: '/signin'
     },
-    /* Auth */
+    /* auth */
     {
         name: "SignIn",
         path: '/signin',
@@ -33,6 +33,14 @@ export const routes = [
         component: () => import('../pages/PasswordForget'),
         meta: {
             title: "SOLS - Восстановление пароля"
+        }
+    },
+    /* testing  */
+    {
+        path: '/test/:id',
+        component: () => import('@/pages/Testing'),
+        meta: {
+            title: "SOLS - Прохождение теста"
         }
     },
     /* teacher */

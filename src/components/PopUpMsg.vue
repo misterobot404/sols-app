@@ -2,10 +2,11 @@
   <v-snackbar
       v-model="m_popupMsg"
       :color="popupMsg.type"
-      bottom
+      top
+      right
       rounded
-      app
       class="h4"
+      :class="$vuetify.breakpoint.lgAndUp ? 'lg-margin' : null"
       content-class="text-center"
       timeout="3000"
   >
@@ -36,5 +37,8 @@ export default {
 </script>
 
 <style scoped>
-
+  .lg-margin {
+    top: 12px;
+    right: 18px
+  }
 </style>

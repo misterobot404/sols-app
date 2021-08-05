@@ -12,11 +12,24 @@
     <!-- Body -->
     <v-form
         ref="form"
-        class="rounded-lg d-flex flex-column align-center pt-12 pb-6 mb-8"
+        class="rounded-lg d-flex flex-column align-center pt-12 pb-4 mb-8"
         style="margin-top: 30px; background: #FEFEFF;"
     >
       <v-col cols="11" md="10" xl="8">
         <v-row class="align-center">
+          <v-col cols="12" md="6">
+            <h4>Название</h4>
+            <v-text-field
+                v-model="name"
+                required
+                :rules="[(v) => !!v ||  '']"
+                hide-details
+                append-icon="title"
+                outlined
+                class="mt-2 mb-1 rounded-lg"
+                background-color="white"
+            />
+          </v-col>
           <v-col cols="12" md="6">
             <h4>Тип опросника</h4>
             <v-select
@@ -32,38 +45,10 @@
             />
           </v-col>
           <v-col cols="12" md="6">
-            <h4>Название</h4>
-            <v-text-field
-                v-model="name"
-                required
-                :rules="[(v) => !!v ||  '']"
-                hide-details
-                append-icon="title"
-                outlined
-                class="mt-2 mb-1 rounded-lg"
-                background-color="white"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <h4>Количество вопросов</h4>
-            <v-text-field
-                required
-                :rules="[(v) => !!v ||  '']"
-                v-model="amountQuestions"
-                type="number"
-                min="0"
-                append-icon="format_list_numbered"
-                hide-details
-                outlined
-                class="mt-2 mb-1 rounded-lg"
-                background-color="white"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <h4>Категории</h4>
+            <h4>Категории вопросов</h4>
             <v-select
-                v-model="selectedQuestionCategories"
-                :items="questionCategories"
+                v-model="categoryIds"
+                :items="categories"
                 :item-text="'name'"
                 :item-value="'id'"
                 chips
@@ -76,7 +61,48 @@
                 class="mt-2 mb-1 rounded-lg"
             />
           </v-col>
-          <v-col cols="12">
+          <v-col cols="12" md="6">
+            <h4 class="mb-3">Количество вопросов</h4>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-text-field
+                    v-model="countOfQuestionsByLvl[0]"
+                    required
+                    outlined
+                    :rules="[(v) => !!v ||  '']"
+                    hide-details
+                    type="number"
+                    label="Лёгкие"
+                    class="rounded-lg"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                    v-model="countOfQuestionsByLvl[1]"
+                    required
+                    outlined
+                    type="number"
+                    :rules="[(v) => !!v ||  '']"
+                    hide-details
+                    label="Средние"
+                    class="rounded-lg"
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-text-field
+                    v-model="countOfQuestionsByLvl[2]"
+                    required
+                    outlined
+                    type="number"
+                    :rules="[(v) => !!v ||  '']"
+                    hide-details
+                    label="Сложные"
+                    class="rounded-lg"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="mt-4">
             <h4 class="mb-2">Дополнительные возможности:</h4>
             <v-row>
               <v-col>
@@ -89,16 +115,16 @@
               </v-col>
               <v-col>
                 <v-switch
-                    label="Ограничение длительности прохождения"
-                    v-model="showDuration"
+                    label="Ограничение периода тестирования"
+                    v-model="showRange"
                     hide-details
                     class="mr-8 my-2"
                 />
               </v-col>
               <v-col>
                 <v-switch
-                    label="Ограничение времени прохождения"
-                    v-model="showRange"
+                    label="Ограничение времени тестирования"
+                    v-model="showDuration"
                     hide-details
                     class="mr-8 my-2"
                 />
@@ -154,7 +180,7 @@
           <v-col cols="12" md="6" v-show="showDuration">
             <h4>Время для прохождения (в минутах)</h4>
             <v-text-field
-                v-model="duration"
+                v-model="testingTime"
                 :rules="[(v) => !showDuration || !!v ||  '']"
                 required
                 append-icon="timer"
@@ -178,8 +204,8 @@
                 :rules="[(v) => !showPassword || !!v ||  '']"
             />
           </v-col>
-          <v-col align-self="end" class="d-flex justify-end mb-2">
-            <v-btn @click="createTest()" class="success rounded-lg h4" x-large>Создать</v-btn>
+          <v-col align-self="end" class="d-flex justify-end mb-2 mt-2">
+            <v-btn @click="createTest()" class="success rounded-lg h4" x-large :loading="loading">Создать</v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -201,6 +227,7 @@ export default {
   name: "CreateTest",
   data() {
     return {
+      loading: false,
       valid: false,
       showRange: true,
       rangeHideError: true,
@@ -209,18 +236,18 @@ export default {
       // test data
       type: null,
       name: null,
+      countOfQuestionsByLvl: [null, null, null],
+      categoryIds: null,
       range: {
         start: null,
         end: null
       },
-      amountQuestions: null,
-      duration: null,
-      selectedQuestionCategories: null,
+      testingTime: null,
       password: null,
     }
   },
   computed: {
-    ...mapState('data', ["questionCategories", "testTypes"]),
+    ...mapState('data', ["categories", "testTypes"]),
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
@@ -231,16 +258,22 @@ export default {
           is_active: true,
           type: this.type,
           name: this.name,
-          amount_questions: this.amountQuestions,
-          selected_question_categories: this.selectedQuestionCategories,
-          start_date: this.showRange ? this.range.start : null,
-          end_date: this.showRange ? this.range.end : null,
-          duration: this.showDuration ? this.duration : null,
+          count_of_questions_by_lvl: this.countOfQuestionsByLvl,
+          category_ids: this.categoryIds,
+          date_of_beginning: this.showRange ? this.range.start : null,
+          date_of_finishing: this.showRange ? this.range.end : null,
+          testing_time: this.showDuration ? this.testingTime : null,
           password: this.showPassword ? this.password : null
         }
-        this.CREATE_TEST(test);
-        // Show msg
-        this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
+
+        this.loading = true;
+        setTimeout(() => {
+          this.CREATE_TEST(test);
+          // Show msg
+          this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
+          this.loading = false;
+        }, 800);
+
       }
     },
   },
@@ -253,11 +286,11 @@ export default {
           return this.$refs.startDateTextField.errorBucket
         },
         () => {
-            if (dropError) {
-              this.$refs.startDateTextField.errorBucket = [];
-              this.$refs.endDateTextField.errorBucket = [];
-              dropError = false;
-            }
+          if (dropError) {
+            this.$refs.startDateTextField.errorBucket = [];
+            this.$refs.endDateTextField.errorBucket = [];
+            dropError = false;
+          }
         },
     );
   }

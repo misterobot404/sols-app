@@ -38,7 +38,7 @@
         </v-icon>
         <span style="text-transform: none">Добавить ещё ответы</span>
       </v-btn>
-      <v-btn class="success rounded-lg h4" large @click="done()">Сохранить</v-btn>
+      <v-btn class="success rounded-lg h4" :loading="loading" large @click="done()">Сохранить</v-btn>
     </v-col>
   </v-row>
 </template>
@@ -48,6 +48,7 @@ import {mapMutations} from "vuex";
 
 export default {
   name: "TextAnswer",
+  props: ["loading"],
   data() {
     return {
       answers: [

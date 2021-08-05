@@ -19,8 +19,8 @@
           <v-col cols="12">
             <h4>Выберите категорию</h4>
             <v-select
-                v-model="selectedCategoriesId"
-                :items="questionCategories"
+                v-model="categoryId"
+                :items="categories"
                 :item-text="'name'"
                 :item-value="'id'"
                 hide-details
@@ -54,9 +54,9 @@
           <v-col cols="12" md="6">
             <h4>Уровень сложности</h4>
             <v-radio-group
-                v-model="selectedQuestionLevel"
+                v-model="questionLevel"
                 row
-                :rules="[ !!selectedQuestionLevel || '']"
+                :rules="[ !!questionLevel || '']"
             >
               <v-radio
                   v-for="n in questionLevels"
@@ -71,9 +71,9 @@
           <v-col cols="12" md="6" align-self="start">
             <h4>Тип вопроса</h4>
             <v-radio-group
-                v-model="selectedQuestionType"
+                v-model="questionType"
                 row
-                :rules="[ !!selectedQuestionType || '']"
+                :rules="[ !!questionType || '']"
             >
               <v-radio
                   v-for="n in testTypes"
@@ -98,7 +98,7 @@
             </v-radio-group>
           </v-col>
           <v-col cols="12" v-if="selectedAnswerType">
-            <component :is="selectedAnswerType" @done='createQuestion'/>
+            <component :is="selectedAnswerType" @done='createQuestion' :loading="loading"/>
           </v-col>
         </v-row>
       </v-col>
@@ -119,6 +119,7 @@ import Vue from 'vue'
 import vuetify from "@/plugins/vuetify"
 import {TiptapVuetifyPlugin} from 'tiptap-vuetify'
 import 'tiptap-vuetify/dist/main.css'
+
 Vue.use(TiptapVuetifyPlugin, {
   vuetify,
   iconsGroup: 'md'
@@ -157,12 +158,13 @@ export default {
   },
   data() {
     return {
+      loading: false,
       // question data
-      selectedCategoriesId: null,
+      categoryId: null,
       text: "",
       commentary: "",
-      selectedQuestionLevel: null,
-      selectedQuestionType: null,
+      questionLevel: null,
+      questionType: null,
       selectedAnswerType: null,
       // declare extensions you want to use  in html editor
       extensions: [
@@ -191,11 +193,11 @@ export default {
     }
   },
   computed: {
-    ...mapState('data', ["questionCategories","questionLevels","testTypes","answerTypes"])
+    ...mapState('data', ["categories", "questionLevels", "testTypes"])
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapMutations('data', ['ADD_QUESTION_TO_CATEGORY']),
+    ...mapMutations('data', ['CREATE_QUESTION']),
     /* Method called only from AnswerTypes/Create */
     createQuestion(answers) {
       let htmlEditorValidation = true;
@@ -206,19 +208,22 @@ export default {
       }
 
       if (this.$refs.form.validate() && htmlEditorValidation) {
-        let question = {
-          selectedCategoriesId: this.selectedCategoriesId,
-          text: this.text,
-          commentary: this.commentary,
-          selectedQuestionLevel: this.selectedQuestionLevel,
-          selectedQuestionType: this.selectedQuestionType,
-          selectedAnswerType: this.selectedAnswerType,
-          answers: answers
-        }
-        this.ADD_QUESTION_TO_CATEGORY(question);
-        this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
-      }
-      else {
+        this.loading = true;
+        setTimeout(() => {
+          let question = {
+            category_id: this.categoryId,
+            text: this.text,
+            commentary: this.commentary,
+            question_level: this.questionLevel,
+            question_type: this.questionType,
+            selectedAnswerType: this.selectedAnswerType,
+            answers: answers
+          }
+          this.CREATE_QUESTION(question);
+          this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
+          this.loading = false;
+        }, 800);
+      } else {
         /* scroll to error */
         this.$nextTick(() => {
           let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
@@ -230,7 +235,7 @@ export default {
   watch: {
     text() {
       let el = this.$el.querySelector(".html-editor--error");
-      if(el) el.classList.remove('html-editor--error');
+      if (el) el.classList.remove('html-editor--error');
     }
   }
 }

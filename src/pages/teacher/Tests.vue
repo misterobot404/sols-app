@@ -16,6 +16,11 @@
             :headers="headers"
             :items="tableData"
             :search="search"
+            no-results-text="Данные не найдены"
+            no-data-text="Нет данных"
+            multi-sort
+            show-expand
+            :expanded.sync="expanded"
         >
           <template v-slot:top>
             <v-toolbar flat class="mb-4">
@@ -27,7 +32,7 @@
               <v-text-field
                   v-model="search"
                   append-icon="search"
-                  label="Search"
+                  label="Поиск..."
                   style="max-width: 340px"
                   single-line
                   hide-details
@@ -35,11 +40,16 @@
             </v-toolbar>
           </template>
           <template v-slot:item.actions="{ item }">
+            <router-link :to="'/test/' + item.id">
+              <v-icon class="mr-2">
+                play_circle_outline
+              </v-icon>
+            </router-link>
             <v-icon
                 class="mr-2"
-                @click="console.log(item)"
+                @click="edit(item)"
             >
-              play_circle_outline
+              edit
             </v-icon>
             <v-icon
                 class="mr-2"
@@ -62,15 +72,26 @@
               </v-icon>
             </template>
           </template>
+          <template v-slot:expanded-item="{ headers, item }">
+            <td :colspan="headers.length" class="py-2 pl-16">
+              <div class="d-flex align-center">
+                <v-chip
+                    v-for="(categoryId) in item.category_ids"
+                    class="ma-2"
+                    :key="categoryId"
+                    v-text="getCategoryById(categoryId).name"
+                />
+              </div>
+            </td>
+          </template>
         </v-data-table>
-        <div v-for="(test,index) in tests" :key="index" v-text="test" class="mt-4"/>
       </v-col>
     </div>
   </v-container>
 </template>
 
 <script>
-import {mapMutations, mapState} from 'vuex'
+import {mapMutations, mapState, mapGetters} from 'vuex'
 
 export default {
   name: "Tests",
@@ -78,31 +99,59 @@ export default {
     return {
       showActive: true,
       search: "",
+      expanded: [],
       headers: [
-        {text: 'Название', value: 'name'},
-        {text: 'Тип', value: 'type'},
-        {text: 'Время прохождения', value: 'duration'},
-        {text: 'Кол-во вопросов', value: 'amount_questions'},
-        {text: 'Дата создания', value: 'created_at'},
-        {text: 'Дата начала', value: 'start_date'},
-        {text: 'Дата окончания', value: 'end_date'},
-        {text: 'Пароль', value: 'password'},
+        {text: 'Название', value: 'name', class: ''},
+        {text: 'Тип', value: 'type', class: ''},
+        {text: 'Кол-во вопросов', value: 'count_of_questions_by_lvl', class: ''},
+        {text: 'Время прохождения (мин.)', value: 'testing_time', class: 'small-table-col'},
+        {text: 'Дата начала', value: 'date_of_beginning', class: ''},
+        {text: 'Дата окончания', value: 'date_of_finishing', class: ''},
+        {text: 'Пароль', value: 'password', class: ''},
+        {text: 'Дата создания', value: 'created_at', class: ''},
         {text: 'Действия', value: 'actions', sortable: false, align: 'center'},
       ]
     }
   },
   computed: {
     ...mapState('data', ["tests"]),
+    ...mapGetters('data', ['getCategoryById']),
     tableData() {
+      // DATE FORMATTING FOR PRINTF TO TABLE
       let result = this.tests.map(a => Object.assign({}, a));
+      // filter tests by is_active
       result = result.filter(el => el.is_active === this.showActive);
+      // count + level of question
+      result.forEach(el => el.count_of_questions_by_lvl = el.count_of_questions_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' (' + el.count_of_questions_by_lvl.join('/') + ')');
+      // datetime
+      result.forEach(el => el.date_of_beginning ? el.date_of_beginning = el.date_of_beginning.toLocaleDateString('ru-RU') + ' ' + el.date_of_beginning.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : el.date_of_beginning = "Не установлена");
+      result.forEach(el => el.date_of_finishing ? el.date_of_finishing = el.date_of_finishing.toLocaleDateString('ru-RU') + ' ' + el.date_of_finishing.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : el.date_of_finishing = "Не установлена");
+      result.forEach(el => el.created_at = el.created_at.toLocaleDateString('ru-RU') + ' ' + el.created_at.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }));
+      // testing time
+      result.forEach(el => el.testing_time ? null : el.testing_time = "Не установлено");
+      // password
       result.forEach(el => el.password ? null : el.password = "Не установлен");
-      return result;
+      // show on data
+      return result.reverse();
     }
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapMutations('data', ['ARCHIVE_TEST','UNARCHIVE_TEST', 'DELETE_TEST']),
+    ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST', 'DELETE_TEST']),
+    edit(test) {
+      navigator.clipboard.writeText(test.name).then(() => {
+        this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
+      })
+    },
     share(test) {
       navigator.clipboard.writeText(test.name).then(() => {
         this.SHOW_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"});
@@ -148,5 +197,15 @@ export default {
     font-size: 22px;
     line-height: 27px;
   }
+}
+</style>
+
+<style>
+.small-table-col {
+  width: 160px;
+}
+
+.v-data-table > .v-data-table__wrapper tbody tr.v-data-table__expanded__content {
+  box-shadow: none;
 }
 </style>

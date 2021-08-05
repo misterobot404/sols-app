@@ -16,7 +16,7 @@
       <NavigationTeacher v-if="role === 'teacher'"/>
       <NavigationStudent v-else-if="role === 'student'"/>
       <!-- Page -->
-      <keep-alive>
+      <keep-alive exclude="Testing">
         <router-view/>
       </keep-alive>
     </v-main>

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="px-4 px-lg-8 px-xl-12">
+  <v-container class="px-4 px-lg-6">
     <!-- Logo -->
     <v-row class="mt-4 mt-xl-5 justify-center align-center flex-grow-0">
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-end">
@@ -11,11 +11,14 @@
     </v-row>
     <!-- Body -->
     <div class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8 mb-4" style="margin-top: 30px; background: #FEFEFF;">
-      <v-col cols="11" xl="10" class="pa-0">
+      <v-col cols="11" class="pa-0">
         <v-data-table
             :headers="headers"
-            :items="tests"
+            :items="tableData"
             :search="search"
+            no-results-text="Данные не найдены"
+            no-data-text="Нет данных"
+            locale="ru-RU"
         >
           <template v-slot:top>
             <v-toolbar flat class="mb-4">
@@ -23,7 +26,7 @@
               <v-text-field
                   v-model="search"
                   append-icon="search"
-                  label="Search"
+                  label="Поиск..."
                   style="max-width: 340px"
                   single-line
                   hide-details
@@ -31,7 +34,6 @@
             </v-toolbar>
           </template>
         </v-data-table>
-        <div v-for="(question,index) in questionCategories" :key="index" v-text="question"/>
       </v-col>
     </div>
   </v-container>
@@ -51,15 +53,31 @@ export default {
           value: 'name',
         },
         {text: 'Всего вопросов', value: 'subject_name'},
-        {text: 'Лёгких вопросов', value: 'created_at'},
-        {text: 'Средних вопросов', value: 'updated_at'},
-        {text: 'Сложных вопросов', value: 'йцу'},
-        {text: 'Действия', value: 'actions', sortable: false, align: 'center'},
+        {text: 'Лёгких вопросов', value: 'count_of_easy_q'},
+        {text: 'Средних вопросов', value: 'count_of_normal_q'},
+        {text: 'Сложных вопросов', value: 'count_of_hard_q'},
       ]
     }
   },
   computed: {
-    ...mapState('data', ["questionCategories"])
+    ...mapState('data', ["categories"]),
+    tableData() {
+      // DATE FORMATTING FOR PRINTF TO TABLE
+      let result = this.categories.map(a => Object.assign({}, a));
+      result.forEach(category => {
+        category.count_of_easy_q = 0;
+        category.count_of_normal_q = 0;
+        category.count_of_hard_q = 0;
+        category.questions.forEach(question => {
+          if (question) {
+            category.count_of_easy_q = 0;
+            category.count_of_normal_q = 0;
+            category.count_of_hard_q = 0;
+          }
+        })
+      })
+      return result;
+    }
   },
 }
 </script>
