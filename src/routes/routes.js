@@ -2,7 +2,7 @@
 export const routes = [
     {
         path: '/',
-        redirect: '/signin'
+        redirect: '/signin',
     },
     /* auth */
     {
@@ -10,7 +10,8 @@ export const routes = [
         path: '/signin',
         component: () => import('../pages/SignIn'),
         meta: {
-            title: "SOLS - Вход"
+            title: "SOLS - Вход",
+            hideForAuth: true
         }
     },
     {
@@ -18,21 +19,24 @@ export const routes = [
         path: '/signup',
         component: () => import('../pages/SignUp'),
         meta: {
-            title: "SOLS - Регистрация"
+            title: "SOLS - Регистрация",
+            hideForAuth: true
         }
     },
     {
         path: '/username-forget',
         component: () => import('../pages/UsernameForget'),
         meta: {
-            title: "SOLS - Восстановление логин"
+            title: "SOLS - Восстановление логин",
+            hideForAuth: true
         }
     },
     {
         path: '/password-forget',
         component: () => import('../pages/PasswordForget'),
         meta: {
-            title: "SOLS - Восстановление пароля"
+            title: "SOLS - Восстановление пароля",
+            hideForAuth: true
         }
     },
     /* testing  */
@@ -73,8 +77,8 @@ export const routes = [
         }
     },
     {
-        path: '/teacher/questions',
-        component: () => import('../pages/teacher/Questions'),
+        path: '/teacher/categories/:id?',
+        component: () => import('../pages/teacher/QuestionСategories'),
         meta: {
             title: "SOLS - База вопросов",
             middlewareAuth: "teacher"

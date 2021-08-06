@@ -20,7 +20,6 @@
           :key="link.title"
           class="d-flex my-11 navbar-link"
           active-class="navbar-active-link"
-          exact
           :to="link.url"
       >
         <v-icon x-large class="material-icons" v-text="link.icon"/>

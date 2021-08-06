@@ -12,8 +12,12 @@ const router = new VueRouter({
 
 // eslint-disable-next-line no-unused-vars
 router.beforeEach((to, from, next) => {
-    // checking access to the router
-    if (to.matched.some(record => record.meta.middlewareAuth && record.meta.middlewareAuth !== store.getters['auth/role'])) {
+    // hide page for auth users
+    if (to.matched.some(record => record.meta.hideForAuth && store.getters['auth/role'])) {
+        next({ path: '/' + store.getters['auth/role'] });
+    }
+    // page access check
+    else if (to.matched.some(record => record.meta.middlewareAuth && record.meta.middlewareAuth !== store.getters['auth/role'])) {
         store.commit("auth/LOGOUT", null, {root: true});
         next(false);
     } else {

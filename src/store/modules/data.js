@@ -39,7 +39,29 @@ export default {
         testTypes: ["Тест", "Викторина", "Опрос"],
         // question data
         questions: [
-            {}
+            {
+                category_id: "2",
+                commentary: "",
+                text: '<p>qweqwe</p>',
+                answers: [
+                    {text: "qweqwe"}
+                ],
+                // refs
+                level: "Средний",
+                type: "TextAnswer"
+            },
+            {
+                category_id: "1",
+                commentary: "Коментарий",
+                text: '<p>qweqwe</p>',
+                answers: [
+                    {"text": "1", "correct": true},
+                    {"text": "2", "correct": false}
+                ],
+                // refs
+                level: "Лёгкий",
+                type: "ChoiceAnswer"
+            }
         ],
         questionTypes: [
             {
@@ -63,7 +85,7 @@ export default {
                 name: "Альтернативный ввод"
             }
         ],
-        questionLevels: ["Легкий", "Средний", "Сложный"],
+        questionLevels: ["Лёгкий", "Средний", "Сложный"],
     },
     getters: {
         getCategoryById: state => id => {
@@ -74,6 +96,7 @@ export default {
         }
     },
     mutations: {
+        // TEST
         CREATE_TEST(state, test) {
             // data will be added to backend
             let nextId = 1;
@@ -97,9 +120,9 @@ export default {
             let testIndex = state.tests.findIndex(el => el.id === test_id);
             state.tests = state.tests.slice(testIndex, 1);
         },
-        CREATE_QUESTION(state, payload) {
-            let selectedCategories = state.questionCategories.find(el => el.id === payload.selectedCategoriesId);
-            selectedCategories.questions.push(payload);
+        // QUESTION
+        CREATE_QUESTION(state, question) {
+            state.questions.push(question);
         }
     }
 }

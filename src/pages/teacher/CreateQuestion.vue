@@ -16,7 +16,7 @@
     >
       <v-col cols="11" md="10" xl="9">
         <v-row class="align-center justify-center">
-          <v-col cols="12">
+          <v-col cols="12" md="6">
             <h4>Выберите категорию</h4>
             <v-select
                 v-model="categoryId"
@@ -28,6 +28,25 @@
                 :rules="[(v) => !!v ||  '']"
                 class="mt-2 mb-1 rounded-lg"
             />
+          </v-col>
+          <v-col cols="12" md="6" align-self="start" class="pl-md-8">
+            <h4>Уровень сложности</h4>
+            <v-radio-group
+                v-model="level"
+                :rules="[ !!level || '']"
+                row
+                class="d-flex justify-space-between"
+                hide-details
+            >
+              <v-radio
+                  v-for="n in questionLevels"
+                  :key="n"
+                  :label="n"
+                  :value="n"
+                  required
+                  class="mr-6 mt-1"
+              />
+            </v-radio-group>
           </v-col>
           <v-col cols="12">
             <h4>Текст вопроса</h4>
@@ -51,54 +70,20 @@
                 background-color="white"
             />
           </v-col>
-          <v-col cols="12" md="6">
-            <h4>Уровень сложности</h4>
-            <v-radio-group
-                v-model="questionLevel"
-                row
-                :rules="[ !!questionLevel || '']"
-            >
-              <v-radio
-                  v-for="n in questionLevels"
-                  :key="n"
-                  :label="n"
-                  :value="n"
-                  required
-                  class="mr-8 my-2"
-              />
-            </v-radio-group>
-          </v-col>
-          <v-col cols="12" md="6" align-self="start">
-            <h4>Тип вопроса</h4>
-            <v-radio-group
-                v-model="questionType"
-                row
-                :rules="[ !!questionType || '']"
-            >
-              <v-radio
-                  v-for="n in testTypes"
-                  :key="n"
-                  :label="n"
-                  :value="n"
-                  required
-                  class="mr-8 my-2"
-              />
-            </v-radio-group>
-          </v-col>
           <v-col cols="12">
             <h4>Тип ответа</h4>
-            <v-radio-group v-model="selectedAnswerType" row>
+            <v-radio-group v-model="type" row>
               <v-radio
-                  v-for="n in answerTypes"
+                  v-for="n in questionTypes"
                   :key="n.name"
                   :label="n.name"
                   :value="n.component"
-                  class="mr-7 my-2"
+                  class="mr-6 my-2"
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" v-if="selectedAnswerType">
-            <component :is="selectedAnswerType" @done='createQuestion' :loading="loading"/>
+          <v-col cols="12" v-if="this.type">
+            <component :is="this.type" @done='createQuestion' :loading="loading"/>
           </v-col>
         </v-row>
       </v-col>
@@ -120,10 +105,6 @@ import vuetify from "@/plugins/vuetify"
 import {TiptapVuetifyPlugin} from 'tiptap-vuetify'
 import 'tiptap-vuetify/dist/main.css'
 
-Vue.use(TiptapVuetifyPlugin, {
-  vuetify,
-  iconsGroup: 'md'
-})
 import {
   TiptapVuetify,
   Heading,
@@ -145,6 +126,11 @@ import {
   Image
 } from 'tiptap-vuetify'
 
+Vue.use(TiptapVuetifyPlugin, {
+  vuetify,
+  iconsGroup: 'md'
+})
+
 export default {
   name: "CreateQuestion",
   components: {
@@ -163,9 +149,8 @@ export default {
       categoryId: null,
       text: "",
       commentary: "",
-      questionLevel: null,
-      questionType: null,
-      selectedAnswerType: null,
+      level: null,
+      type: null,
       // declare extensions you want to use  in html editor
       extensions: [
         History,
@@ -193,7 +178,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('data', ["categories", "questionLevels", "testTypes"])
+    ...mapState('data', ["categories", "questionLevels", "questionTypes"])
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
@@ -214,9 +199,8 @@ export default {
             category_id: this.categoryId,
             text: this.text,
             commentary: this.commentary,
-            question_level: this.questionLevel,
-            question_type: this.questionType,
-            selectedAnswerType: this.selectedAnswerType,
+            level: this.level,
+            type: this.type,
             answers: answers
           }
           this.CREATE_QUESTION(question);
