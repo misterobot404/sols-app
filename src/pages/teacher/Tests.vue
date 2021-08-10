@@ -15,11 +15,14 @@
         <v-data-table
             :headers="headers"
             :items="tableData"
+            :loading="loading"
+            loader-height="2"
             :search="search"
             no-results-text="Данные не найдены"
             no-data-text="Нет данных"
             multi-sort
             show-expand
+            :footer-props="{'items-per-page-text':'Строк на странице:'}"
             :expanded.sync="expanded"
         >
           <template v-slot:top>
@@ -37,39 +40,43 @@
                   single-line
                   hide-details
               />
+              <v-btn icon class="ml-2" @click="sync">
+                <v-icon>
+                  sync
+                </v-icon>
+              </v-btn>
             </v-toolbar>
           </template>
           <template v-slot:item.actions="{ item }">
-            <router-link :to="'/test/' + item.id">
-              <v-icon class="mr-2">
-                play_circle_outline
+            <v-btn icon :to="'/test/' + item.id">
+              <v-icon>play_circle_outline</v-icon>
+            </v-btn>
+            <v-btn @click="edit(item)" icon>
+              <v-icon class="material-icons-outlined">
+                edit
               </v-icon>
-            </router-link>
-            <v-icon
-                class="mr-2"
-                @click="edit(item)"
-            >
-              edit
-            </v-icon>
-            <v-icon
-                class="mr-2"
-                @click="share(item)"
-            >
-              share
-            </v-icon>
-            <v-icon
-                v-if="item.is_active"
-                @click="archiveTest(item)"
-            >
-              archive
-            </v-icon>
+            </v-btn>
+            <v-btn @click="share(item)" icon>
+              <v-icon class="material-icons-outlined">
+                share
+              </v-icon>
+            </v-btn>
+            <v-btn v-if="item.is_active" @click="archiveTest(item)" icon>
+              <v-icon class="material-icons-outlined">
+                archive
+              </v-icon>
+            </v-btn>
             <template v-else>
-              <v-icon @click="unarchiveTest(item)" class="mr-2">
-                unarchive
-              </v-icon>
-              <v-icon @click="deleteTest(item)">
-                delete
-              </v-icon>
+              <v-btn icon @click="unarchiveTest(item)">
+                <v-icon class="material-icons-outlined">
+                  unarchive
+                </v-icon>
+              </v-btn>
+              <v-btn icon @click="deleteTest(item)">
+                <v-icon>
+                  delete_outline
+                </v-icon>
+              </v-btn>
             </template>
           </template>
           <template v-slot:expanded-item="{ headers, item }">
@@ -97,6 +104,7 @@ export default {
   name: "Tests",
   data() {
     return {
+      loading: false,
       showActive: true,
       search: "",
       expanded: [],
@@ -109,7 +117,7 @@ export default {
         {text: 'Дата окончания', value: 'date_of_finishing', class: ''},
         {text: 'Пароль', value: 'password', class: ''},
         {text: 'Дата создания', value: 'created_at', class: ''},
-        {text: 'Действия', value: 'actions', sortable: false, align: 'center'},
+        {value: 'actions', sortable: false, align: 'right'},
       ]
     }
   },
@@ -168,6 +176,13 @@ export default {
     deleteTest(test) {
       this.DELETE_TEST(test.id);
       this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "удалена" : "удалён")});
+    },
+    sync() {
+      this.loading = true;
+      setTimeout(() => {
+        this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
+        this.loading = false;
+      }, 1000);
     }
   }
 }

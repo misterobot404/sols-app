@@ -8,7 +8,8 @@
       class="h4"
       :class="$vuetify.breakpoint.lgAndUp ? 'lg-margin' : null"
       content-class="text-center"
-      timeout="3000"
+      :timeout="popupMsg.timeout"
+      transition="slide-y-transition"
   >
     {{ popupMsg.text }}
   </v-snackbar>

@@ -13,7 +13,7 @@
     <div class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8 mb-4" style="margin-top: 30px; background: #FEFEFF;">
       <v-col cols="11" class="pa-0">
         <CategoryTable v-if="!$route.params.id"/>
-        <QuestionTable v-else/>
+        <QuestionTable v-else :category-id="$route.params.id"/>
       </v-col>
     </div>
   </v-container>
@@ -24,7 +24,7 @@ import CategoryTable from "@/components/CategoryTable";
 import QuestionTable from "@/components/QuestionTable";
 
 export default {
-  name: "Questions",
+  name: "QuestionCategories",
   components: {QuestionTable, CategoryTable},
 }
 </script>

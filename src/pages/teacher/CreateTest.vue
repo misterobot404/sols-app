@@ -205,7 +205,7 @@
             />
           </v-col>
           <v-col align-self="end" class="d-flex justify-end mb-2 mt-2">
-            <v-btn @click="createTest()" class="success rounded-lg h4" x-large :loading="loading">Создать</v-btn>
+            <v-btn @click="createTest()" class="success rounded-lg h4 ml-2" x-large :loading="loading">Создать</v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -271,11 +271,26 @@ export default {
           this.CREATE_TEST(test);
           // Show msg
           this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
+          this.clear();
           this.loading = false;
         }, 800);
-
       }
     },
+    clear() {
+      // clear data
+      this.type = null;
+      this.name = null;
+      this.countOfQuestionsByLvl = [null, null, null];
+      this.categoryIds = null;
+      this.range = {
+        start: null,
+        end: null
+      };
+      this.testingTime = null;
+      this.password = null;
+      // clear form valid
+      this.$refs.form.resetValidation();
+    }
   },
   mounted() {
     // CRUTCH

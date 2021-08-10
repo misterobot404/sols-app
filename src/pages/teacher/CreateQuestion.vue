@@ -77,13 +77,13 @@
                   v-for="n in questionTypes"
                   :key="n.name"
                   :label="n.name"
-                  :value="n.component"
+                  :value="n"
                   class="mr-6 my-2"
               />
             </v-radio-group>
           </v-col>
           <v-col cols="12" v-if="this.type">
-            <component :is="this.type" @done='createQuestion' :loading="loading"/>
+            <component :is="this.type.component" @done='createQuestion' :loading="loading"/>
           </v-col>
         </v-row>
       </v-col>
@@ -200,10 +200,11 @@ export default {
             text: this.text,
             commentary: this.commentary,
             level: this.level,
-            type: this.type,
+            type_id: this.type.id,
             answers: answers
           }
           this.CREATE_QUESTION(question);
+          this.clear();
           this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
           this.loading = false;
         }, 800);
@@ -214,6 +215,10 @@ export default {
           this.$vuetify.goTo(el, {offset: 54});
         });
       }
+    },
+    clear() {
+      // clear data and valid
+      this.$refs.form.reset();
     }
   },
   watch: {

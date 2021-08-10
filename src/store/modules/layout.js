@@ -10,6 +10,8 @@ export default {
         // popup msg
         popupMsg: {
             show: false,
+            defaultTimeout: 2400,
+            timeout: 2400,
             text: "",
             // primary or error
             type: ""
@@ -32,10 +34,12 @@ export default {
         SHOW_MSG_DIALOG(state, payload) {
             state.popupMsg.type = payload.type;
             state.popupMsg.text = payload.text;
+            if (payload.timeout) state.popupMsg.timeout = payload.timeout;
             state.popupMsg.show = true;
         },
         HIDE_MSG_DIALOG(state) {
             state.popupMsg.show = false;
+            state.popupMsg.timeout = state.popupMsg.defaultTimeout;
         },
     }
 }

@@ -5,7 +5,6 @@ export default {
             {
                 id: "1",
                 name: "Математика",
-
             },
             {
                 id: "2",
@@ -20,7 +19,7 @@ export default {
                 name: "География",
             }
         ],
-        // test data
+        //
         tests: [
             {
                 "id": 1,
@@ -36,8 +35,9 @@ export default {
                 "created_at": new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
             }
         ],
+        // test data
         testTypes: ["Тест", "Викторина", "Опрос"],
-        // question data
+        //
         questions: [
             {
                 category_id: "2",
@@ -48,7 +48,7 @@ export default {
                 ],
                 // refs
                 level: "Средний",
-                type: "TextAnswer"
+                type_id: "2"
             },
             {
                 category_id: "1",
@@ -60,27 +60,33 @@ export default {
                 ],
                 // refs
                 level: "Лёгкий",
-                type: "ChoiceAnswer"
+                type_id: "1"
             }
         ],
+        // question data
         questionTypes: [
             {
+                id: "1",
                 component: "ChoiceAnswer",
                 name: "Выбор ответа"
             },
             {
+                id: "2",
                 component: "TextAnswer",
                 name: "Текстовый ввод"
             },
             {
+                id: "3",
                 component: "RangingAnswer",
                 name: "Ранжирование"
             },
             {
+                id: "4",
                 component: "ConformityAnswer",
                 name: "Соответствие"
             },
             {
+                id: "5",
                 component: "AlternativeAnswer",
                 name: "Альтернативный ввод"
             }
@@ -90,6 +96,12 @@ export default {
     getters: {
         getCategoryById: state => id => {
             return state.categories.find(category => category.id === id);
+        },
+        getQuestionsByCategoryId: state => id => {
+            return state.questions.filter(question => question.category_id === id);
+        },
+        getQuestionTypeNameById: state => id => {
+            return (state.questionTypes.find(type => type.id === id)).name;
         },
         getTestById: state => id => {
             return state.tests.find(test => test.id === id);
