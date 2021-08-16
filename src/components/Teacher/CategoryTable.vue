@@ -1,57 +1,67 @@
 <template>
-  <v-data-table
-      loader-height="2"
-      :loading="loading"
-      :headers="headers"
-      :items="tableData"
-      :search="search"
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-      no-results-text="Данные не найдены"
-      no-data-text="Нет данных"
-      @click:row="goToCategory"
-      class="row-pointer"
-      locale="ru-RU"
-      :footer-props="{'items-per-page-text':'Строк на странице:'}"
-  >
-    <template v-slot:top>
-      <v-toolbar flat class="mb-4">
-        <v-spacer/>
-        <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Поиск..."
-            style="max-width: 340px"
-            single-line
-            hide-details
-        />
-        <v-btn icon class="ml-2" @click="sync">
-          <v-icon>
-            sync
+  <div>
+    <v-data-table
+        loader-height="2"
+        :loading="loading"
+        :headers="headers"
+        :items="tableData"
+        :search="search"
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
+        no-results-text="Данные не найдены"
+        no-data-text="Нет данных"
+        @click:row="goToCategory"
+        class="row-pointer"
+        locale="ru-RU"
+        :footer-props="{'items-per-page-text':'Строк на странице:'}"
+    >
+      <template v-slot:top>
+        <v-toolbar flat class="mb-4">
+          <v-spacer/>
+          <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Поиск..."
+              style="max-width: 340px"
+              single-line
+              hide-details
+          />
+          <v-btn icon class="ml-2" @click="sync">
+            <v-icon>
+              sync
+            </v-icon>
+          </v-btn>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-btn icon @click.stop="openEditDialog(item.id)">
+          <v-icon class="material-icons-outlined">
+            edit
           </v-icon>
         </v-btn>
-      </v-toolbar>
-    </template>
-    <template v-slot:item.actions="{ item }">
-      <v-btn icon @click.stop="edit(item)">
-        <v-icon class="material-icons-outlined">
-          edit
-        </v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="deleteTest(item)">
-        <v-icon>
-          delete_outline
-        </v-icon>
-      </v-btn>
-    </template>
-  </v-data-table>
+        <v-btn icon @click.stop="deleteTest(item)">
+          <v-icon>
+            delete_outline
+          </v-icon>
+        </v-btn>
+      </template>
+    </v-data-table>
+    <CategoryEditDialog
+        v-if="editableCategoryId"
+        :show.sync="showEditDialog"
+        :category-id="editableCategoryId"
+    />
+  </div>
+
 </template>
 
 <script>
 import {mapMutations, mapState} from 'vuex'
+import CategoryEditDialog from "@/components/Teacher/CategoryEditDialog";
 
 export default {
   name: "CategoryTable",
+  components: {CategoryEditDialog},
   data() {
     return {
       loading: false,
@@ -68,7 +78,10 @@ export default {
         {text: 'Сложных вопросов', value: 'count_of_hard_q', align: 'center'},
         {text: 'Всего вопросов', value: 'count_of_questions', align: 'center'},
         {value: 'actions', sortable: false, align: 'right'}
-      ]
+      ],
+      // Edit dialog
+      showEditDialog: false,
+      editableCategoryId: null
     }
   },
   computed: {
@@ -104,7 +117,11 @@ export default {
         this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
         this.loading = false;
       }, 1000);
-    }
+    },
+    openEditDialog(categoryId) {
+      this.editableCategoryId = categoryId;
+      this.showEditDialog = true;
+    },
   }
 }
 </script>

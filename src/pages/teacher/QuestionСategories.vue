@@ -6,7 +6,7 @@
         <img class="questions-svg pr-lg-4" :src="require('@/assets/svg/Base-1.svg')" alt="Иконка создания">
       </v-col>
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="questions-title primary--text text-center text-lg-left">Список моих<br>категорий</span>
+        <span class="questions-title primary--text text-center text-lg-left">Список моих<br>{{ $route.params.id ? "вопросов" : "категорий" }}</span>
       </v-col>
     </v-row>
     <!-- Body -->
@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import CategoryTable from "@/components/CategoryTable";
-import QuestionTable from "@/components/QuestionTable";
+import CategoryTable from "@/components/Teacher/CategoryTable";
+import QuestionTable from "@/components/Teacher/QuestionTable";
 
 export default {
   name: "QuestionCategories",

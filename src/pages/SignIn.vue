@@ -28,7 +28,7 @@
                     class="mt-2 mb-1 rounded-lg"
                     background-color="white"
                 />
-                <router-link to="/username-forget" class="p-14-medium">Забыли логин?</router-link>
+                <router-link to="/username/reset" class="p-14-medium">Забыли логин?</router-link>
               </div>
               <div style="margin-top: 38px">
                 <h4>Пароль</h4>
@@ -41,12 +41,12 @@
                     background-color="white"
                     type="password"
                 />
-                <router-link to="/password-forget" class="p-14-medium">Забыли пароль?</router-link>
+                <router-link to="/password/reset" class="p-14-medium">Забыли пароль?</router-link>
               </div>
               <v-row style="margin-top: 26px">
                 <v-col cols="12" md="6">
                   <v-btn
-                      :to="{name: 'SignUp'}"
+                      :to="{path: '/signup'}"
                       class="primary rounded-lg h4"
                       style="min-height: 54px; white-space: normal"
                       type="submit"

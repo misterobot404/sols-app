@@ -35,7 +35,7 @@
       </v-toolbar>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-btn icon @click="edit(item)">
+      <v-btn icon :to="'/teacher/questions/' + item.id + '/edit'">
         <v-icon class="material-icons-outlined">
           edit
         </v-icon>
@@ -69,7 +69,7 @@ export default {
         {text: 'Уровень сложности', value: 'level'},
         {text: 'Тип', value: 'type_name'},
         {text: 'Примечание', value: 'commentary'},
-        {value: 'actions', sortable: false, align: 'right'},
+        {value: 'actions', sortable: false, align: 'right', class: 'small-table-col'},
       ]
     }
   },
@@ -87,7 +87,8 @@ export default {
         question.type_name = this.getQuestionTypeNameById(question.type_id);
         // remove html tags
         question.text = question.text.replace(/(<([^>]+)>)/gi, "");
-      })
+      });
+      result.forEach(el => el.commentary ? null : el.commentary = "Не установлено");
       return result.reverse();
     }
   },
@@ -103,3 +104,10 @@ export default {
   }
 }
 </script>
+
+
+<style>
+.small-table-col {
+  width: 160px;
+}
+</style>

@@ -1,17 +1,16 @@
 <template>
   <v-navigation-drawer
       :width="$vuetify.breakpoint.lgAndDown ? 280 : 320"
-      style="min-height: 100%"
       permanent
       :mini-variant="$vuetify.breakpoint.smAndDown"
       mini-variant-width="70"
       app
   >
-    <v-list-item class="text-center mt-8 mt-xl-12 d-none d-md-block">
+    <v-list-item class="mt-8 mt-xl-12 text-center d-none d-md-block">
       <router-link to="/teacher" class="mx-auto">
         <v-list-item-content>
           <v-list-item-title class="primary--text h1">SOLS</v-list-item-title>
-          <v-list-item-subtitle class="p-14-regular primary--text">для преподавателей</v-list-item-subtitle>
+          <v-list-item-subtitle class="p-14-regular primary--text">для студентов</v-list-item-subtitle>
         </v-list-item-content>
       </router-link>
     </v-list-item>
@@ -21,6 +20,7 @@
           :key="link.title"
           class="d-flex my-11 navbar-link"
           active-class="navbar-active-link"
+          exact
           :to="link.url"
       >
         <v-icon x-large class="material-icons" v-text="link.icon"/>
@@ -38,40 +38,25 @@
 import {mapMutations} from 'vuex'
 
 export default {
-  name: "NavigationTeacher",
+  name: "NavigationStudent",
   data() {
     return {
       links: [
         {
-          url: "/teacher/home",
+          url: "/student/home",
           title: 'Домашняя',
           icon: 'portrait'
         },
         {
-          url: "/teacher/create-test",
-          title: 'Создать',
-          icon: 'addchart',
-        },
-        {
-          url: "/teacher/create-question",
-          title: 'Конструктор',
-          icon: 'edit',
-        },
-        {
-          url: "/teacher/categories",
-          title: 'База вопросов',
-          icon: 'folder_open',
-        },
-        {
-          url: "/teacher/tests",
-          title: 'Список тестов',
-          icon: 'receipt_long',
-        },
-      ]
+          url: "/student/answers",
+          title: 'Мои ответы',
+          icon: 'done_all',
+        }
+      ],
     }
   },
   methods: {
     ...mapMutations(['auth/LOGOUT'])
   }
 }
-</script>>
+</script>

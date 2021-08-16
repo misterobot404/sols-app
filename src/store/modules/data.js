@@ -1,3 +1,5 @@
+// import axios from "axios";
+
 export default {
     namespaced: true,
     state: {
@@ -40,26 +42,28 @@ export default {
         //
         questions: [
             {
-                category_id: "2",
+                id: "1",
                 commentary: "",
+                level: "Средний",
                 text: '<p>qweqwe</p>',
                 answers: [
                     {text: "qweqwe"}
                 ],
                 // refs
-                level: "Средний",
+                category_id: "2",
                 type_id: "2"
             },
             {
-                category_id: "1",
+                id: "2",
                 commentary: "Коментарий",
+                level: "Лёгкий",
                 text: '<p>qweqwe</p>',
                 answers: [
                     {"text": "1", "correct": true},
                     {"text": "2", "correct": false}
                 ],
                 // refs
-                level: "Лёгкий",
+                category_id: "1",
                 type_id: "1"
             }
         ],
@@ -107,35 +111,152 @@ export default {
             return state.tests.find(test => test.id === id);
         }
     },
+    actions: {
+        // TEST
+        createTest({state, commit}, test) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        // data will be added to backend
+                        let nextId = 1;
+                        state.tests.forEach((el) => {
+                            if (el.id >= nextId) nextId = el.id + 1;
+                        });
+                        test.id = nextId;
+                        test.created_at = new Date();
+                        test.is_active = true;
+
+                        commit('CREATE_TEST', test);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        updateTest({commit}, test) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    commit('UPDATE_TEST', test);
+                    resolve();
+                }, 800)
+                }
+            )
+        },
+        deleteTest({commit}, id) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('DELETE_TEST', id);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        // QUESTION
+        createQuestion({state, commit}, question) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        // data will be added to backend
+                        let nextId = 1;
+                        state.tests.forEach((el) => {
+                            if (el.id >= nextId) nextId = el.id + 1;
+                        });
+                        question.id = nextId;
+
+                        commit('CREATE_QUESTION', question);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        updateQuestion({commit}, question) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('UPDATE_QUESTION', question);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        deleteQuestion({commit}, id) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('DELETE_QUESTION', id);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        // CATEGORY
+        createCategory({state, commit}, category) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        // data will be added to backend
+                        let nextId = 1;
+                        state.categories.forEach((el) => {
+                            if (el.id >= nextId) nextId = el.id + 1;
+                        });
+                        category.id = nextId;
+
+                        commit('CREATE_CATEGORY', category);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        updateCategory({commit}, category) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('UPDATE_CATEGORY', category);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+        deleteCategory({commit}, id) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('DELETE_CATEGORY', id);
+                        resolve();
+                    }, 800)
+                }
+            )
+        },
+    },
     mutations: {
         // TEST
         CREATE_TEST(state, test) {
-            // data will be added to backend
-            let nextId = 1;
-            state.tests.forEach((el) => {
-                if (el.id >= nextId) nextId = el.id + 1;
-            });
-            test.id = nextId;
-            test.created_at = new Date();
-
             state.tests.push(test);
         },
-        ARCHIVE_TEST(state, test_id) {
-            let test = state.tests.find(el => el.id === test_id);
-            test.is_active = false;
+        UPDATE_TEST(state, test) {
+            Object.assign(state.tests.find(el => el.id === test.id), test);
         },
-        UNARCHIVE_TEST(state, test_id) {
-            let test = state.tests.find(el => el.id === test_id);
-            test.is_active = true;
+        ARCHIVE_TEST(state, id) {
+            state.tests.find(el => el.id === id).is_active = false;
         },
-        DELETE_TEST(state, test_id) {
-            let testIndex = state.tests.findIndex(el => el.id === test_id);
-            state.tests = state.tests.slice(testIndex, 1);
+        UNARCHIVE_TEST(state, id) {
+            state.tests.find(el => el.id === id).is_active = true;
+        },
+        DELETE_TEST(state, id) {
+            state.tests = state.tests.filter((item) => item.id !== id);
         },
         // QUESTION
         CREATE_QUESTION(state, question) {
             state.questions.push(question);
-        }
+        },
+        UPDATE_QUESTION(state, question) {
+            Object.assign(state.questions.find(el => el.id === question.id), question);
+        },
+        DELETE_QUESTION(state, id) {
+            state.questions = state.questions.filter((item) => item.id !== id);
+        },
+        // CATEGORY
+        CREATE_CATEGORY(state, category) {
+            state.categories.push(category);
+        },
+        UPDATE_CATEGORY(state, category) {
+            Object.assign(state.categories.find(el => el.id === category.id), category);
+        },
+        DELETE_CATEGORY(state, id) {
+            state.categories = state.categories.filter((item) => item.id !== id);
+        },
     }
 }
 

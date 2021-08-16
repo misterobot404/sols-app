@@ -6,7 +6,7 @@
         <img class="create-test-svg pr-lg-4" :src="require('@/assets/svg/Create-1.svg')" alt="Иконка создания">
       </v-col>
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="create-test-title primary--text text-center text-lg-left">Создайте свой<br>опросник</span>
+        <span class="create-test-title primary--text text-center text-lg-left">Редактирование<br>теста</span>
       </v-col>
     </v-row>
     <!-- Body -->
@@ -47,7 +47,7 @@
           <v-col cols="12" md="6">
             <h4>Категории вопросов</h4>
             <v-select
-                v-model="categoryIds"
+                v-model="test.category_ids"
                 :items="categories"
                 :item-text="'name'"
                 :item-value="'id'"
@@ -66,7 +66,7 @@
             <v-row>
               <v-col cols="12" md="4">
                 <v-text-field
-                    v-model="countOfQuestionsByLvl[0]"
+                    v-model="test.count_of_questions_by_lvl[0]"
                     required
                     outlined
                     :rules="[(v) => !!v ||  '']"
@@ -78,7 +78,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
-                    v-model="countOfQuestionsByLvl[1]"
+                    v-model="test.count_of_questions_by_lvl[1]"
                     required
                     outlined
                     type="number"
@@ -90,7 +90,7 @@
               </v-col>
               <v-col cols="12" md="4">
                 <v-text-field
-                    v-model="countOfQuestionsByLvl[2]"
+                    v-model="test.count_of_questions_by_lvl[2]"
                     required
                     outlined
                     type="number"
@@ -133,6 +133,7 @@
           </v-col>
           <v-col cols="12" class="pa-0" v-show="showRange">
             <vc-date-picker
+                ref="datapicker"
                 v-model="range"
                 is-range
                 mode='dateTime'
@@ -143,7 +144,7 @@
                 locale="ru"
                 class="d-flex flex-wrap"
             >
-              <template v-slot="{ inputValue, inputEvents }">
+              <template v-slot="{ inputValue, inputEvents  }">
                 <v-col cols="12" md="6">
                   <h4>Дата начала</h4>
                   <v-text-field
@@ -180,7 +181,7 @@
           <v-col cols="12" md="6" v-show="showDuration">
             <h4>Время для прохождения (в минутах)</h4>
             <v-text-field
-                v-model="testingTime"
+                v-model="test.testing_time"
                 :rules="[(v) => !showDuration || !!v ||  '']"
                 required
                 append-icon="timer"
@@ -195,6 +196,7 @@
           <v-col align-self="end" cols="12" md="6" v-show="showPassword">
             <h4>Пароль</h4>
             <v-text-field
+                v-model="test.password"
                 hide-details
                 outlined
                 type="password"
@@ -205,7 +207,7 @@
             />
           </v-col>
           <v-col align-self="end" class="d-flex justify-end mb-2 mt-2">
-            <v-btn @click="createTest()" class="success rounded-lg h4 ml-2" x-large :loading="loading">Создать</v-btn>
+            <v-btn @click="lUpdateTest()" class="success rounded-lg h4 ml-2" x-large :loading="loading">Сохранить</v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -215,7 +217,7 @@
 
 <script>
 import Vue from 'vue'
-import {mapMutations, mapState} from 'vuex'
+import {mapGetters, mapMutations, mapState, mapActions} from 'vuex'
 import VCalendar from 'v-calendar';
 
 // Use v-calendar & v-date-picker components
@@ -224,71 +226,42 @@ Vue.use(VCalendar, {
 });
 
 export default {
-  name: "CreateTest",
+  name: "EditTest",
   data() {
     return {
       loading: false,
       valid: false,
-      showRange: true,
       rangeHideError: true,
-      showDuration: true,
+      showRange: false,
+      showDuration: false,
       showPassword: false,
-      // test data
-      type: null,
-      name: null,
-      countOfQuestionsByLvl: [null, null, null],
-      categoryIds: null,
+      // data
+      test: null,
       range: {
         start: null,
         end: null
-      },
-      testingTime: null,
-      password: null,
+      }
     }
   },
   computed: {
     ...mapState('data', ["categories", "testTypes"]),
+    ...mapGetters('data', ['getTestById'])
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapMutations('data', ['CREATE_TEST']),
-    createTest() {
+    ...mapActions('data', ['updateTest']),
+    lUpdateTest() {
       if (this.$refs.form.validate()) {
-        let test = {
-          type: this.type,
-          name: this.name,
-          count_of_questions_by_lvl: this.countOfQuestionsByLvl,
-          category_ids: this.categoryIds,
-          date_of_beginning: this.showRange ? this.range.start : null,
-          date_of_finishing: this.showRange ? this.range.end : null,
-          testing_time: this.showDuration ? this.testingTime : null,
-          password: this.showPassword ? this.password : null
-        }
-
         this.loading = true;
-        setTimeout(() => {
-          this.CREATE_TEST(test);
-          // Show msg
-          this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
-          this.clear();
-          this.loading = false;
-        }, 800);
+        this.test.date_of_beginning = this.range.start;
+        this.test.date_of_finishing = this.range.end;
+        this.updateTest(this.test)
+            .then(() => {
+              this.loading = false;
+              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
+              this.$router.push("/teacher/tests");
+            })
       }
-    },
-    clear() {
-      // clear data
-      this.type = null;
-      this.name = null;
-      this.countOfQuestionsByLvl = [null, null, null];
-      this.categoryIds = null;
-      this.range = {
-        start: null,
-        end: null
-      };
-      this.testingTime = null;
-      this.password = null;
-      // clear form valid
-      this.$refs.form.resetValidation();
     }
   },
   mounted() {
@@ -307,6 +280,24 @@ export default {
           }
         },
     );
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      Object.assign(vm.test, vm.getTestById(Number.parseInt(vm.$route.params.id)));
+
+      if (vm.test.date_of_beginning && vm.test.date_of_finishing) {
+        vm.range.start = new Date(vm.test.date_of_beginning);
+        vm.range.end = new Date(vm.test.date_of_finishing);
+        vm.$refs.datapicker.value_ = vm.range;
+        vm.showRange = true;
+      }
+      if (vm.test.testing_time) {
+        vm.showDuration = true;
+      }
+      if (vm.test.password) {
+        vm.showPassword = true;
+      }
+    })
   }
 }
 </script>

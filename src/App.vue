@@ -25,9 +25,9 @@
 
 <script>
 import {mapState} from 'vuex'
-import NavigationTeacher from "./components/NavigationTeacher";
-import NavigationStudent from "./components/NavigationStudent";
-import PopUpMsg from "@/components/PopUpMsg";
+import NavigationTeacher from "./components/Teacher/NavigationTeacher";
+import NavigationStudent from "./components/Student/NavigationStudent";
+import PopUpMsg from "@/components/Share/PopUpMsg";
 
 export default {
   name: 'App',

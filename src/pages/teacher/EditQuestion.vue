@@ -6,7 +6,7 @@
         <img class="create-test-svg pr-lg-4" :src="require('@/assets/svg/Kit.svg')" alt="Иконка создания">
       </v-col>
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="create-test-title primary--text text-center text-lg-left">Создайте перечень<br>вопросов</span>
+        <span class="create-test-title primary--text text-center text-lg-left">Редактируйте<br>вопрос</span>
       </v-col>
     </v-row>
     <!-- Body -->
@@ -83,7 +83,7 @@
             </v-radio-group>
           </v-col>
           <v-col cols="12" v-if="this.type">
-            <component :is="this.type.component" @done='lCreateQuestion' :loading="loading"/>
+            <component :is="this.type.component" @done='createQuestion' :loading="loading"/>
           </v-col>
         </v-row>
       </v-col>
@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import {mapMutations, mapState, mapActions} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 // import answer types
 import AlternativeAnswer from "../../components/Teacher/CreateQuestionTypes/AlternativeAnswer";
 import ChoiceAnswer from "../../components/Teacher/CreateQuestionTypes/ChoiceAnswer";
@@ -182,9 +182,9 @@ export default {
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data', ['createQuestion']),
+    ...mapMutations('data', ['CREATE_QUESTION']),
     /* Method called only from CreateQuestionTypes/Create */
-    lCreateQuestion(answers) {
+    createQuestion(answers) {
       let htmlEditorValidation = true;
       if (!this.text) {
         htmlEditorValidation = false;
@@ -193,22 +193,21 @@ export default {
       }
 
       if (this.$refs.form.validate() && htmlEditorValidation) {
-        let question = {
-          category_id: this.categoryId,
-          text: this.text,
-          commentary: this.commentary,
-          level: this.level,
-          type_id: this.type.id,
-          answers: answers
-        }
-
         this.loading = true;
-        this.createQuestion(question)
-            .then(() => {
-              this.loading = false;
-              this.clear();
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
-            })
+        setTimeout(() => {
+          let question = {
+            category_id: this.categoryId,
+            text: this.text,
+            commentary: this.commentary,
+            level: this.level,
+            type_id: this.type.id,
+            answers: answers
+          }
+          this.CREATE_QUESTION(question);
+          this.clear();
+          this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
+          this.loading = false;
+        }, 800);
       } else {
         /* scroll to error */
         this.$nextTick(() => {

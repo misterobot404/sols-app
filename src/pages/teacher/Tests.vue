@@ -6,7 +6,7 @@
         <img class="tests-svg pr-lg-4" :src="require('@/assets/svg/Select-option-1.svg')" alt="Иконка создания">
       </v-col>
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="tests-title primary--text text-center text-lg-left">Список моих<br>опросов</span>
+        <span class="tests-title primary--text text-center text-lg-left">Список моих<br>тестов</span>
       </v-col>
     </v-row>
     <!-- Body -->
@@ -48,10 +48,12 @@
             </v-toolbar>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-btn icon :to="'/test/' + item.id">
-              <v-icon>play_circle_outline</v-icon>
+            <v-btn icon :to="'/tests/' + item.id">
+              <v-icon>
+                play_circle_outline
+              </v-icon>
             </v-btn>
-            <v-btn @click="edit(item)" icon>
+            <v-btn icon :to="'/teacher/tests/' + item.id + '/edit'">
               <v-icon class="material-icons-outlined">
                 edit
               </v-icon>
@@ -111,12 +113,12 @@ export default {
       headers: [
         {text: 'Название', value: 'name', class: ''},
         {text: 'Тип', value: 'type', class: ''},
-        {text: 'Кол-во вопросов', value: 'count_of_questions_by_lvl', class: ''},
+        {text: 'Кол-во вопросов', value: 'count_of_questions_by_lvl'},
         {text: 'Время прохождения (мин.)', value: 'testing_time', class: 'small-table-col'},
-        {text: 'Дата начала', value: 'date_of_beginning', class: ''},
-        {text: 'Дата окончания', value: 'date_of_finishing', class: ''},
+        {text: 'Дата начала', value: 'date_of_beginning'},
+        {text: 'Дата окончания', value: 'date_of_finishing'},
         {text: 'Пароль', value: 'password', class: ''},
-        {text: 'Дата создания', value: 'created_at', class: ''},
+        {text: 'Дата создания', value: 'created_at'},
         {value: 'actions', sortable: false, align: 'right'},
       ]
     }
@@ -130,16 +132,16 @@ export default {
       // filter tests by is_active
       result = result.filter(el => el.is_active === this.showActive);
       // count + level of question
-      result.forEach(el => el.count_of_questions_by_lvl = el.count_of_questions_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' (' + el.count_of_questions_by_lvl.join('/') + ')');
+      result.forEach(el => el.count_of_questions_by_lvl = el.count_of_questions_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' ( ' + el.count_of_questions_by_lvl.join(' / ') + ' )');
       // datetime
       result.forEach(el => el.date_of_beginning ? el.date_of_beginning = el.date_of_beginning.toLocaleDateString('ru-RU') + ' ' + el.date_of_beginning.toLocaleTimeString('ru-RU', {
         hour: '2-digit',
         minute: '2-digit'
-      }) : el.date_of_beginning = "Не установлена");
+      }) : el.date_of_beginning = "Не установлено");
       result.forEach(el => el.date_of_finishing ? el.date_of_finishing = el.date_of_finishing.toLocaleDateString('ru-RU') + ' ' + el.date_of_finishing.toLocaleTimeString('ru-RU', {
         hour: '2-digit',
         minute: '2-digit'
-      }) : el.date_of_finishing = "Не установлена");
+      }) : el.date_of_finishing = "Не установлено");
       result.forEach(el => el.created_at = el.created_at.toLocaleDateString('ru-RU') + ' ' + el.created_at.toLocaleTimeString('ru-RU', {
         hour: '2-digit',
         minute: '2-digit'
@@ -147,7 +149,7 @@ export default {
       // testing time
       result.forEach(el => el.testing_time ? null : el.testing_time = "Не установлено");
       // password
-      result.forEach(el => el.password ? null : el.password = "Не установлен");
+      result.forEach(el => el.password ? null : el.password = "Не установлено");
       // show on data
       return result.reverse();
     }
@@ -155,11 +157,6 @@ export default {
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST', 'DELETE_TEST']),
-    edit(test) {
-      navigator.clipboard.writeText(test.name).then(() => {
-        this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
-      })
-    },
     share(test) {
       navigator.clipboard.writeText(test.name).then(() => {
         this.SHOW_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"});

@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import Feedback from "@/components/Feedback";
+import Feedback from "@/components/Share/Feedback";
 
 export default {
   name: "Home",
