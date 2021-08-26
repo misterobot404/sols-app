@@ -56,7 +56,7 @@ export default {
   name: "QuestionTable",
   props: {
     categoryId: {
-      type: String,
+      type: Number,
       required: true
     }
   },
@@ -77,14 +77,14 @@ export default {
     ...mapGetters('data', [
       'getCategoryById',
       'getQuestionsByCategoryId',
-      'getQuestionTypeNameById'
+      'getQuestionTypeById'
     ]),
     ...mapState('data', ["categories", "questions"]),
     tableData() {
       // DATE FORMATTING FOR PRINTF TO TABLE
       let result = this.getQuestionsByCategoryId(this.categoryId).map(a => Object.assign({}, a));
       result.forEach(question => {
-        question.type_name = this.getQuestionTypeNameById(question.type_id);
+        question.type_name = this.getQuestionTypeById(question.type_id).name;
         // remove html tags
         question.text = question.text.replace(/(<([^>]+)>)/gi, "");
       });

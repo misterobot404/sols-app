@@ -48,7 +48,7 @@ import {mapMutations} from "vuex";
 
 export default {
   name: "TextAnswer",
-  props: ["loading"],
+  props: ["data", "loading"],
   data() {
     return {
       answers: [
@@ -84,6 +84,14 @@ export default {
     },
     removeAnswer(index) {
       this.answers.splice(index, 1);
+    }
+  },
+  watch: {
+    data: {
+      handler(val) {
+        if (val) this.answers = val;
+      },
+      immediate: true
     }
   }
 }

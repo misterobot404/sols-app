@@ -1,10 +1,11 @@
 <template>
   <v-row>
-    <v-col v-for="(answer, index) in answers" cols="12" :key="index">
+    <v-col v-for="(el, index) in answers" cols="12" :key="index">
       <div class="d-flex align-center mb-3">
         <h4>Вариант ответа</h4>
         <v-checkbox
-            v-model="answer.correct"
+            :input-value="rightAnswers.includes(el)"
+            @click="rightAnswerClick(el)"
             class="mx-4 my-0"
             hide-details
         >
@@ -28,7 +29,7 @@
         </v-tooltip>
       </div>
       <v-textarea
-          v-model="answer.text"
+          v-model="answers[index]"
           hide-details
           outlined
           auto-grow
@@ -53,23 +54,27 @@
 </template>
 
 <script>
+
 import {mapMutations} from "vuex";
 
 export default {
   name: "ChoiceAnswer",
-  props: ["loading"],
+  props: ["data", "loading"],
   data() {
     return {
-      answers: [
-        {
-          text: "",
-          correct: false
-        },
-        {
-          text: "",
-          correct: false
+      answers: ["", ""],
+      rightAnswers: []
+    }
+  },
+  watch: {
+    data: {
+      handler(val) {
+        if (val) {
+          this.answers = val.body;
+          this.rightAnswers = val.rightAnswer.answer;
         }
-      ]
+      },
+      immediate: true
     }
   },
   methods: {
@@ -78,9 +83,7 @@ export default {
       // check empty answer
       let emptyAnswerFound = false;
       this.answers.forEach((el) => {
-        if (el.text === "") {
-          emptyAnswerFound = true;
-        }
+        if (el.text === "") emptyAnswerFound = true
       });
       if (emptyAnswerFound) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
@@ -92,25 +95,26 @@ export default {
         return;
       }
       // check true answer
-      let trueAnswerNotFound = true;
-      this.answers.forEach((el) => {
-        if (el.correct === true) trueAnswerNotFound = false;
-      })
-      if (trueAnswerNotFound) {
+      if (!this.rightAnswers.length) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите хотя бы один правильный ответ"});
         return;
       }
       // emit answers to parent
-      this.$emit('done', this.answers)
+      this.$emit('done', {
+        body: this.answers,
+        rightAnswer: this.rightAnswers
+      })
     },
     addAnswer() {
-      this.answers.push({
-        text: "",
-        correct: false
-      })
+      this.answers.push("")
     },
     removeAnswer(index) {
       this.answers.splice(index, 1);
+    },
+    rightAnswerClick(answer) {
+      if (this.rightAnswers.includes(answer))
+        this.rightAnswers = this.rightAnswers.filter(e => e !== answer)
+      else this.rightAnswers.push(answer);
     }
   }
 }

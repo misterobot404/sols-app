@@ -10,16 +10,18 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <v-form ref="form"
-            class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
-            style="margin-top: 30px; background: #FEFEFF;"
+    <v-form
+        v-if="question"
+        ref="form"
+        class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
+        style="margin-top: 30px; background: #FEFEFF;"
     >
       <v-col cols="11" md="10" xl="9">
         <v-row class="align-center justify-center">
           <v-col cols="12" md="6">
             <h4>Выберите категорию</h4>
             <v-select
-                v-model="categoryId"
+                v-model="question.category_id"
                 :items="categories"
                 :item-text="'name'"
                 :item-value="'id'"
@@ -32,8 +34,8 @@
           <v-col cols="12" md="6" align-self="start" class="pl-md-8">
             <h4>Уровень сложности</h4>
             <v-radio-group
-                v-model="level"
-                :rules="[ !!level || '']"
+                v-model="question.level"
+                :rules="[ !!question.level || '']"
                 row
                 class="d-flex justify-space-between"
                 hide-details
@@ -51,17 +53,17 @@
           <v-col cols="12">
             <h4>Текст вопроса</h4>
             <tiptap-vuetify
-                v-model="text"
+                v-model="question.text"
                 class="mt-3"
                 :toolbar-attributes="{ color: 'rgba(0, 0, 0, 0.04)' }"
-                :extensions="extensions"
+                :extensions="htmlExtensions"
                 :card-props="{ outlined: true, class: 'html-editor rounded-lg' }"
             />
           </v-col>
           <v-col cols="12">
             <h4>Примечание к вопросу</h4>
             <v-text-field
-                v-model="commentary"
+                v-model="question.commentary"
                 required
                 hide-details
                 append-icon="error_outline"
@@ -72,18 +74,23 @@
           </v-col>
           <v-col cols="12">
             <h4>Тип ответа</h4>
-            <v-radio-group v-model="type" row>
+            <v-radio-group v-model="question.type_id" row>
               <v-radio
                   v-for="n in questionTypes"
-                  :key="n.name"
+                  :key="n.id"
                   :label="n.name"
-                  :value="n"
+                  :value="n.id"
                   class="mr-6 my-2"
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" v-if="this.type">
-            <component :is="this.type.component" @done='createQuestion' :loading="loading"/>
+          <v-col cols="12">
+            <component
+                :is="getQuestionTypeById(question.type_id).component"
+                :data="{ body: question.body, rightAnswer: rightAnswer }"
+                @done='lUpdateQuestion'
+                :loading="loading"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -92,47 +99,17 @@
 </template>
 
 <script>
-import {mapMutations, mapState} from 'vuex'
-// import answer types
+import {mapMutations, mapActions, mapState, mapGetters} from 'vuex'
+import htmlExtensions from '@/plugins/tiptapDefaultExtensions'
+import {TiptapVuetify} from 'tiptap-vuetify'
 import AlternativeAnswer from "../../components/Teacher/CreateQuestionTypes/AlternativeAnswer";
 import ChoiceAnswer from "../../components/Teacher/CreateQuestionTypes/ChoiceAnswer";
 import ConformityAnswer from "../../components/Teacher/CreateQuestionTypes/ConformityAnswer";
 import RangingAnswer from "../../components/Teacher/CreateQuestionTypes/RangingAnswer";
 import TextAnswer from "../../components/Teacher/CreateQuestionTypes/TextAnswer";
-// import TipTap - html editor
-import Vue from 'vue'
-import vuetify from "@/plugins/vuetify"
-import {TiptapVuetifyPlugin} from 'tiptap-vuetify'
-import 'tiptap-vuetify/dist/main.css'
-
-import {
-  TiptapVuetify,
-  Heading,
-  Bold,
-  Italic,
-  Strike,
-  Underline,
-  Code,
-  CodeBlock,
-  Paragraph,
-  BulletList,
-  OrderedList,
-  ListItem,
-  Link,
-  Blockquote,
-  HardBreak,
-  HorizontalRule,
-  History,
-  Image
-} from 'tiptap-vuetify'
-
-Vue.use(TiptapVuetifyPlugin, {
-  vuetify,
-  iconsGroup: 'md'
-})
 
 export default {
-  name: "CreateQuestion",
+  name: "EditQuestion",
   components: {
     TiptapVuetify,
     // answer types
@@ -145,48 +122,27 @@ export default {
   data() {
     return {
       loading: false,
-      // question data
-      categoryId: null,
-      text: "",
-      commentary: "",
-      level: null,
-      type: null,
-      // declare extensions you want to use  in html editor
-      extensions: [
-        History,
-        Link,
-        [Heading, {
-          options: {
-            levels: [1, 2, 3, 4]
-          }
-        }],
-        Underline,
-        Strike,
-        Italic,
-        Bold,
-        ListItem,
-        BulletList,
-        OrderedList,
-        Blockquote,
-        HorizontalRule,
-        Paragraph,
-        HardBreak,
-        Code,
-        CodeBlock,
-        Image
-      ],
+      question: null,
+      rightAnswer: null,
+      htmlExtensions,
     }
   },
   computed: {
-    ...mapState('data', ["categories", "questionLevels", "questionTypes"])
+    ...mapState('data', ["categories", "questionLevels", "questionTypes"]),
+    ...mapGetters('data', ['getQuestionById', 'getQuestionTypeById','getRightAnswerByQuestionId'])
+  },
+  watch: {
+    'question.text'() {
+      let el = this.$el.querySelector(".html-editor--error");
+      if (el) el.classList.remove('html-editor--error');
+    }
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapMutations('data', ['CREATE_QUESTION']),
-    /* Method called only from CreateQuestionTypes/Create */
-    createQuestion(answers) {
+    ...mapActions('data', ['updateQuestion']),
+    lUpdateQuestion(data) {
       let htmlEditorValidation = true;
-      if (!this.text) {
+      if (!this.question.text) {
         htmlEditorValidation = false;
         let el = this.$el.querySelector(".html-editor");
         el.classList.add('html-editor--error');
@@ -194,20 +150,14 @@ export default {
 
       if (this.$refs.form.validate() && htmlEditorValidation) {
         this.loading = true;
-        setTimeout(() => {
-          let question = {
-            category_id: this.categoryId,
-            text: this.text,
-            commentary: this.commentary,
-            level: this.level,
-            type_id: this.type.id,
-            answers: answers
-          }
-          this.CREATE_QUESTION(question);
-          this.clear();
-          this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
-          this.loading = false;
-        }, 800);
+
+        this.question.body = [...data.body];
+        this.updateQuestion(this.question)
+            .then(() => {
+              this.loading = false;
+              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
+              this.$router.back();
+            })
       } else {
         /* scroll to error */
         this.$nextTick(() => {
@@ -215,17 +165,13 @@ export default {
           this.$vuetify.goTo(el, {offset: 54});
         });
       }
-    },
-    clear() {
-      // clear data and valid
-      this.$refs.form.reset();
     }
   },
-  watch: {
-    text() {
-      let el = this.$el.querySelector(".html-editor--error");
-      if (el) el.classList.remove('html-editor--error');
-    }
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.question = Object.assign({}, vm.getQuestionById(Number(vm.$route.params.id)));
+      vm.rightAnswer = vm.getRightAnswerByQuestionId(Number(vm.$route.params.id));
+    })
   }
 }
 </script>
@@ -256,7 +202,6 @@ export default {
   }
 }
 </style>
-
 <style>
 .html-editor {
   width: 100%;

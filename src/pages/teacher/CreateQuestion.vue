@@ -54,7 +54,7 @@
                 v-model="text"
                 class="mt-3"
                 :toolbar-attributes="{ color: 'rgba(0, 0, 0, 0.04)' }"
-                :extensions="extensions"
+                :extensions="htmlExtensions"
                 :card-props="{ outlined: true, class: 'html-editor rounded-lg' }"
             />
           </v-col>
@@ -72,18 +72,22 @@
           </v-col>
           <v-col cols="12">
             <h4>Тип ответа</h4>
-            <v-radio-group v-model="type" row>
+            <v-radio-group v-model="typeId" row>
               <v-radio
                   v-for="n in questionTypes"
-                  :key="n.name"
+                  :key="n.id"
                   :label="n.name"
-                  :value="n"
+                  :value="n.id"
                   class="mr-6 my-2"
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" v-if="this.type">
-            <component :is="this.type.component" @done='lCreateQuestion' :loading="loading"/>
+          <v-col cols="12" v-if="this.typeId">
+            <component
+                :is="getQuestionTypeById(typeId).component"
+                @done='lCreateQuestion'
+                :loading="loading"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -92,45 +96,14 @@
 </template>
 
 <script>
-import {mapMutations, mapState, mapActions} from 'vuex'
-// import answer types
+import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
+import {TiptapVuetify} from 'tiptap-vuetify'
+import htmlExtensions from '@/plugins/tiptapDefaultExtensions'
 import AlternativeAnswer from "../../components/Teacher/CreateQuestionTypes/AlternativeAnswer";
 import ChoiceAnswer from "../../components/Teacher/CreateQuestionTypes/ChoiceAnswer";
 import ConformityAnswer from "../../components/Teacher/CreateQuestionTypes/ConformityAnswer";
 import RangingAnswer from "../../components/Teacher/CreateQuestionTypes/RangingAnswer";
 import TextAnswer from "../../components/Teacher/CreateQuestionTypes/TextAnswer";
-// import TipTap - html editor
-import Vue from 'vue'
-import vuetify from "@/plugins/vuetify"
-import {TiptapVuetifyPlugin} from 'tiptap-vuetify'
-import 'tiptap-vuetify/dist/main.css'
-
-import {
-  TiptapVuetify,
-  Heading,
-  Bold,
-  Italic,
-  Strike,
-  Underline,
-  Code,
-  CodeBlock,
-  Paragraph,
-  BulletList,
-  OrderedList,
-  ListItem,
-  Link,
-  Blockquote,
-  HardBreak,
-  HorizontalRule,
-  History,
-  Image
-} from 'tiptap-vuetify'
-
-Vue.use(TiptapVuetifyPlugin, {
-  vuetify,
-  iconsGroup: 'md'
-})
-
 export default {
   name: "CreateQuestion",
   components: {
@@ -145,46 +118,23 @@ export default {
   data() {
     return {
       loading: false,
+      htmlExtensions,
       // question data
       categoryId: null,
       text: "",
       commentary: "",
       level: null,
-      type: null,
-      // declare extensions you want to use  in html editor
-      extensions: [
-        History,
-        Link,
-        [Heading, {
-          options: {
-            levels: [1, 2, 3, 4]
-          }
-        }],
-        Underline,
-        Strike,
-        Italic,
-        Bold,
-        ListItem,
-        BulletList,
-        OrderedList,
-        Blockquote,
-        HorizontalRule,
-        Paragraph,
-        HardBreak,
-        Code,
-        CodeBlock,
-        Image
-      ],
+      typeId: null,
     }
   },
   computed: {
-    ...mapState('data', ["categories", "questionLevels", "questionTypes"])
+    ...mapState('data', ["categories", "questionLevels", "questionTypes"]),
+    ...mapGetters('data',['getQuestionTypeById'])
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapActions('data', ['createQuestion']),
-    /* Method called only from CreateQuestionTypes/Create */
-    lCreateQuestion(answers) {
+    lCreateQuestion(data) {
       let htmlEditorValidation = true;
       if (!this.text) {
         htmlEditorValidation = false;
@@ -198,17 +148,16 @@ export default {
           text: this.text,
           commentary: this.commentary,
           level: this.level,
-          type_id: this.type.id,
-          answers: answers
+          type_id: this.typeId,
+          body: [...data.body],
         }
-
         this.loading = true;
-        this.createQuestion(question)
+        this.createQuestion({question: question, rightAnswer: [...data.rightAnswer]})
             .then(() => {
               this.loading = false;
               this.clear();
               this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
-            })
+            });
       } else {
         /* scroll to error */
         this.$nextTick(() => {
@@ -218,6 +167,7 @@ export default {
       }
     },
     clear() {
+      this.text = "";
       // clear data and valid
       this.$refs.form.reset();
     }
@@ -257,7 +207,6 @@ export default {
   }
 }
 </style>
-
 <style>
 .html-editor {
   width: 100%;

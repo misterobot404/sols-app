@@ -20,7 +20,7 @@
           <v-col cols="12" md="6">
             <h4>Название</h4>
             <v-text-field
-                v-model="name"
+                v-model="test.name"
                 required
                 :rules="[(v) => !!v ||  '']"
                 hide-details
@@ -33,7 +33,7 @@
           <v-col cols="12" md="6">
             <h4>Тип</h4>
             <v-select
-                v-model="type"
+                v-model="test.type"
                 required
                 hide-details
                 :items="testTypes"
@@ -64,39 +64,16 @@
           <v-col cols="12" md="6">
             <h4 class="mb-3">Количество вопросов</h4>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="4" v-for="(_, i) in countOfQuestionsByLvl" :key="i">
                 <v-text-field
-                    v-model="test.count_of_questions_by_lvl[0]"
+                    v-model="countOfQuestionsByLvl[i]"
                     required
                     outlined
                     :rules="[(v) => !!v ||  '']"
                     hide-details
                     type="number"
-                    label="Лёгкие"
-                    class="rounded-lg"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                    v-model="test.count_of_questions_by_lvl[1]"
-                    required
-                    outlined
-                    type="number"
-                    :rules="[(v) => !!v ||  '']"
-                    hide-details
-                    label="Средние"
-                    class="rounded-lg"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                    v-model="test.count_of_questions_by_lvl[2]"
-                    required
-                    outlined
-                    type="number"
-                    :rules="[(v) => !!v ||  '']"
-                    hide-details
-                    label="Сложные"
+                    min="0"
+                    :label="i === 0 ? 'Лёгкие' : i === 1 ? 'Средние' : 'Сложные'"
                     class="rounded-lg"
                 />
               </v-col>
@@ -220,7 +197,6 @@ import Vue from 'vue'
 import {mapGetters, mapMutations, mapState, mapActions} from 'vuex'
 import VCalendar from 'v-calendar';
 
-// Use v-calendar & v-date-picker components
 Vue.use(VCalendar, {
   componentPrefix: 'vc'
 });
@@ -235,12 +211,14 @@ export default {
       showRange: false,
       showDuration: false,
       showPassword: false,
-      // data
-      test: null,
+
+      test: {},
+      // problem data
       range: {
         start: null,
         end: null
-      }
+      },
+      countOfQuestionsByLvl: []
     }
   },
   computed: {
@@ -253,8 +231,11 @@ export default {
     lUpdateTest() {
       if (this.$refs.form.validate()) {
         this.loading = true;
+
         this.test.date_of_beginning = this.range.start;
         this.test.date_of_finishing = this.range.end;
+        this.test.count_of_questions_by_lvl = this.countOfQuestionsByLvl;
+
         this.updateTest(this.test)
             .then(() => {
               this.loading = false;
@@ -283,7 +264,8 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      Object.assign(vm.test, vm.getTestById(Number.parseInt(vm.$route.params.id)));
+      Object.assign(vm.test, vm.getTestById(vm.$route.params.id));
+      vm.countOfQuestionsByLvl = [...vm.test.count_of_questions_by_lvl];
 
       if (vm.test.date_of_beginning && vm.test.date_of_finishing) {
         vm.range.start = new Date(vm.test.date_of_beginning);

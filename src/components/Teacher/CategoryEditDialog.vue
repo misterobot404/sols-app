@@ -52,7 +52,7 @@ export default {
   data() {
     return {
       loading: false,
-      category: null
+      category: {}
     }
   },
   computed: {
@@ -61,7 +61,7 @@ export default {
   watch: {
     show: {
       handler(val) {
-        if (val) this.category = Object.assign({}, this.getCategoryById(this.categoryId));
+        if (val) Object.assign(this.category, this.getCategoryById(this.categoryId));
       },
       immediate: true
     }

@@ -31,7 +31,11 @@ import PopUpMsg from "@/components/Share/PopUpMsg";
 
 export default {
   name: 'App',
-  components: {PopUpMsg, NavigationStudent, NavigationTeacher},
+  components: {
+    PopUpMsg,
+    NavigationStudent,
+    NavigationTeacher
+  },
   computed: {
     ...mapState('auth', ["role"]),
     ...mapState('layout', ["pageLoading"]),

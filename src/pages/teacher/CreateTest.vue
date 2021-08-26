@@ -64,39 +64,16 @@
           <v-col cols="12" md="6">
             <h4 class="mb-3">Количество вопросов</h4>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="4" v-for="(_, i) in countOfQuestionsByLvl" :key="i">
                 <v-text-field
-                    v-model="countOfQuestionsByLvl[0]"
+                    v-model="countOfQuestionsByLvl[i]"
                     required
                     outlined
                     :rules="[(v) => !!v ||  '']"
                     hide-details
                     type="number"
-                    label="Лёгкие"
-                    class="rounded-lg"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                    v-model="countOfQuestionsByLvl[1]"
-                    required
-                    outlined
-                    type="number"
-                    :rules="[(v) => !!v ||  '']"
-                    hide-details
-                    label="Средние"
-                    class="rounded-lg"
-                />
-              </v-col>
-              <v-col cols="12" md="4">
-                <v-text-field
-                    v-model="countOfQuestionsByLvl[2]"
-                    required
-                    outlined
-                    type="number"
-                    :rules="[(v) => !!v ||  '']"
-                    hide-details
-                    label="Сложные"
+                    min="0"
+                    :label="i === 0 ? 'Лёгкие' : i === 1 ? 'Средние' : 'Сложные'"
                     class="rounded-lg"
                 />
               </v-col>
@@ -205,7 +182,7 @@
             />
           </v-col>
           <v-col align-self="end" class="d-flex justify-end mb-2 mt-2">
-            <v-btn @click="createTest()" class="success rounded-lg h4 ml-2" x-large :loading="loading">Создать</v-btn>
+            <v-btn @click="lCreateTest()" class="success rounded-lg h4 ml-2" x-large :loading="loading">Создать</v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -215,7 +192,7 @@
 
 <script>
 import Vue from 'vue'
-import {mapMutations, mapState} from 'vuex'
+import {mapMutations, mapState, mapActions} from 'vuex'
 import VCalendar from 'v-calendar';
 
 // Use v-calendar & v-date-picker components
@@ -251,8 +228,8 @@ export default {
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapMutations('data', ['CREATE_TEST']),
-    createTest() {
+    ...mapActions('data', ['createTest']),
+    lCreateTest() {
       if (this.$refs.form.validate()) {
         let test = {
           type: this.type,
@@ -264,15 +241,13 @@ export default {
           testing_time: this.showDuration ? this.testingTime : null,
           password: this.showPassword ? this.password : null
         }
-
         this.loading = true;
-        setTimeout(() => {
-          this.CREATE_TEST(test);
-          // Show msg
-          this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
-          this.clear();
-          this.loading = false;
-        }, 800);
+        this.createTest(test)
+            .then(() => {
+              this.loading = false;
+              this.clear();
+              this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "создана" : "создан")});
+            });
       }
     },
     clear() {
