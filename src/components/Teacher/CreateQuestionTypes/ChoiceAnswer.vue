@@ -4,7 +4,7 @@
       <div class="d-flex align-center mb-3">
         <h4>Вариант ответа</h4>
         <v-checkbox
-            :input-value="rightAnswers.includes(el)"
+            :input-value="right_answer.find(v => v.id === el.id)"
             @click="rightAnswerClick(el)"
             class="mx-4 my-0"
             hide-details
@@ -29,7 +29,7 @@
         </v-tooltip>
       </div>
       <v-textarea
-          v-model="answers[index]"
+          v-model="el.text"
           hide-details
           outlined
           auto-grow
@@ -62,16 +62,24 @@ export default {
   props: ["data", "loading"],
   data() {
     return {
-      answers: ["", ""],
-      rightAnswers: []
+      answers: [
+        {id: 1, text: ""},
+        {id: 2, text: ""},
+      ],
+      right_answer: []
     }
   },
   watch: {
     data: {
       handler(val) {
         if (val) {
-          this.answers = val.body;
-          this.rightAnswers = val.rightAnswer.answer;
+          let next_id = 1;
+          this.answers = val.body.map(el => {
+            return {id: next_id++, text: el}
+          });
+          this.right_answer = val.right_answer.map(el => {
+            return {id: this.answers.find(answer => answer.text === el).id, text: el}
+          });
         }
       },
       immediate: true
@@ -81,13 +89,16 @@ export default {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     done() {
       // check empty answer
-      let emptyAnswerFound = false;
-      this.answers.forEach((el) => {
-        if (el.text === "") emptyAnswerFound = true
-      });
-      if (emptyAnswerFound) {
+      if (this.answers.find(el => !el.text)) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
         return;
+      }
+      // check duplicate
+      for (let i = 0; i < this.answers.length; i++) {
+        if (this.answers.find(v => this.answers[i].id !== v.id && this.answers[i].text === v.text)) {
+          this.SHOW_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
+          return;
+        }
       }
       // check answer count
       if (this.answers.length < 2) {
@@ -95,26 +106,26 @@ export default {
         return;
       }
       // check true answer
-      if (!this.rightAnswers.length) {
+      if (!this.right_answer.length) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите хотя бы один правильный ответ"});
         return;
       }
       // emit answers to parent
       this.$emit('done', {
-        body: this.answers,
-        rightAnswer: this.rightAnswers
+        body: this.answers.map(el => el.text),
+        right_answer: this.right_answer.map(el => el.text),
       })
     },
     addAnswer() {
-      this.answers.push("")
+      this.answers.push({text: ""})
     },
     removeAnswer(index) {
       this.answers.splice(index, 1);
     },
     rightAnswerClick(answer) {
-      if (this.rightAnswers.includes(answer))
-        this.rightAnswers = this.rightAnswers.filter(e => e !== answer)
-      else this.rightAnswers.push(answer);
+      if (this.right_answer.find(el => el.id === answer.id))
+        this.right_answer = this.right_answer.filter(el => el.id !== answer.id)
+      else this.right_answer.push(answer);
     }
   }
 }

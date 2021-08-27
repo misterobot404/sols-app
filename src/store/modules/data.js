@@ -36,7 +36,7 @@ export default {
                 created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
             }
         ],
-        testTypes: ["Тест", "Викторина", "Опрос"],
+        test_types: ["Тест", "Викторина", "Опрос"],
         questions: [
             {
                 id: 1,
@@ -58,7 +58,7 @@ export default {
                 type_id: 1
             }
         ],
-        questionTypes: [
+        question_types: [
             {
                 id: 1,
                 component: "ChoiceAnswer",
@@ -85,8 +85,8 @@ export default {
                 name: "Альтернативный ввод"
             }
         ],
-        questionLevels: ["Лёгкий", "Средний", "Сложный"],
-        rightAnswers: [
+        question_levels: ["Лёгкий", "Средний", "Сложный"],
+        right_answers: [
             {
                 id: 1,
                 question_id: "1",
@@ -110,17 +110,16 @@ export default {
             return (state.questions.find(question => question.id === id));
         },
         getRightAnswerByQuestionId: state => id => {
-            return (state.rightAnswers.find(answer => answer.question_id === id));
+            return (state.right_answers.find(answer => answer.question_id === id));
         },
         getQuestionTypeById: state => id => {
-            return (state.questionTypes.find(type => type.id === id));
+            return (state.question_types.find(type => type.id === id));
         },
         getTestById: state => id => {
             return state.tests.find(test => test.id === id);
         }
     },
     actions: {
-        // TEST
         createTest({commit}, test) {
             return new Promise((resolve) => {
                     setTimeout(() => {
@@ -148,26 +147,27 @@ export default {
                 }
             )
         },
-        // QUESTION
-        createQuestion({state, commit}, {question, rightAnswer}) {
+
+        createQuestion({state, commit}, {question, right_answer}) {
             return new Promise((resolve) => {
                     setTimeout(() => {
                         commit('CREATE_QUESTION', question);
                         // Костыль. в будущем id созданного вопроса мы будем получать из api
                         commit('CREATE_RIGHT_ANSWER', {
                             question_id: state.questions[state.questions.length - 1].id,
-                            rightAnswer: rightAnswer
+                            rightAnswer: right_answer
                         })
                         resolve();
                     }, 800)
                 }
             )
         },
-        updateQuestion({commit}, {question, rightAnswer}) {
+        updateQuestion({commit}, {question, right_answer}) {
             return new Promise((resolve) => {
                     setTimeout(() => {
                         commit('UPDATE_QUESTION', question);
-                        commit('UPDATE_RIGHT_ANSWER', rightAnswer);
+                        console.log(right_answer);
+                        commit('UPDATE_RIGHT_ANSWER', right_answer);
                         resolve();
                     }, 800)
                 }
@@ -182,7 +182,7 @@ export default {
                 }
             )
         },
-        // CATEGORY
+
         createCategory({commit}, category) {
             return new Promise((resolve) => {
                     setTimeout(() => {
@@ -212,14 +212,13 @@ export default {
         },
     },
     mutations: {
-        // TEST
         CREATE_TEST(state, test) {
             // data will be added to backend
-            let nextId = 1;
+            let next_id = 1;
             state.tests.forEach((el) => {
-                if (el.id >= nextId) nextId = el.id + 1;
+                if (el.id >= next_id) next_id = el.id + 1;
             });
-            test.id = nextId;
+            test.id = next_id;
             test.created_at = new Date();
             test.is_active = true;
 
@@ -237,14 +236,14 @@ export default {
         DELETE_TEST(state, id) {
             state.tests = state.tests.filter((item) => item.id !== id);
         },
-        // QUESTION
+
         CREATE_QUESTION(state, question) {
             // data will be added to backend
-            let nextId = 1;
+            let next_id = 1;
             state.questions.forEach((el) => {
-                if (el.id >= nextId) nextId = el.id + 1;
+                if (el.id >= next_id) next_id = el.id + 1;
             });
-            question.id = nextId;
+            question.id = next_id;
 
             state.questions.push(question);
         },
@@ -254,31 +253,31 @@ export default {
         DELETE_QUESTION(state, id) {
             state.questions = state.questions.filter((item) => item.id !== id);
         },
-        // RIGHT ANSWER
-        CREATE_RIGHT_ANSWER(state, {question_id, rightAnswer}) {
+
+        CREATE_RIGHT_ANSWER(state, {question_id, right_answer}) {
             // data will be added to backend
-            let nextId = 1;
-            state.rightAnswers.forEach((el) => {
-                if (el.id >= nextId) nextId = el.id + 1;
+            let next_id = 1;
+            state.right_answers.forEach((el) => {
+                if (el.id >= next_id) next_id = el.id + 1;
             });
 
-            state.rightAnswers.push({
-                id: nextId,
+            state.right_answers.push({
+                id: next_id,
                 question_id: question_id,
-                answer: rightAnswer
+                answer: right_answer
             });
         },
-        UPDATE_RIGHT_ANSWER(state, rightAnswer) {
-            Object.assign(state.rightAnswers.find(el => el.id === rightAnswer.id), rightAnswer);
+        UPDATE_RIGHT_ANSWER(state, right_answer) {
+            Object.assign(state.right_answers.find(el => el.id === right_answer.id), right_answer);
         },
-        // CATEGORY
+
         CREATE_CATEGORY(state, category) {
             // data will be added to backend
-            let nextId = 1;
+            let next_id = 1;
             state.categories.forEach((el) => {
-                if (el.id >= nextId) nextId = el.id + 1;
+                if (el.id >= next_id) next_id = el.id + 1;
             });
-            category.id = nextId;
+            category.id = next_id;
 
             state.categories.push(category);
         },

@@ -101,16 +101,18 @@ export const routes = [
         }
     },
     {
+        name: "CreateQuestion",
         path: '/teacher/questions/create',
-        component: () => import('../pages/teacher/CreateQuestion'),
+        component: () => import('../pages/teacher/SetQuestionData'),
         meta: {
             title: "SOLS - Конструктор вопросов",
             middlewareAuth: "teacher"
         }
     },
     {
+        name: "EditQuestion",
         path: '/teacher/questions/:id/edit',
-        component: () => import('../pages/teacher/EditQuestion'),
+        component: () => import('../pages/teacher/SetQuestionData'),
         meta: {
             title: "SOLS - Редактирование вопроса",
             middlewareAuth: "teacher"

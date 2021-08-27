@@ -6,15 +6,15 @@
         <img class="create-test-svg pr-lg-4" :src="require('@/assets/svg/Kit.svg')" alt="Иконка создания">
       </v-col>
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="create-test-title primary--text text-center text-lg-left">Редактируйте<br>вопрос</span>
+        <span class="create-test-title primary--text text-center text-lg-left" style="white-space: pre-line">
+          {{ mode === "create" ? "Создайте перечень \n вопросов" : "Редактируйте \n вопрос" }}
+        </span>
       </v-col>
     </v-row>
     <!-- Body -->
-    <v-form
-        v-if="question"
-        ref="form"
-        class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
-        style="margin-top: 30px; background: #FEFEFF;"
+    <v-form ref="form"
+            class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
+            style="margin-top: 30px; background: #FEFEFF;"
     >
       <v-col cols="11" md="10" xl="9">
         <v-row class="align-center justify-center">
@@ -41,7 +41,7 @@
                 hide-details
             >
               <v-radio
-                  v-for="n in questionLevels"
+                  v-for="n in question_levels"
                   :key="n"
                   :label="n"
                   :value="n"
@@ -76,7 +76,7 @@
             <h4>Тип ответа</h4>
             <v-radio-group v-model="question.type_id" row>
               <v-radio
-                  v-for="n in questionTypes"
+                  v-for="n in question_types"
                   :key="n.id"
                   :label="n.name"
                   :value="n.id"
@@ -84,11 +84,11 @@
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="12" v-if="question.type_id">
             <component
                 :is="getQuestionTypeById(question.type_id).component"
-                :data="{ body: question.body, rightAnswer: rightAnswer }"
-                @done='lUpdateQuestion'
+                :data="mode === 'create' ? null : { body: question.body, right_answer: right_answer.answer }"
+                @done="(v) => mode === 'create' ? lCreateQuestion(v) : lUpdateQuestion(v)"
                 :loading="loading"
             />
           </v-col>
@@ -99,9 +99,9 @@
 </template>
 
 <script>
-import {mapMutations, mapActions, mapState, mapGetters} from 'vuex'
-import htmlExtensions from '@/plugins/tiptapDefaultExtensions'
+import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
 import {TiptapVuetify} from 'tiptap-vuetify'
+import htmlExtensions from '@/plugins/tiptapDefaultExtensions'
 import AlternativeAnswer from "../../components/Teacher/CreateQuestionTypes/AlternativeAnswer";
 import ChoiceAnswer from "../../components/Teacher/CreateQuestionTypes/ChoiceAnswer";
 import ConformityAnswer from "../../components/Teacher/CreateQuestionTypes/ConformityAnswer";
@@ -109,7 +109,7 @@ import RangingAnswer from "../../components/Teacher/CreateQuestionTypes/RangingA
 import TextAnswer from "../../components/Teacher/CreateQuestionTypes/TextAnswer";
 
 export default {
-  name: "EditQuestion",
+  name: "SetQuestionData",
   components: {
     TiptapVuetify,
     // answer types
@@ -121,15 +121,82 @@ export default {
   },
   data() {
     return {
+      mode: null,
       loading: false,
-      question: null,
-      rightAnswer: null,
       htmlExtensions,
+      // data
+      question: {
+        text: "",
+        commentary: "",
+        level: null,
+        body: null,
+        category_id: null,
+        type_id: null,
+      },
+      right_answer: []
     }
   },
   computed: {
-    ...mapState('data', ["categories", "questionLevels", "questionTypes"]),
-    ...mapGetters('data', ['getQuestionById', 'getQuestionTypeById','getRightAnswerByQuestionId'])
+    ...mapState('data', ["categories", "question_levels", "question_types"]),
+    ...mapGetters('data', ['getQuestionTypeById', 'getQuestionById', 'getRightAnswerByQuestionId']),
+  },
+  methods: {
+    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapActions('data', ['createQuestion', 'updateQuestion']),
+    lCreateQuestion({body, right_answer}) {
+      if (this.$refs.form.validate() && this.question.text) {
+        this.loading = true;
+        this.question.body = body;
+        this.createQuestion({question: this.question, right_answer: right_answer})
+            .then(() => {
+              this.loading = false;
+              this.clear();
+              this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
+            });
+      } else {
+        // set error to html editor
+        if (!this.question.text) this.$el.querySelector(".html-editor").classList.add('html-editor--error');
+        // scroll to error
+        this.$nextTick(() => {
+          let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
+          this.$vuetify.goTo(el, {offset: 54});
+        });
+      }
+    },
+    lUpdateQuestion({body, right_answer}) {
+      if (this.$refs.form.validate() && this.question.text) {
+        this.loading = true;
+        this.question.body = body;
+        this.right_answer.answer = right_answer;
+        this.updateQuestion({question: this.question, right_answer: this.right_answer})
+            .then(() => {
+              this.loading = false;
+              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
+              this.$router.back();
+            })
+      } else {
+        // set error to html editor
+        if (!this.question.text) this.$el.querySelector(".html-editor").classList.add('html-editor--error');
+        // scroll to first error
+        this.$nextTick(() => {
+          let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
+          this.$vuetify.goTo(el, {offset: 54});
+        });
+      }
+    },
+    clear() {
+      this.question = {
+        text: "",
+        commentary: "",
+        level: null,
+        body: null,
+        category_id: null,
+        type_id: null,
+      };
+      this.right_answer = [];
+      // clear form valid
+      this.$refs.form.resetValidation();
+    }
   },
   watch: {
     'question.text'() {
@@ -137,41 +204,17 @@ export default {
       if (el) el.classList.remove('html-editor--error');
     }
   },
-  methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data', ['updateQuestion']),
-    lUpdateQuestion(data) {
-      let htmlEditorValidation = true;
-      if (!this.question.text) {
-        htmlEditorValidation = false;
-        let el = this.$el.querySelector(".html-editor");
-        el.classList.add('html-editor--error');
-      }
-
-      if (this.$refs.form.validate() && htmlEditorValidation) {
-        this.loading = true;
-
-        this.question.body = [...data.body];
-        this.updateQuestion(this.question)
-            .then(() => {
-              this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
-              this.$router.back();
-            })
-      } else {
-        /* scroll to error */
-        this.$nextTick(() => {
-          let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
-          this.$vuetify.goTo(el, {offset: 54});
-        });
-      }
-    }
-  },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.question = Object.assign({}, vm.getQuestionById(Number(vm.$route.params.id)));
-      vm.rightAnswer = vm.getRightAnswerByQuestionId(Number(vm.$route.params.id));
-    })
+    if (to.name === "EditQuestion") {
+      next(vm => {
+        vm.mode = "edit";
+        Object.assign(vm.question, vm.getQuestionById(Number(vm.$route.params.id)));
+        Object.assign(vm.right_answer, vm.getRightAnswerByQuestionId(Number(vm.$route.params.id)));
+      })
+    } else next(vm => {
+      if (vm.mode === "edit") vm.clear();
+      vm.mode = "create";
+    });
   }
 }
 </script>

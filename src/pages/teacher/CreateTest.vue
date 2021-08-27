@@ -36,7 +36,7 @@
                 v-model="type"
                 required
                 hide-details
-                :items="testTypes"
+                :items="test_types"
                 :rules="[(v) => !!v ||  '']"
                 outlined
                 class="mt-2 mb-1 rounded-lg"
@@ -224,7 +224,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('data', ["categories", "testTypes"]),
+    ...mapState('data', ["categories", "test_types"]),
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
