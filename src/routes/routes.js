@@ -12,6 +12,13 @@ export const routes = [
             title: "SOLS - Прохождение теста"
         }
     },
+    {
+        path: '/beta',
+        component: () => import('@/pages/AdaptiveTesting'),
+        meta: {
+            title: "SOLS - Прохождение теста"
+        }
+    },
     /* auth */
     {
         path: '/signin',
