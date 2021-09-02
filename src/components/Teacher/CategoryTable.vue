@@ -26,7 +26,12 @@
               single-line
               hide-details
           />
-          <v-btn icon class="ml-2" @click="sync">
+          <v-btn icon class="ml-2" @click="openCreateDialog()">
+            <v-icon>
+              add
+            </v-icon>
+          </v-btn>
+          <v-btn icon @click="sync">
             <v-icon>
               sync
             </v-icon>
@@ -39,29 +44,38 @@
             edit
           </v-icon>
         </v-btn>
-        <v-btn icon @click.stop="deleteTest(item)">
+        <v-btn icon @click.stop="openDeleteDialog(item)">
           <v-icon>
             delete_outline
           </v-icon>
         </v-btn>
       </template>
     </v-data-table>
-    <CategoryEditDialog
-        v-if="editableCategoryId"
+    <SetCategoryDataDialog
         :show.sync="showEditDialog"
-        :category-id="editableCategoryId"
+        :category_id="editableCategoryId"
+    />
+    <DeleteConfirmation
+        :show.sync="showDeleteDialog"
+        header="Удалить эту категорию?"
+        :body="selected_category_to_delete ? 'Вы собираетесь удалить категорию вопросов \'' + selected_category_to_delete.name + '\'. Восстановить её будет нельзя. Все вложенные вопросы будут удалены. Категория так же будет исключена из всех тестов.' : null"
+        @confirm="lDeleteCategory"
     />
   </div>
 
 </template>
 
 <script>
-import {mapMutations, mapState} from 'vuex'
-import CategoryEditDialog from "@/components/Teacher/CategoryEditDialog";
+import {mapMutations, mapState, mapActions} from 'vuex'
+import SetCategoryDataDialog from "@/components/Teacher/SetCategoryDataDialog";
+import DeleteConfirmation from "@/components/Teacher/DeleteConfirmation";
 
 export default {
   name: "CategoryTable",
-  components: {CategoryEditDialog},
+  components: {
+    SetCategoryDataDialog,
+    DeleteConfirmation
+  },
   data() {
     return {
       loading: false,
@@ -81,7 +95,10 @@ export default {
       ],
       // Edit dialog
       showEditDialog: false,
-      editableCategoryId: null
+      editableCategoryId: null,
+      // Delete dialog
+      showDeleteDialog: false,
+      selected_category_to_delete: null
     }
   },
   computed: {
@@ -108,6 +125,7 @@ export default {
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapActions('data', ['deleteCategory']),
     goToCategory(category) {
       this.$router.push("categories/" + category.id)
     },
@@ -122,6 +140,23 @@ export default {
       this.editableCategoryId = categoryId;
       this.showEditDialog = true;
     },
+    openCreateDialog() {
+      this.editableCategoryId = null;
+      this.showEditDialog = true;
+    },
+    openDeleteDialog(category) {
+      this.selected_category_to_delete = category;
+      this.showDeleteDialog = true;
+    },
+    lDeleteCategory() {
+      this.loading = true;
+      this.deleteCategory(this.selected_category_to_delete.id)
+          .then(() => {
+            this.loading = false;
+            this.SHOW_MSG_DIALOG({type: 'primary', text: 'Категория удалена'});
+          });
+      this.selected_category_to_delete = null;
+    }
   }
 }
 </script>

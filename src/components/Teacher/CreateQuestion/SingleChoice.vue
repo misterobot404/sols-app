@@ -1,10 +1,11 @@
 <template>
   <v-row>
-    <v-col v-for="(answer, index) in answers" cols="12" :key="index">
+    <v-col v-for="(el, index) in answers" cols="12" :key="index">
       <div class="d-flex align-center mb-3">
         <h4>Вариант ответа</h4>
         <v-checkbox
-            v-model="answer.correct"
+            :input-value="right_answer ? right_answer.id === el.id : false"
+            @click="rightAnswerClick(el)"
             class="mx-4 my-0"
             hide-details
         >
@@ -28,7 +29,7 @@
         </v-tooltip>
       </div>
       <v-textarea
-          v-model="answer.text"
+          v-model="el.text"
           hide-details
           outlined
           auto-grow
@@ -53,38 +54,51 @@
 </template>
 
 <script>
+
 import {mapMutations} from "vuex";
 
 export default {
-  name: "ChoiceAnswer",
-  props: ["loading"],
+  name: "SingleChoice",
+  props: ["data", "loading"],
   data() {
     return {
       answers: [
-        {
-          text: "",
-          correct: false
-        },
-        {
-          text: "",
-          correct: false
+        {id: 1, text: ""},
+        {id: 2, text: ""},
+      ],
+      right_answer: null,
+    }
+  },
+  watch: {
+    data: {
+      handler(val) {
+        if (val) {
+          let next_id = 1;
+          this.answers = val.body.map(el => {
+            return {id: next_id++, text: el}
+          });
+          this.right_answer = val.right_answer.map(el => {
+            return {id: this.answers.find(answer => answer.text === el).id, text: el}
+          });
         }
-      ]
+      },
+      immediate: true
     }
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     done() {
       // check empty answer
-      let emptyAnswerFound = false;
-      this.answers.forEach((el) => {
-        if (el.text === "") {
-          emptyAnswerFound = true;
-        }
-      });
-      if (emptyAnswerFound) {
+      if (this.answers.find(el => !el.text)) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
         return;
+      }
+      // check duplicate
+      for (let i = 0; i < this.answers.length; i++) {
+        if (this.answers.find(v => this.answers[i].id !== v.id && this.answers[i].text === v.text)) {
+          this.SHOW_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
+          return;
+        }
       }
       // check answer count
       if (this.answers.length < 2) {
@@ -92,25 +106,26 @@ export default {
         return;
       }
       // check true answer
-      let trueAnswerNotFound = true;
-      this.answers.forEach((el) => {
-        if (el.correct === true) trueAnswerNotFound = false;
-      })
-      if (trueAnswerNotFound) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите хотя бы один правильный ответ"});
+      if (!this.right_answer) {
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите правильный ответ"});
         return;
       }
       // emit answers to parent
-      this.$emit('done', this.answers)
+      this.$emit('done', {
+        body: this.answers.map(el => el.text),
+        right_answer: this.right_answer.text
+      })
     },
     addAnswer() {
-      this.answers.push({
-        text: "",
-        correct: false
-      })
+      let next_id = Math.max(...this.answers.map(user => user.id)) + 1;
+      this.answers.push({id: next_id, text: ""})
     },
     removeAnswer(index) {
       this.answers.splice(index, 1);
+    },
+    rightAnswerClick(answer) {
+      if (this.right_answer && this.right_answer.id === answer.id) this.right_answer = null
+      else this.right_answer = answer
     }
   }
 }

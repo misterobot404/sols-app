@@ -26,7 +26,33 @@ export default {
                 id: 1,
                 is_active: true,
                 type: "Тест",
-                name: "Тестовое задание",
+                name: "Тестовое задание 1",
+                count_of_questions_by_lvl: [3, 6, 3],
+                category_ids: [2, 1],
+                date_of_beginning: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)"),
+                date_of_finishing: new Date("Thu Jul 30 2021 17:32:35 GMT+1000 (GMT+10:00)"),
+                testing_time: 90,
+                password: null,
+                created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
+            },
+            {
+                id: 2,
+                is_active: true,
+                type: "Тест",
+                name: "Тестовое задание 2",
+                count_of_questions_by_lvl: [3, 6, 3],
+                category_ids: [2, 1],
+                date_of_beginning: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)"),
+                date_of_finishing: new Date("Thu Jul 30 2021 17:32:35 GMT+1000 (GMT+10:00)"),
+                testing_time: 90,
+                password: null,
+                created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
+            },
+            {
+                id: 3,
+                is_active: true,
+                type: "Тест",
+                name: "Тестовое задание 3",
                 count_of_questions_by_lvl: [3, 6, 3],
                 category_ids: [2, 1],
                 date_of_beginning: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)"),
@@ -40,62 +66,108 @@ export default {
         questions: [
             {
                 id: 1,
-                commentary: "",
+                commentary: null,
                 level: "Средний",
-                text: '<p>qweqwe</p>',
+                text: '<p>Как называется первый язык программирования?</p>',
+                // refs
+                category_id: 2,
+                type_id: 3
+            },
+            {
+                id: 2,
+                commentary: null,
+                level: "Лёгкий",
+                text: '<p>Что из перечисленного относится к трём китам ООП (три основные понятия)?</p>',
+                body: ["Модульность", "Однозначность", "Наследование", "Полиморфизм", "Разделение обязанностей", "Строгая типизация", "Инкапсуляция"],
                 // refs
                 category_id: 2,
                 type_id: 2
             },
             {
-                id: 2,
-                commentary: "Коментарий",
-                level: "Лёгкий",
-                text: '<p>qweqwe</p>',
-                body: ["qwe", "2"],
+                id: 3,
+                commentary: null,
+                level: "Сложный",
+                text: '<p>Выберите правильную структуру альтернативного условного оператора (полный вариант)</p>',
+                body: [
+                    "If <условие> Then <оператор 1>",
+                    "If <условие> Then <оператор 1> Else <оператор 2>",
+                    "If <условие> Then <оператор 1> <оператор 2>",
+                    "If <условие 1> Then if <условие 2> Then <оператор 1> <оператор 2>"
+                ],
                 // refs
-                category_id: 1,
+                category_id: 2,
                 type_id: 1
+            },
+            {
+                id: 4,
+                commentary: null,
+                level: "Сложный",
+                text: '<p>Расположите события в порядке следования</p>',
+                body: ["Событие 1 ","Событие 2","Событие 3"],
+                // refs
+                category_id: 3,
+                type_id: 4
             }
         ],
         question_types: [
             {
                 id: 1,
-                component: "ChoiceAnswer",
-                name: "Выбор ответа"
+                component: "SingleChoice",
+                icon: "check",
+                name: "Одиночный выбор"
             },
             {
                 id: 2,
-                component: "TextAnswer",
-                name: "Текстовый ввод"
+                component: "MultiChoice",
+                icon: "done_all",
+                name: "Множественный выбор"
             },
             {
                 id: 3,
-                component: "RangingAnswer",
-                name: "Ранжирование"
+                component: "TextInput",
+                icon: "edit",
+                name: "Текстовый ввод"
             },
             {
                 id: 4,
-                component: "ConformityAnswer",
-                name: "Соответствие"
+                component: "Ranging",
+                icon: "low_priority",
+                name: "Ранжирование"
             },
             {
                 id: 5,
-                component: "AlternativeAnswer",
-                name: "Альтернативный ввод"
+                component: "Conformity",
+                icon: "settings_input_component",
+                name: "Соответствие"
+            },
+            {
+                id: 6,
+                component: "FileUpload",
+                icon: "save",
+                name: "Загрузка файла"
             }
         ],
         question_levels: ["Лёгкий", "Средний", "Сложный"],
         right_answers: [
             {
                 id: 1,
-                question_id: "1",
-                answer: ["qwe"],
+                question_id: 1,
+                answer: ["Паскаль"],
             },
             {
                 id: 2,
                 question_id: 2,
-                answer: ["2"],
+                answer: ["Наследование", "Полиморфизм", "Инкапсуляция"],
+            },
+            {
+                id: 3,
+                question_id: 3,
+                answer: "If <условие> Then <оператор 1>",
+            },
+            {
+                id: 4,
+                question_id: 4,
+                answer: [3,1,2],
             },
         ],
     },
@@ -155,7 +227,7 @@ export default {
                         // Костыль. в будущем id созданного вопроса мы будем получать из api
                         commit('CREATE_RIGHT_ANSWER', {
                             question_id: state.questions[state.questions.length - 1].id,
-                            rightAnswer: right_answer
+                            right_answer: right_answer
                         })
                         resolve();
                     }, 800)
@@ -166,7 +238,6 @@ export default {
             return new Promise((resolve) => {
                     setTimeout(() => {
                         commit('UPDATE_QUESTION', question);
-                        console.log(right_answer);
                         commit('UPDATE_RIGHT_ANSWER', right_answer);
                         resolve();
                     }, 800)
@@ -214,11 +285,7 @@ export default {
     mutations: {
         CREATE_TEST(state, test) {
             // data will be added to backend
-            let next_id = 1;
-            state.tests.forEach((el) => {
-                if (el.id >= next_id) next_id = el.id + 1;
-            });
-            test.id = next_id;
+            test.id = Math.max(...state.tests.map(el => el.id)) + 1;
             test.created_at = new Date();
             test.is_active = true;
 
@@ -239,11 +306,7 @@ export default {
 
         CREATE_QUESTION(state, question) {
             // data will be added to backend
-            let next_id = 1;
-            state.questions.forEach((el) => {
-                if (el.id >= next_id) next_id = el.id + 1;
-            });
-            question.id = next_id;
+            question.id = Math.max(...state.questions.map(el => el.id)) + 1;
 
             state.questions.push(question);
         },
@@ -255,14 +318,8 @@ export default {
         },
 
         CREATE_RIGHT_ANSWER(state, {question_id, right_answer}) {
-            // data will be added to backend
-            let next_id = 1;
-            state.right_answers.forEach((el) => {
-                if (el.id >= next_id) next_id = el.id + 1;
-            });
-
             state.right_answers.push({
-                id: next_id,
+                id: Math.max(...state.right_answers.map(el => el.id)) + 1,
                 question_id: question_id,
                 answer: right_answer
             });
@@ -273,11 +330,7 @@ export default {
 
         CREATE_CATEGORY(state, category) {
             // data will be added to backend
-            let next_id = 1;
-            state.categories.forEach((el) => {
-                if (el.id >= next_id) next_id = el.id + 1;
-            });
-            category.id = next_id;
+            category.id = Math.max(...state.categories.map(el => el.id)) + 1;
 
             state.categories.push(category);
         },
@@ -285,6 +338,11 @@ export default {
             Object.assign(state.categories.find(el => el.id === category.id), category);
         },
         DELETE_CATEGORY(state, id) {
+            // удаление категории из тестов
+            state.tests.forEach(el => el.category_ids = el.category_ids.filter((item) => item !== id));
+            // удаление вопросов относящихся к категории
+            state.questions = state.questions.filter((item) => item.category_id !== id)
+            // удаление категории
             state.categories = state.categories.filter((item) => item.id !== id);
         },
     }

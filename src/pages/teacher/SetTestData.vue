@@ -6,7 +6,9 @@
         <img class="create-test-svg pr-lg-4" :src="require('@/assets/svg/Create-1.svg')" alt="Иконка создания">
       </v-col>
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="create-test-title primary--text text-center text-lg-left">Редактирование<br>теста</span>
+        <span class="create-test-title primary--text text-center text-lg-left" style="white-space: pre-line">
+          {{ mode === "create" ? "Создайте свой \n опросник" : "Редактируйте \n опросник" }}
+        </span>
       </v-col>
     </v-row>
     <!-- Body -->
@@ -63,10 +65,11 @@
           </v-col>
           <v-col cols="12" md="6">
             <h4 class="mb-3">Количество вопросов</h4>
-            <v-row>
-              <v-col cols="12" md="4" v-for="(_, i) in countOfQuestionsByLvl" :key="i">
+            <v-row
+            >
+              <v-col cols="12" md="4" v-for="(_, i) in test.count_of_questions_by_lvl" :key="i">
                 <v-text-field
-                    v-model="countOfQuestionsByLvl[i]"
+                    v-model="test.count_of_questions_by_lvl[i]"
                     required
                     outlined
                     :rules="[(v) => !!v ||  '']"
@@ -85,7 +88,7 @@
               <v-col>
                 <v-switch
                     label="Ограничение доступа к тесту"
-                    v-model="showPassword"
+                    v-model="show_password"
                     hide-details
                     class="mr-8 my-2"
                 />
@@ -93,7 +96,7 @@
               <v-col>
                 <v-switch
                     label="Ограничение периода тестирования"
-                    v-model="showRange"
+                    v-model="show_range"
                     hide-details
                     class="mr-8 my-2"
                 />
@@ -101,14 +104,14 @@
               <v-col>
                 <v-switch
                     label="Ограничение времени тестирования"
-                    v-model="showDuration"
+                    v-model="show_duration"
                     hide-details
                     class="mr-8 my-2"
                 />
               </v-col>
             </v-row>
           </v-col>
-          <v-col cols="12" class="pa-0" v-show="showRange">
+          <v-col cols="12" class="pa-0" v-show="show_range">
             <vc-date-picker
                 ref="datapicker"
                 v-model="range"
@@ -121,7 +124,7 @@
                 locale="ru"
                 class="d-flex flex-wrap"
             >
-              <template v-slot="{ inputValue, inputEvents  }">
+              <template v-slot="{ inputValue, inputEvents }">
                 <v-col cols="12" md="6">
                   <h4>Дата начала</h4>
                   <v-text-field
@@ -129,7 +132,7 @@
                       :value="inputValue.start"
                       v-on="inputEvents.start"
                       required
-                      :rules="[(v) => !showRange || !!v || '']"
+                      :rules="[(v) => !show_range || !!v || '']"
                       hide-details
                       outlined
                       readonly
@@ -145,7 +148,7 @@
                       v-on="inputEvents.end"
                       required
                       readonly
-                      :rules="[(v) => !showRange || !!v || '']"
+                      :rules="[(v) => !show_range || !!v || '']"
                       hide-details
                       outlined
                       class="mt-2 mb-1 rounded-lg"
@@ -155,11 +158,11 @@
               </template>
             </vc-date-picker>
           </v-col>
-          <v-col cols="12" md="6" v-show="showDuration">
+          <v-col cols="12" md="6" v-show="show_duration">
             <h4>Время для прохождения (в минутах)</h4>
             <v-text-field
                 v-model="test.testing_time"
-                :rules="[(v) => !showDuration || !!v ||  '']"
+                :rules="[(v) => !show_duration || !!v ||  '']"
                 required
                 append-icon="timer"
                 hide-details
@@ -170,7 +173,7 @@
                 background-color="white"
             />
           </v-col>
-          <v-col align-self="end" cols="12" md="6" v-show="showPassword">
+          <v-col align-self="end" cols="12" md="6" v-show="show_password">
             <h4>Пароль</h4>
             <v-text-field
                 v-model="test.password"
@@ -180,11 +183,17 @@
                 append-icon="vpn_key"
                 class="mt-2 mb-1 rounded-lg"
                 background-color="white"
-                :rules="[(v) => !showPassword || !!v ||  '']"
+                :rules="[(v) => !show_password || !!v ||  '']"
             />
           </v-col>
           <v-col align-self="end" class="d-flex justify-end mb-2 mt-2">
-            <v-btn @click="lUpdateTest()" class="success rounded-lg h4 ml-2" x-large :loading="loading">Сохранить</v-btn>
+            <v-btn
+                @click="mode === 'create' ? lCreateTest() : lUpdateTest()"
+                class="success rounded-lg h4 ml-2"
+                x-large
+                :loading="loading">
+              Сохранить
+            </v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -194,31 +203,40 @@
 
 <script>
 import Vue from 'vue'
-import {mapGetters, mapMutations, mapState, mapActions} from 'vuex'
+import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
 import VCalendar from 'v-calendar';
 
+// Use v-calendar & v-date-picker components
 Vue.use(VCalendar, {
   componentPrefix: 'vc'
 });
 
 export default {
-  name: "EditTest",
+  name: "CreateTest",
   data() {
     return {
+      mode: null,
       loading: false,
       valid: false,
-      rangeHideError: true,
-      showRange: false,
-      showDuration: false,
-      showPassword: false,
-
-      test: {},
-      // problem data
+      show_range: true,
+      show_duration: true,
+      show_password: false,
+      // test data
+      test: {
+        type: null,
+        name: null,
+        count_of_questions_by_lvl: [null, null, null],
+        category_ids: null,
+        date_of_beginning: null,
+        date_of_finishing: null,
+        testing_time: null,
+        password: null,
+      },
+      // datepicker работает с объектом, поэтому будем зеркалить поля date_of_beginning и date_of_finishing сюда
       range: {
         start: null,
         end: null
       },
-      countOfQuestionsByLvl: []
     }
   },
   computed: {
@@ -227,14 +245,38 @@ export default {
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data', ['updateTest']),
+    ...mapActions('data', ['createTest', 'updateTest']),
+    lCreateTest() {
+      if (this.$refs.form.validate()) {
+        if (this.show_range) {
+          this.test.date_of_beginning = this.range.start;
+          this.test.date_of_finishing = this.range.end;
+        }
+        if (!this.show_duration) this.test.testing_time = null;
+        if (!this.show_password) this.test.password = null;
+
+        this.loading = true;
+        this.createTest(this.test)
+            .then(() => {
+              this.loading = false;
+              this.clear();
+              this.SHOW_MSG_DIALOG({
+                type: 'primary',
+                text: this.test.type + ': "' + this.test.name + '" ' + (this.test.type === "Викторина" ? "создана" : "создан")
+              });
+            });
+      }
+    },
     lUpdateTest() {
       if (this.$refs.form.validate()) {
         this.loading = true;
 
-        this.test.date_of_beginning = this.range.start;
-        this.test.date_of_finishing = this.range.end;
-        this.test.count_of_questions_by_lvl = this.countOfQuestionsByLvl;
+        if (this.show_range) {
+          this.test.date_of_beginning = this.range.start;
+          this.test.date_of_finishing = this.range.end;
+        }
+        if (!this.show_duration) this.test.testing_time = null;
+        if (!this.show_password) this.test.password = null;
 
         this.updateTest(this.test)
             .then(() => {
@@ -243,6 +285,24 @@ export default {
               this.$router.push("/teacher/tests");
             })
       }
+    },
+    clear() {
+      // clear data
+      this.test.type = null;
+      this.test.name = null;
+      this.test.count_of_questions_by_lvl = [null, null, null];
+      this.test.category_ids = null;
+      this.test.date_of_beginning = null;
+      this.test.date_of_finishing = null;
+      this.test.testing_time = null;
+      this.test.password = null;
+
+      this.range = {
+        start: null,
+        end: null
+      };
+      // clear form valid
+      this.$refs.form.resetValidation();
     }
   },
   mounted() {
@@ -263,23 +323,28 @@ export default {
     );
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
-      Object.assign(vm.test, vm.getTestById(vm.$route.params.id));
-      vm.countOfQuestionsByLvl = [...vm.test.count_of_questions_by_lvl];
+    if (to.name === "EditTest") {
+      next(vm => {
+        vm.mode = "edit";
+        Object.assign(vm.test, vm.getTestById(Number(vm.$route.params.id)));
 
-      if (vm.test.date_of_beginning && vm.test.date_of_finishing) {
-        vm.range.start = new Date(vm.test.date_of_beginning);
-        vm.range.end = new Date(vm.test.date_of_finishing);
-        vm.$refs.datapicker.value_ = vm.range;
-        vm.showRange = true;
-      }
-      if (vm.test.testing_time) {
-        vm.showDuration = true;
-      }
-      if (vm.test.password) {
-        vm.showPassword = true;
-      }
-    })
+        if (vm.test.date_of_beginning && vm.test.date_of_finishing) {
+          vm.range.start = new Date(vm.test.date_of_beginning);
+          vm.range.end = new Date(vm.test.date_of_finishing);
+          vm.$refs.datapicker.value_ = vm.range;
+          vm.show_range = true;
+        }
+        if (vm.test.testing_time) {
+          vm.show_duration = true;
+        }
+        if (vm.test.password) {
+          vm.show_password = true;
+        }
+      })
+    } else next(vm => {
+      if (vm.mode === "edit") vm.clear();
+      vm.mode = "create";
+    });
   }
 }
 </script>
@@ -310,7 +375,6 @@ export default {
   }
 }
 </style>
-
 <style>
 .v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--box .v-select__selections, .v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--enclosed .v-select__selections {
   min-height: 56px !important;

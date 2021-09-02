@@ -74,7 +74,7 @@
                   unarchive
                 </v-icon>
               </v-btn>
-              <v-btn icon @click="deleteTest(item)">
+              <v-btn icon @click="openDeleteDialog(item)">
                 <v-icon>
                   delete_outline
                 </v-icon>
@@ -94,16 +94,24 @@
             </td>
           </template>
         </v-data-table>
+        <DeleteConfirmation
+            :show.sync="showDeleteDialog"
+            header="Удалить этот тест?"
+            :body="selected_test_to_delete ? 'Вы собираетесь удалить тест \'' + selected_test_to_delete.name + '\'. Восстановить его будет нельзя.' : null"
+            @confirm="lDeleteTest"
+        />
       </v-col>
     </div>
   </v-container>
 </template>
 
 <script>
-import {mapMutations, mapState, mapGetters} from 'vuex'
+import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
+import DeleteConfirmation from "@/components/Teacher/DeleteConfirmation";
 
 export default {
   name: "Tests",
+  components: {DeleteConfirmation},
   data() {
     return {
       loading: false,
@@ -120,7 +128,10 @@ export default {
         {text: 'Пароль', value: 'password', class: ''},
         {text: 'Дата создания', value: 'created_at'},
         {value: 'actions', sortable: false, align: 'right'},
-      ]
+      ],
+      // Delete dialog
+      showDeleteDialog: false,
+      selected_test_to_delete: null
     }
   },
   computed: {
@@ -155,6 +166,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('data',['deleteTest']),
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST', 'DELETE_TEST']),
     share(test) {
@@ -170,16 +182,25 @@ export default {
       this.UNARCHIVE_TEST(test.id);
       this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "активна" : "активен")});
     },
-    deleteTest(test) {
-      this.DELETE_TEST(test.id);
-      this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "удалена" : "удалён")});
-    },
     sync() {
       this.loading = true;
       setTimeout(() => {
         this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
         this.loading = false;
       }, 1000);
+    },
+    openDeleteDialog(question) {
+      this.selected_test_to_delete = question;
+      this.showDeleteDialog = true;
+    },
+    lDeleteTest() {
+      this.loading = true;
+      this.deleteTest(this.selected_test_to_delete.id)
+          .then(() => {
+            this.loading = false;
+            this.SHOW_MSG_DIALOG({type: 'primary', text: 'Тест удален'});
+          });
+      this.selected_test_to_delete = null;
     }
   }
 }

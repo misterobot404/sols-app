@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col v-for="(answer, index) in answers" cols="12" :key="index">
+    <v-col v-for="(answer, index) in right_answers" cols="12" :key="index">
       <div class="d-flex align-center mb-3">
         <h4>Правильный ответ</h4>
         <v-spacer/>
@@ -48,47 +48,60 @@ import {mapMutations} from "vuex";
 
 export default {
   name: "TextAnswer",
-  props: ["loading"],
+  props: ["data", "loading"],
   data() {
     return {
-      answers: [
+      right_answers: [
         {
+          id: 1,
           text: ""
         }
       ]
+    }
+  },
+  watch: {
+    data: {
+      handler(val) {
+        if (val) {
+          let next_id = 1;
+          this.right_answers = val.right_answer.map(el => {return {id: next_id++, text: el}});
+        }
+      },
+      immediate: true
     }
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     done() {
       // check empty answer
-      let emptyAnswerFound = false;
-      this.answers.forEach((el) => {
-        if (el.text === "") {
-          emptyAnswerFound = true;
-        }
-      });
-      if (emptyAnswerFound) {
+      if (this.right_answers.find(el => !el.text)) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
         return;
       }
+      // check duplicate
+      for (let i = 0; i < this.right_answers.length; i++) {
+        if (this.right_answers.find(v => this.right_answers[i].id !== v.id && this.right_answers[i].text === v.text)) {
+          this.SHOW_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
+          return;
+        }
+      }
       // check answer count
-      if (this.answers.length < 1) {
+      if (this.right_answers.length < 1) {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 1"});
         return;
       }
-      this.$emit('done', this.answers)
+      this.$emit('done', {
+        body: null,
+        right_answer: this.right_answers.map(el => el.text)
+      })
     },
     addAnswer() {
-      this.answers.push({text: ""})
+      let next_id = Math.max(...this.right_answers.map(el => el.id)) + 1;
+      this.right_answers.push({id: next_id, text: ""})
     },
     removeAnswer(index) {
-      this.answers.splice(index, 1);
+      this.right_answers.splice(index, 1);
     }
   }
 }
 </script>
-
-<style scoped>
-
-</style>

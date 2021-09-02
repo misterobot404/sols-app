@@ -75,16 +75,18 @@ export const routes = [
         }
     },
     {
+        name: "CreateTest",
         path: '/teacher/tests/create',
-        component: () => import('../pages/teacher/CreateTest'),
+        component: () => import('../pages/teacher/SetTestData'),
         meta: {
-            title: "SOLS - Создание тестов",
+            title: "SOLS - Создание теста",
             middlewareAuth: "teacher"
         }
     },
     {
+        name: "EditTest",
         path: '/teacher/tests/:id/edit',
-        component: () => import('../pages/teacher/EditTest'),
+        component: () => import('../pages/teacher/SetTestData'),
         meta: {
             title: "SOLS - Редактирование теста",
             middlewareAuth: "teacher"
@@ -94,7 +96,7 @@ export const routes = [
     {
         name: "QuestionСategories",
         path: '/teacher/categories/:id?',
-        component: () => import('../pages/teacher/QuestionСategories'),
+        component: () => import('../pages/teacher/CaQ'),
         meta: {
             title: "SOLS - База вопросов",
             middlewareAuth: "teacher"

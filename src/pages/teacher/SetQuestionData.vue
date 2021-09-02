@@ -56,7 +56,7 @@
                 v-model="question.text"
                 class="mt-3"
                 :toolbar-attributes="{ color: 'rgba(0, 0, 0, 0.04)' }"
-                :extensions="htmlExtensions"
+                :extensions="html_extensions"
                 :card-props="{ outlined: true, class: 'html-editor rounded-lg' }"
             />
           </v-col>
@@ -74,14 +74,20 @@
           </v-col>
           <v-col cols="12">
             <h4>Тип ответа</h4>
-            <v-radio-group v-model="question.type_id" row>
+            <v-radio-group v-model="question.type_id" row class="d-flex flex-row">
               <v-radio
                   v-for="n in question_types"
                   :key="n.id"
-                  :label="n.name"
                   :value="n.id"
-                  class="mr-6 my-2"
-              />
+                  class="col-md-3 col-6 justify-start mr-0"
+              >
+                <template slot="label">
+                  <v-icon>{{ n.icon }}</v-icon>
+                  <label class="cursor-pointer">
+                    {{ '&nbsp;' + n.name }}
+                  </label>
+                </template>
+              </v-radio>
             </v-radio-group>
           </v-col>
           <v-col cols="12" v-if="question.type_id">
@@ -101,29 +107,31 @@
 <script>
 import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
 import {TiptapVuetify} from 'tiptap-vuetify'
-import htmlExtensions from '@/plugins/tiptapDefaultExtensions'
-import AlternativeAnswer from "../../components/Teacher/CreateQuestionTypes/AlternativeAnswer";
-import ChoiceAnswer from "../../components/Teacher/CreateQuestionTypes/ChoiceAnswer";
-import ConformityAnswer from "../../components/Teacher/CreateQuestionTypes/ConformityAnswer";
-import RangingAnswer from "../../components/Teacher/CreateQuestionTypes/RangingAnswer";
-import TextAnswer from "../../components/Teacher/CreateQuestionTypes/TextAnswer";
+import html_extensions from '@/plugins/tiptapDefaultExtensions'
+import FileUpload from "../../components/Teacher/CreateQuestion/FileUpload";
+import SingleChoice from "../../components/Teacher/CreateQuestion/SingleChoice";
+import MultiChoice from "../../components/Teacher/CreateQuestion/MultiChoice";
+import Conformity from "../../components/Teacher/CreateQuestion/Conformity";
+import Ranging from "../../components/Teacher/CreateQuestion/Ranging";
+import TextInput from "../../components/Teacher/CreateQuestion/TextInput";
 
 export default {
   name: "SetQuestionData",
   components: {
     TiptapVuetify,
     // answer types
-    AlternativeAnswer,
-    ChoiceAnswer,
-    ConformityAnswer,
-    RangingAnswer,
-    TextAnswer
+    FileUpload,
+    SingleChoice,
+    MultiChoice,
+    Conformity,
+    Ranging,
+    TextInput
   },
   data() {
     return {
       mode: null,
       loading: false,
-      htmlExtensions,
+      html_extensions,
       // data
       question: {
         text: "",
@@ -199,6 +207,10 @@ export default {
     }
   },
   watch: {
+    'question.type_id'() {
+      this.question.body = null;
+      this.right_answer = []
+    },
     'question.text'() {
       let el = this.$el.querySelector(".html-editor--error");
       if (el) el.classList.remove('html-editor--error');
