@@ -36,7 +36,7 @@
               </template>
             </v-select>
           </template>
-          <span>Порядковый номер элемента в ключе ответа</span>
+          <span>Правильный порядок</span>
         </v-tooltip>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">

@@ -12,9 +12,10 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <v-form ref="form"
-            class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
-            style="margin-top: 30px; background: #FEFEFF;"
+    <v-form
+        ref="form"
+        class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
+        style="margin-top: 30px; background: #FEFEFF;"
     >
       <v-col cols="11" md="10" xl="9">
         <v-row class="align-center justify-center">
@@ -137,7 +138,7 @@ export default {
         text: "",
         commentary: "",
         level: null,
-        body: null,
+        body: [],
         category_id: null,
         type_id: null,
       },
@@ -207,9 +208,11 @@ export default {
     }
   },
   watch: {
-    'question.type_id'() {
-      this.question.body = null;
-      this.right_answer = []
+    'question.type_id'(_, oldVal) {
+      if (oldVal) {
+        this.question.body = null;
+        this.right_answer = [];
+      }
     },
     'question.text'() {
       let el = this.$el.querySelector(".html-editor--error");
@@ -220,8 +223,8 @@ export default {
     if (to.name === "EditQuestion") {
       next(vm => {
         vm.mode = "edit";
-        Object.assign(vm.question, vm.getQuestionById(Number(vm.$route.params.id)));
-        Object.assign(vm.right_answer, vm.getRightAnswerByQuestionId(Number(vm.$route.params.id)));
+        vm.question = JSON.parse(JSON.stringify(vm.getQuestionById(Number(vm.$route.params.id))));
+        vm.right_answer = JSON.parse(JSON.stringify(vm.getRightAnswerByQuestionId(Number(vm.$route.params.id))));
       })
     } else next(vm => {
       if (vm.mode === "edit") vm.clear();

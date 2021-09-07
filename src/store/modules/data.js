@@ -103,10 +103,23 @@ export default {
                 commentary: null,
                 level: "Сложный",
                 text: '<p>Расположите события в порядке следования</p>',
-                body: ["Событие 1 ","Событие 2","Событие 3"],
+                body: ["Событие 1","Событие 2","Событие 3"],
                 // refs
                 category_id: 3,
                 type_id: 4
+            },
+            {
+                id: 5,
+                commentary: null,
+                level: "Сложный",
+                text: '<p>Соотнесите события</p>',
+                body: {
+                    left_list: ["Событие 1","Событие 2","Событие 3"],
+                    right_list: ["1998", "2000"]
+                },
+                // refs
+                category_id: 3,
+                type_id: 5
             }
         ],
         question_types: [
@@ -169,6 +182,11 @@ export default {
                 question_id: 4,
                 answer: [3,1,2],
             },
+            {
+                id: 5,
+                question_id: 5,
+                answer: [1,1,2],
+            },
         ],
     },
     getters: {
@@ -179,7 +197,7 @@ export default {
             return state.questions.filter(question => question.category_id === id);
         },
         getQuestionById: state => id => {
-            return (state.questions.find(question => question.id === id));
+            return state.questions.find(question => question.id === id);
         },
         getRightAnswerByQuestionId: state => id => {
             return (state.right_answers.find(answer => answer.question_id === id));

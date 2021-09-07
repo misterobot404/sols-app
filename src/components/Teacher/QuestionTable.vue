@@ -18,7 +18,7 @@
               chevron_left
             </v-icon>
           </v-btn>
-          <h2>{{ getCategoryById(categoryId).name }}</h2>
+          <h2>{{  getCategoryById(categoryId) ? getCategoryById(categoryId).name : null }}</h2>
           <v-spacer/>
           <v-text-field
               v-model="search"

@@ -77,9 +77,10 @@ export default {
           this.answers = val.body.map(el => {
             return {id: next_id++, text: el}
           });
-          this.right_answer = val.right_answer.map(el => {
-            return {id: this.answers.find(answer => answer.text === el).id, text: el}
-          });
+          this.right_answer = {
+            id: this.answers.find(answer => answer.text === val.right_answer).id,
+            text: val.right_answer
+          }
         }
       },
       immediate: true
