@@ -72,7 +72,7 @@ export default {
   watch: {
     data: {
       handler(val) {
-        if (val) {
+        if (val.body && val.right_answer) {
           let next_id = 1;
           this.answers = val.body.map(el => {
             return {id: next_id++, text: el}

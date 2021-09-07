@@ -62,7 +62,7 @@ export default {
   watch: {
     data: {
       handler(val) {
-        if (val) {
+        if (val.right_answer) {
           let next_id = 1;
           this.right_answers = val.right_answer.map(el => {return {id: next_id++, text: el}});
         }

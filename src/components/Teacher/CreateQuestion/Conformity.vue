@@ -131,7 +131,7 @@ export default {
   watch: {
     data: {
       handler(val) {
-        if (val) {
+        if (val.body && val.right_answer) {
           this.left_list = [...val.body.left_list];
           this.right_list = [...val.body.right_list];
           this.right_answer = [...val.right_answer];
