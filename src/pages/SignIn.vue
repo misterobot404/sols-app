@@ -4,7 +4,9 @@
       <v-row>
         <v-col/>
         <v-col cols="3">
-          <h1 class="site-title primary--text" :class="$vuetify.breakpoint.xlOnly ? 'text-no-wrap' : null">SOLS - Онлайн опросы</h1>
+          <h1 class="site-title primary--text" :class="$vuetify.breakpoint.xlOnly ? 'text-no-wrap' : null">
+            SOLS<span class="d-none d-md-inline"> - Онлайн опросы</span>
+          </h1>
           <img class="svg-people" :src="require('@/assets/svg/Personal-main-1.svg')" alt="Человек">
         </v-col>
         <v-col/>
@@ -13,15 +15,28 @@
           <img width="100%" height="290" style="margin-top: 220px; position: relative; z-index: 1" :src="require('@/assets/svg/Vector-2.svg')" alt="Клякса">
         </v-col>
         <v-col cols="1">
-          <form class="signin-dialog">
+          <div class="signin-dialog">
             <div class="text-center">
               <h1>Вход</h1>
             </div>
+            <v-alert
+                :value="show_error"
+                class="mt-6 mb-2"
+                border="left"
+                transition="scale-transition"
+                colored-border
+                type="error"
+                elevation="2"
+                style="text-align: left"
+            >
+              <h4>Такое сочетании логина и пароля - не существует.</h4>
+            </v-alert>
             <form @submit.prevent="auth()">
               <div style="margin-top: 28px">
                 <h4>Логин</h4>
                 <v-text-field
                     v-model.trim="username"
+                    prepend-inner-icon="person"
                     required
                     hide-details
                     outlined
@@ -34,12 +49,15 @@
                 <h4>Пароль</h4>
                 <v-text-field
                     v-model.trim="password"
+                    :append-icon="password ? (show_password ? 'visibility_off' : 'visibility') : null"
+                    @click:append="() => (show_password = !show_password)"
+                    :type="show_password ?  'text' : 'password'"
+                    prepend-inner-icon="lock"
                     required
                     hide-details
                     outlined
                     class="mt-2 mb-1 rounded-lg"
                     background-color="white"
-                    type="password"
                 />
                 <router-link to="/password/reset" class="p-14-medium">Забыли пароль?</router-link>
               </div>
@@ -61,13 +79,14 @@
                       class="success rounded-lg h4"
                       type="submit"
                       style="height: 54px;"
+                      :loading="loading"
                   >
                     Войти
                   </v-btn>
                 </v-col>
               </v-row>
             </form>
-          </form>
+          </div>
         </v-col>
         <v-col cols="4" class="overflow-hidden">
           <img style="margin-top: 518px;" width="775" height="788" :src="require('@/assets/svg/Vector-1.svg')" alt="Клякса">
@@ -86,21 +105,33 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import {mapActions} from 'vuex'
 
 export default {
   name: "SignIn",
   data() {
     return {
+      loading: false,
       username: "",
-      password: ""
+      password: "",
+      show_password: false,
+      show_error: false,
     }
   },
   methods: {
-    ...mapMutations('auth', ['LOGIN']),
+    ...mapActions('auth', ['login']),
     auth() {
-      if (this.username === "teacher") this.LOGIN({role: "teacher"});
-      else if (this.username === "student") this.LOGIN({role: "student"});
+      this.loading = true;
+      this.show_error = false;
+      this.login({login: this.username, password: this.password})
+          .then(() => this.clear())
+          .catch(() => this.show_error = true)
+          .finally(() => this.loading = false)
+    },
+    clear() {
+      this.username = "";
+      this.password = "";
+      this.show_error = false;
     }
   }
 }
@@ -112,7 +143,9 @@ export default {
 }
 
 .signin-dialog {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 3;
   width: 450px;
   background: #ECECF9;
@@ -120,7 +153,6 @@ export default {
   border: 3px solid #41C284;
   box-sizing: border-box;
   border-radius: 10px;
-  margin-top: 240px;
 }
 
 .svg-people {
@@ -133,9 +165,6 @@ export default {
 
 /* Изменение разметки под более низкое разрешение */
 @media screen and (max-width: 1280px) {
-  .signin-dialog {
-    margin-top: 128px;
-  }
 
   .site-title {
     margin-top: 89px;
@@ -149,7 +178,6 @@ export default {
 
 @media screen and (max-width: 960px) {
   .signin-dialog {
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

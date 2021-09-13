@@ -62,6 +62,35 @@ export default {
                 created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
             }
         ],
+        active_tests: [
+            {
+                id: 1,
+                user_id: 1,
+                test_id: 1,
+                questions: [
+                    {
+                        question_id: 1,
+                        answer: "Ключ ответа"
+                    },
+                    {
+                        question_id: 2,
+                        data: null
+                    },
+                    {
+                        question_id: 3,
+                        data: null
+                    },
+                    {
+                        question_id: 4,
+                        data: null
+                    },
+                    {
+                        question_id: 5,
+                        data: null
+                    },
+                ]
+            }
+        ],
         test_types: ["Тест", "Викторина", "Опрос"],
         questions: [
             {
@@ -120,7 +149,72 @@ export default {
                 // refs
                 category_id: 3,
                 type_id: 5
-            }
+            },
+            {
+                id: 6,
+                commentary: null,
+                level: "Средний",
+                text: '<p>Как называется первый язык программирования? 2</p>',
+                // refs
+                category_id: 2,
+                type_id: 3
+            },
+            {
+                id: 7,
+                commentary: null,
+                level: "Средний",
+                text: '<p>Как называется первый язык программирования? 3</p>',
+                // refs
+                category_id: 2,
+                type_id: 3
+            },
+            {
+                id: 8,
+                commentary: null,
+                level: "Средний",
+                text: '<p>Как называется первый язык программирования? 4</p>',
+                // refs
+                category_id: 2,
+                type_id: 3
+            },
+            {
+                id: 9,
+                commentary: null,
+                level: "Средний",
+                text: '<p>Как называется первый язык программирования? 5</p>',
+                // refs
+                category_id: 2,
+                type_id: 3
+            },
+            {
+                id: 10,
+                commentary: null,
+                level: "Лёгкий",
+                text: '<p>Что из перечисленного относится к трём китам ООП (три основные понятия)? 2</p>',
+                body: ["Модульность", "Однозначность", "Наследование", "Полиморфизм", "Разделение обязанностей", "Строгая типизация", "Инкапсуляция"],
+                // refs
+                category_id: 2,
+                type_id: 2
+            },
+            {
+                id: 11,
+                commentary: null,
+                level: "Лёгкий",
+                text: '<p>Что из перечисленного относится к трём китам ООП (три основные понятия)? 3</p>',
+                body: ["Модульность", "Однозначность", "Наследование", "Полиморфизм", "Разделение обязанностей", "Строгая типизация", "Инкапсуляция"],
+                // refs
+                category_id: 2,
+                type_id: 2
+            },
+            {
+                id: 12,
+                commentary: null,
+                level: "Средний",
+                text: '<p>Как называется первый язык программирования? 12312</p>',
+                // refs
+                category_id: 2,
+                type_id: 3
+            },
         ],
         question_types: [
             {
@@ -210,14 +304,18 @@ export default {
         }
     },
     actions: {
+        /*getTest({state, commit, getters}, test_id) {
+            // active test exist for current users
+            // or generate new active test
+        },*/
+
         createTest({commit}, test) {
             return new Promise((resolve) => {
                     setTimeout(() => {
                         commit('CREATE_TEST', test);
                         resolve();
                     }, 800)
-                }
-            )
+                })
         },
         updateTest({commit}, test) {
             return new Promise((resolve) => {

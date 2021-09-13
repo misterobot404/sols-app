@@ -13,47 +13,77 @@
           <img width="100%" height="290" style="margin-top: 220px; position: relative; z-index: 1" :src="require('@/assets/svg/Vector-2.svg')" alt="Клякса">
         </v-col>
         <v-col cols="1">
-          <form class="signup-dialog">
+          <div class="signup-dialog">
             <div class="text-center">
               <h1>Регистрация</h1>
             </div>
-            <form>
+            <v-alert
+                :value="show_error"
+                class="mt-6 mb-2"
+                border="left"
+                transition="scale-transition"
+                colored-border
+                type="error"
+                elevation="2"
+                style="text-align: left"
+            >
+              <h4>Пользователь с таким логином уже существует.</h4>
+            </v-alert>
+            <form @submit.prevent="lRegister()">
               <div style="margin-top: 28px">
-                <h4>Email</h4>
-                <v-text-field required hide-details outlined class="mt-2 rounded-lg" background-color="white"/>
-              </div>
-              <div style="margin-top: 38px">
-                <h4>Пароль</h4>
+                <h4>Логин</h4>
                 <v-text-field
+                    prepend-inner-icon="person"
+                    v-model.trim="email"
                     required
                     hide-details
                     outlined
                     class="mt-2 rounded-lg"
                     background-color="white"
-                    type="password"
+                />
+              </div>
+              <div style="margin-top: 38px">
+                <h4>Пароль</h4>
+                <v-text-field
+                    v-model.trim="password"
+                    :append-icon="password ? (show_password ? 'visibility_off' : 'visibility') : null"
+                    @click:append="() => (show_password = !show_password)"
+                    :type="show_password ?  'text' : 'password'"
+                    prepend-inner-icon="lock"
+                    required
+                    hide-details
+                    outlined
+                    class="mt-2 rounded-lg"
+                    background-color="white"
                 />
               </div>
               <div style="margin-top: 38px">
                 <h4>Подтвердите пароль</h4>
                 <v-text-field
+                    v-model.trim="confirm_password"
+                    :append-icon="confirm_password ? (show_confirm_password ? 'visibility_off' : 'visibility') : null"
+                    @click:append="() => (show_confirm_password = !show_confirm_password)"
+                    :type="show_confirm_password ?  'text' : 'password'"
+                    prepend-inner-icon="lock"
+                    :error-messages="password_same ? null : 'Пароли не совпадают'"
                     required
                     hide-details
                     outlined
                     class="mt-2 rounded-lg"
                     background-color="white"
-                    type="password"
                 />
               </div>
               <v-btn
+                  type="submit"
+                  :loading="loading"
                   block
                   class="success rounded-lg h4"
-                  type="submit"
                   style="height: 54px; margin-top: 42px"
               >
                 Зарегистрироваться
               </v-btn>
             </form>
-          </form>
+          </div>
         </v-col>
         <v-col cols="4" class="overflow-hidden">
           <img style="margin-top: 518px;" width="775" height="788" :src="require('@/assets/svg/Vector-1.svg')" alt="Клякса">
@@ -72,8 +102,45 @@
 </template>
 
 <script>
+import {mapActions} from "vuex";
+
 export default {
-  name: "SignUp"
+  name: "SignUp",
+  data() {
+    return {
+      loading: false,
+      email: "",
+      password: "",
+      show_password: false,
+      confirm_password: "",
+      show_confirm_password: false,
+      show_error: false,
+      password_same: true
+    }
+  },
+  methods: {
+    ...mapActions('auth', ['register']),
+    lRegister() {
+      this.password_same = this.password === this.confirm_password;
+      if (this.password_same) {
+        this.show_error = false;
+        this.loading = true;
+        this.register({login: this.email, password: this.password, confirm_password: this.confirm_password})
+            .then(() => this.clear())
+            .catch(() => this.show_error = true)
+            .finally(() => {
+              this.loading = false;
+            })
+      }
+    },
+    clear() {
+      this.email = "";
+      this.password = "";
+      this.confirm_password = "";
+      this.show_error = false;
+      this.password_same = true;
+    }
+  },
 }
 </script>
 
@@ -84,7 +151,9 @@ export default {
 }
 
 .signup-dialog {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 3;
   width: 450px;
   background: #ECECF9;
@@ -92,7 +161,6 @@ export default {
   border: 3px solid #41C284;
   box-sizing: border-box;
   border-radius: 10px;
-  margin-top: 200px;
 }
 
 .svg-people {
@@ -121,7 +189,6 @@ export default {
 
 @media screen and (max-width: 960px) {
   .signup-dialog {
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

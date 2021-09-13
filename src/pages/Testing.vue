@@ -71,6 +71,7 @@
 
 <script>
 import {mapGetters} from 'vuex'
+// import axios from "axios"
 
 export default {
   name: "Testing",
@@ -100,12 +101,15 @@ export default {
     setTimeout(() => {
       // init
       this.test = this.getTestById(Number.parseInt(this.$route.params.id));
-      this.timer = this.test.duration * 60;
+      this.timer = this.test.testing_time * 60;
       this.doTimer();
 
       this.loading = false;
       this.testReady = true;
     }, 2400);
+  },
+  mounted() {
+    //axios.post('https://github.com', {name: 'new name'});
   }
 }
 </script>
