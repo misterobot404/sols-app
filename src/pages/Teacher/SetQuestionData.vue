@@ -109,12 +109,12 @@
 import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
 import {TiptapVuetify} from 'tiptap-vuetify'
 import html_extensions from '@/plugins/tiptapDefaultExtensions'
-import FileUpload from "../../components/Teacher/CreateQuestion/FileUpload";
-import SingleChoice from "../../components/Teacher/CreateQuestion/SingleChoice";
-import MultiChoice from "../../components/Teacher/CreateQuestion/MultiChoice";
-import Conformity from "../../components/Teacher/CreateQuestion/Conformity";
-import Ranging from "../../components/Teacher/CreateQuestion/Ranging";
-import TextInput from "../../components/Teacher/CreateQuestion/TextInput";
+import FileUpload from "../../components/CreateQuestion/FileUpload";
+import SingleChoice from "../../components/CreateQuestion/SingleChoice";
+import MultiChoice from "../../components/CreateQuestion/MultiChoice";
+import Conformity from "../../components/CreateQuestion/Conformity";
+import Ranging from "../../components/CreateQuestion/Ranging";
+import TextInput from "../../components/CreateQuestion/TextInput";
 
 export default {
   name: "SetQuestionData",
@@ -159,8 +159,8 @@ export default {
         this.createQuestion({question: this.question, right_answer: right_answer})
             .then(() => {
               this.loading = false;
-              this.clear();
               this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
+              this.clear();
             });
       } else {
         // set error to html editor
@@ -249,8 +249,8 @@ export default {
 /* Изменение разметки под более низкое разрешение */
 @media screen and (max-width: 600px) {
   .create-test-svg {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
 
   .create-test-title {

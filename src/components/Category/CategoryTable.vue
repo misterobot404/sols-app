@@ -67,8 +67,8 @@
 
 <script>
 import {mapMutations, mapState, mapActions} from 'vuex'
-import SetCategoryDataDialog from "@/components/Teacher/SetCategoryDataDialog";
-import DeleteConfirmation from "@/components/Teacher/DeleteConfirmation";
+import SetCategoryDataDialog from "@/components/Category/SetCategoryDataDialog";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
 
 export default {
   name: "CategoryTable",

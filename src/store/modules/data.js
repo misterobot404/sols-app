@@ -60,10 +60,23 @@ export default {
                 testing_time: 90,
                 password: null,
                 created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
-            }
+            },
+            {
+                id: 4,
+                is_active: true,
+                type: "Тест",
+                name: "Тест без времени",
+                count_of_questions_by_lvl: [3, 3, 3],
+                category_ids: [2, 1],
+                date_of_beginning: null,
+                date_of_finishing: null,
+                testing_time: null,
+                password: null,
+                created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
+            },
         ],
         active_tests: [
-            {
+            /*{
                 id: 1,
                 user_id: 1,
                 test_id: 1,
@@ -89,7 +102,7 @@ export default {
                         data: null
                     },
                 ]
-            }
+            }*/
         ],
         test_types: ["Тест", "Викторина", "Опрос"],
         questions: [
@@ -287,26 +300,47 @@ export default {
         getCategoryById: state => id => {
             return state.categories.find(category => category.id === id);
         },
-        getQuestionsByCategoryId: state => id => {
-            return state.questions.filter(question => question.category_id === id);
+        getQuestionsByCategoryId: state => category_id => {
+            return state.questions.filter(question => question.category_id === category_id);
         },
         getQuestionById: state => id => {
             return state.questions.find(question => question.id === id);
         },
-        getRightAnswerByQuestionId: state => id => {
-            return (state.right_answers.find(answer => answer.question_id === id));
+        getRightAnswerByQuestionId: state => question_id => {
+            return (state.right_answers.find(answer => answer.question_id === question_id));
         },
         getQuestionTypeById: state => id => {
             return (state.question_types.find(type => type.id === id));
         },
         getTestById: state => id => {
             return state.tests.find(test => test.id === id);
+        },
+        getActiveTestByTestId: state => test_id => {
+            return state.active_tests.find(active_test => active_test.test_id === test_id);
         }
     },
     actions: {
-        /*getTest({state, commit, getters}, test_id) {
-            // active test exist for current users
-            // or generate new active test
+        /*getActiveTest() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 800)
+            })
+        },*/
+        startTest({commit}, test_id) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    commit('CREATE_ACTIVE_TEST', {test_id: test_id});
+                    resolve();
+                }, 800)
+            })
+        },
+        /*getAllActiveTests({state}) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 800)
+            })
         },*/
 
         createTest({commit}, test) {
@@ -399,6 +433,14 @@ export default {
         },
     },
     mutations: {
+        CREATE_ACTIVE_TEST(state, active_test) {
+            // data will be added to backend
+            active_test.id = Math.max(...state.active_tests.map(el => el.id)) + 1;
+            active_test.created_at = new Date();
+
+            state.active_tests.push(active_test);
+        },
+
         CREATE_TEST(state, test) {
             // data will be added to backend
             test.id = Math.max(...state.tests.map(el => el.id)) + 1;

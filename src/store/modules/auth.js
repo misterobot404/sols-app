@@ -6,7 +6,7 @@ export default {
 
     state: {
         auth_host: "http://192.168.77.13",
-        // teacher, student or null
+        // Teacher, Student or null
         role: window.localStorage.getItem('role'),
         token: window.localStorage.getItem('token')
     },
@@ -24,7 +24,7 @@ export default {
                 headers: {"Content-Type": "multipart/form-data"}
             })
                 .then(response =>
-                    commit('LOGIN', {token: response.data.token, role: response.data.is_teacher ? "teacher" : "student"})
+                    commit('LOGIN', {token: response.data.token, role: response.data.is_teacher ? "Teacher" : "Student"})
                 )
         },
         register({state, commit}, payload) {
@@ -36,9 +36,7 @@ export default {
             return axios.post(state.auth_host + '/api/registration', formData, {
                 headers: {"Content-Type": "multipart/form-data"}
             })
-                .then(response =>
-                    commit('LOGIN', {token: response.data.token, role: response.data.is_teacher ? "teacher" : "student"})
-                )
+                .then(response => commit('LOGIN', {token: response.data.token, role: response.data.is_teacher ? "Teacher" : "Student"}))
         }
     },
     mutations: {

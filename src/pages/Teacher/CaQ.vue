@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import CategoryTable from "@/components/Teacher/CategoryTable";
-import QuestionTable from "@/components/Teacher/QuestionTable";
+import CategoryTable from "@/components/Category/CategoryTable";
+import QuestionTable from "@/components/QuestionTable";
 
 export default {
   name: "QuestionCategories",
@@ -44,8 +44,8 @@ export default {
 /* Изменение разметки под более низкое разрешение */
 @media screen and (max-width: 600px) {
   .questions-svg {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
 
   .questions-title {

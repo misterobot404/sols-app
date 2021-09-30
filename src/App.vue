@@ -13,10 +13,10 @@
     <PopUpMsg/>
     <v-main>
       <!-- Navigation -->
-      <NavigationTeacher v-if="role === 'teacher'"/>
-      <NavigationStudent v-else-if="role === 'student'"/>
+      <NavigationTeacher v-if="role === 'Teacher'"/>
+      <NavigationStudent v-else-if="role === 'Student'"/>
       <!-- Page -->
-      <keep-alive exclude="Testing">
+      <keep-alive>
         <router-view/>
       </keep-alive>
     </v-main>
@@ -25,9 +25,9 @@
 
 <script>
 import {mapState} from 'vuex'
-import NavigationTeacher from "./components/Teacher/NavigationTeacher";
-import NavigationStudent from "./components/Student/NavigationStudent";
-import PopUpMsg from "@/components/Share/PopUpMsg";
+import NavigationTeacher from "./components/NavigationTeacher";
+import NavigationStudent from "./components/NavigationStudent";
+import PopUpMsg from "@/components/PopUpMsg";
 
 export default {
   name: 'App',

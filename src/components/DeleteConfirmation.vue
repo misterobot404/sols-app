@@ -44,7 +44,7 @@
 
 <script>
 export default {
-  name: "SetCategoryDataDialog",
+  name: "DeleteConfirmation",
   props: [
       "show",
       "header",

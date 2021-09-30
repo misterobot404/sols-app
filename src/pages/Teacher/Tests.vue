@@ -10,11 +10,42 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <div class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-8 mb-4" style="margin-top: 30px; background: #FEFEFF;">
+    <div class="rounded-lg d-flex flex-column align-center pt-12 pb-8 mb-4" style="margin-top: 30px; background: #FEFEFF;">
       <v-col cols="11" class="pa-0">
+        <!-- Filters  -->
+        <v-toolbar flat class="hide-padding mb-4">
+          <v-radio-group v-model="show_active" hide-details row>
+            <v-radio :value="true" :label="$vuetify.breakpoint.xs ? 'Акт.' : 'Активные'"/>
+            <v-radio :value="false" :label="$vuetify.breakpoint.xs ? 'Арх.' : 'Архив'"/>
+          </v-radio-group>
+          <v-spacer/>
+          <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Поиск..."
+              style="max-width: 340px"
+              single-line
+              hide-details
+          />
+          <v-btn icon class="ml-2" @click="sync">
+            <v-icon>
+              sync
+            </v-icon>
+          </v-btn>
+          <v-btn-toggle v-model="show_type" dense color="primary" class="ml-2" mandatory>
+            <v-btn value="table">
+              <v-icon style="opacity: 0.8">calendar_view_month</v-icon>
+            </v-btn>
+            <v-btn value="cards">
+              <v-icon style="opacity: 0.8">grid_view</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </v-toolbar>
+        <!-- Table -->
         <v-data-table
+            v-show="show_type === 'table'"
             :headers="headers"
-            :items="tableData"
+            :items="processedData"
             :loading="loading"
             loader-height="2"
             :search="search"
@@ -25,35 +56,13 @@
             :footer-props="{'items-per-page-text':'Строк на странице:'}"
             :expanded.sync="expanded"
         >
-          <template v-slot:top>
-            <v-toolbar flat class="mb-4">
-              <v-radio-group v-model="showActive" hide-details row>
-                <v-radio :value="true" label="Активные"/>
-                <v-radio :value="false" label="Архив"/>
-              </v-radio-group>
-              <v-spacer/>
-              <v-text-field
-                  v-model="search"
-                  append-icon="search"
-                  label="Поиск..."
-                  style="max-width: 340px"
-                  single-line
-                  hide-details
-              />
-              <v-btn icon class="ml-2" @click="sync">
-                <v-icon>
-                  sync
-                </v-icon>
-              </v-btn>
-            </v-toolbar>
-          </template>
           <template v-slot:item.actions="{ item }">
             <v-btn icon :to="'/tests/' + item.id">
               <v-icon>
                 play_circle_outline
               </v-icon>
             </v-btn>
-            <v-btn icon :to="'/teacher/tests/' + item.id + '/edit'">
+            <v-btn icon :to="'/Teacher/tests/' + item.id + '/edit'">
               <v-icon class="material-icons-outlined">
                 edit
               </v-icon>
@@ -94,8 +103,80 @@
             </td>
           </template>
         </v-data-table>
+        <!-- Cards -->
+        <v-row class="pt-4 justify-center" v-show="show_type === 'cards'">
+          <v-col cols="11" sm="6" lg="4" xl="3" class="pa-4" v-for="(test, index) in processedData" :key="index">
+            <v-card>
+              <v-img
+                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+                  height="200px"
+              />
+              <v-card-subtitle class="pb-0 p-14-medium">
+                <span v-text="test.type"/> • Вопросов: <span v-text="test.count_of_questions_by_lvl.reduce((a, b) => a + b, 0)"/>
+              </v-card-subtitle>
+              <v-card-title v-text="test.name" class="mb-2 pt-2"/>
+              <v-card-subtitle>
+                <v-chip
+                    v-for="(categoryId) in test.category_ids"
+                    class="mr-2 mb-1"
+                    small
+                    :key="categoryId"
+                    v-text="getCategoryById(categoryId).name"
+                />
+              </v-card-subtitle>
+              <v-card-actions>
+                <v-spacer/>
+                <v-menu
+                    rounded="lg"
+                    offset-y
+                >
+                  <template v-slot:activator="{ attrs, on }">
+                    <v-btn
+                        icon
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                      <v-icon>settings</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item :to="'/Teacher/tests/' + test.id + '/edit'">
+                      <v-list-item-title>Редактировать</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="share(test)">
+                      <v-list-item-title>Поделиться</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item v-if="test.is_active" @click="archiveTest(test)">
+                      <v-list-item-title>Переместить в архив</v-list-item-title>
+                    </v-list-item>
+                    <template v-else>
+                      <v-list-item @click="unarchiveTest(test)">
+                        <v-list-item-title>Переместить в активные</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item @click="openDeleteDialog(test)">
+                        <v-list-item-title>Удалить</v-list-item-title>
+                      </v-list-item>
+                    </template>
+                  </v-list>
+                </v-menu>
+                <v-btn
+                    :to="'/tests/' + test.id"
+                    dark
+                    color="success"
+                    depressed
+                    class="ma-2 mt-1 px-4 h4"
+                    style="letter-spacing: 0.05em"
+                >
+                  Открыть
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+        <!-- Delete dialog -->
         <DeleteConfirmation
-            :show.sync="showDeleteDialog"
+            :show.sync="show_delete_dialog"
             header="Удалить этот тест?"
             :body="selected_test_to_delete ? 'Вы собираетесь удалить тест \'' + selected_test_to_delete.name + '\'. Восстановить его будет нельзя.' : null"
             @confirm="lDeleteTest"
@@ -107,7 +188,7 @@
 
 <script>
 import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
-import DeleteConfirmation from "@/components/Teacher/DeleteConfirmation";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
 
 export default {
   name: "Tests",
@@ -115,13 +196,15 @@ export default {
   data() {
     return {
       loading: false,
-      showActive: true,
+      show_active: true,
+      show_type: localStorage.getItem("tests_show_type") ? localStorage.getItem("tests_show_type") : "cards",
       search: "",
+      // table
       expanded: [],
       headers: [
         {text: 'Название', value: 'name', class: ''},
         {text: 'Тип', value: 'type', class: ''},
-        {text: 'Кол-во вопросов', value: 'count_of_questions_by_lvl'},
+        {text: 'Кол-во вопросов', value: 't_count_of_questions_by_lvl'},
         {text: 'Время прохождения (мин.)', value: 'testing_time', class: 'small-table-col'},
         {text: 'Дата начала', value: 'date_of_beginning'},
         {text: 'Дата окончания', value: 'date_of_finishing'},
@@ -129,21 +212,22 @@ export default {
         {text: 'Дата создания', value: 'created_at'},
         {value: 'actions', sortable: false, align: 'right'},
       ],
-      // Delete dialog
-      showDeleteDialog: false,
+      // delete dialog
+      show_delete_dialog: false,
       selected_test_to_delete: null
     }
   },
   computed: {
     ...mapState('data', ["tests"]),
     ...mapGetters('data', ['getCategoryById']),
-    tableData() {
-      // DATE FORMATTING FOR PRINTF TO TABLE
+    processedData() {
       let result = this.tests.map(a => Object.assign({}, a));
       // filter tests by is_active
-      result = result.filter(el => el.is_active === this.showActive);
+      result = result.filter(el => el.is_active === this.show_active);
+
+      // DATE FORMATTING FOR PRINTF TO TABLE
       // count + level of question
-      result.forEach(el => el.count_of_questions_by_lvl = el.count_of_questions_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' ( ' + el.count_of_questions_by_lvl.join(' / ') + ' )');
+      result.forEach(el => el.t_count_of_questions_by_lvl = el.count_of_questions_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' ( ' + el.count_of_questions_by_lvl.join(' / ') + ' )');
       // datetime
       result.forEach(el => el.date_of_beginning ? el.date_of_beginning = el.date_of_beginning.toLocaleDateString('ru-RU') + ' ' + el.date_of_beginning.toLocaleTimeString('ru-RU', {
         hour: '2-digit',
@@ -161,18 +245,26 @@ export default {
       result.forEach(el => el.testing_time ? null : el.testing_time = "Не установлено");
       // password
       result.forEach(el => el.password ? null : el.password = "Не установлено");
-      // show on data
+
       return result.reverse();
     }
   },
+  watch: {
+    show_type(val) {
+      localStorage.setItem("tests_show_type", val)
+    }
+  },
   methods: {
-    ...mapActions('data',['deleteTest']),
+    ...mapActions('data', ['deleteTest']),
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST', 'DELETE_TEST']),
     share(test) {
-      navigator.clipboard.writeText(test.name).then(() => {
-        this.SHOW_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"});
-      })
+      try {
+        navigator.clipboard.writeText(test.name)
+            .then(() => this.SHOW_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"}))
+      } catch (err) {
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Ссылка не может быть скопирована"})
+      }
     },
     archiveTest(test) {
       this.ARCHIVE_TEST(test.id);
@@ -191,7 +283,7 @@ export default {
     },
     openDeleteDialog(question) {
       this.selected_test_to_delete = question;
-      this.showDeleteDialog = true;
+      this.show_delete_dialog = true;
     },
     lDeleteTest() {
       this.loading = true;
@@ -221,8 +313,8 @@ export default {
 /* Изменение разметки под более низкое разрешение */
 @media screen and (max-width: 600px) {
   .tests-svg {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
 
   .tests-title {
@@ -236,6 +328,10 @@ export default {
 <style>
 .small-table-col {
   width: 160px;
+}
+
+.hide-padding > .v-toolbar__content {
+  padding: 4px 0;
 }
 
 .v-data-table > .v-data-table__wrapper tbody tr.v-data-table__expanded__content {

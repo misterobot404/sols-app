@@ -7,6 +7,7 @@ axios.interceptors.response.use(
         // Обращение к защищенному ресурсу без прав
         if (error.response.status === 401 || error.response.status === 403) {
             if (store.state["auth/token"]) store.commit("auth/LOGOUT", null, {root: true});
+            return Promise.reject(error);
         } else return Promise.reject(error);
     });
 

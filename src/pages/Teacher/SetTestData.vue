@@ -69,7 +69,7 @@
             >
               <v-col cols="12" md="4" v-for="(_, i) in test.count_of_questions_by_lvl" :key="i">
                 <v-text-field
-                    v-model="test.count_of_questions_by_lvl[i]"
+                    v-model.number="test.count_of_questions_by_lvl[i]"
                     required
                     outlined
                     :rules="[(v) => !!v ||  '']"
@@ -161,7 +161,7 @@
           <v-col cols="12" md="6" v-show="show_duration">
             <h4>Время для прохождения (в минутах)</h4>
             <v-text-field
-                v-model="test.testing_time"
+                v-model.number="test.testing_time"
                 :rules="[(v) => !show_duration || !!v ||  '']"
                 required
                 append-icon="timer"
@@ -259,11 +259,11 @@ export default {
         this.createTest(this.test)
             .then(() => {
               this.loading = false;
-              this.clear();
               this.SHOW_MSG_DIALOG({
                 type: 'primary',
                 text: this.test.type + ': "' + this.test.name + '" ' + (this.test.type === "Викторина" ? "создана" : "создан")
               });
+              this.clear();
             });
       }
     },
@@ -282,21 +282,22 @@ export default {
             .then(() => {
               this.loading = false;
               this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
-              this.$router.push("/teacher/tests");
+              this.$router.push("/Teacher/tests");
             })
       }
     },
     clear() {
       // clear data
-      this.test.type = null;
-      this.test.name = null;
-      this.test.count_of_questions_by_lvl = [null, null, null];
-      this.test.category_ids = null;
-      this.test.date_of_beginning = null;
-      this.test.date_of_finishing = null;
-      this.test.testing_time = null;
-      this.test.password = null;
-
+      this.test = {
+        type: null,
+        name: null,
+        count_of_questions_by_lvl: [null, null, null],
+        category_ids: null,
+        date_of_beginning: null,
+        date_of_finishing: null,
+        testing_time: null,
+        password: null
+      }
       this.range = {
         start: null,
         end: null
@@ -364,8 +365,8 @@ export default {
 /* Изменение разметки под более низкое разрешение */
 @media screen and (max-width: 600px) {
   .create-test-svg {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
 
   .create-test-title {
