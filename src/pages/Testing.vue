@@ -28,7 +28,7 @@
             </div>
           </template>
           <div v-else class="d-flex justify-center align-center">
-            <v-img height="60%" contain :src="require('@/assets/infinity.png')"/>
+            <v-img height="50%" contain :src="require('@/assets/infinity.png')"/>
           </div>
         </div>
       </v-col>
@@ -38,11 +38,33 @@
       <v-spacer/>
     </v-row>
     <!-- Body -->
-    <div class="rounded-lg d-flex flex-column flex-grow-1 align-center py-8 mb-4" style="margin-top: 16px; background: #FEFEFF; overflow: hidden">
+    <div class="rounded-lg d-flex flex-column flex-grow-1 align-center pt-8 pb-6 mb-4" style="margin-top: 16px; background: #FEFEFF; overflow: hidden">
       <v-fade-transition style="height: 100%;" v-if="test">
-        <v-col v-if="testStarted" cols="10" lg="8">
-          {{ active_test }}
+        <!-- Тест -->
+        <v-col v-if="testStarted" cols="10" class="d-flex flex-column flex-grow-1">
+          <div class="d-flex flex-grow-1">
+            <div>
+              <div class="d-flex justify-space-between">
+                <h2 v-text="test.name"/>
+                <v-btn text small style="text-transform: none">
+                  <v-icon class="mr-1" style="color: rgba(0,0,0, 0.6)">bug_report</v-icon>
+                  Сообщить об ошибке
+                </v-btn>
+              </div>
+              <div style="border: 1px rgba(0,0,0, 0.4) solid;" class="flex-grow-1 rounded-lg mt-4 pa-4">
+                <div/>
+                <div v-text="active_test.questions"/>
+              </div>
+            </div>
+            <div style="width: 60px; height: 100%">
+              q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q<br>q
+            </div>
+          </div>
+          <div class="d-flex justify-center">
+            <v-btn outlined color="primary" rounded class="mt-4" style="min-width: 160px">Далее</v-btn>
+          </div>
         </v-col>
+        <!-- Стартовый экран теста -->
         <v-col v-else cols="10" lg="8">
           <v-img height="240" class="rounded-xl" :src="require('@/assets/testing.jpg')"/>
           <h1 class="text-center mt-6" style="font-size: 32px" v-text="test.name"/>

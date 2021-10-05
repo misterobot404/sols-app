@@ -17,7 +17,7 @@
         class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
         style="margin-top: 30px; background: #FEFEFF;"
     >
-      <v-col cols="11" md="10" xl="9">
+      <v-col cols="11" md="10" xl="9" v-if="question">
         <v-row class="align-center justify-center">
           <v-col cols="12" md="6">
             <h4>Выберите категорию</h4>
@@ -75,7 +75,13 @@
           </v-col>
           <v-col cols="12">
             <h4>Тип ответа</h4>
-            <v-radio-group v-model="question.type_id" row class="d-flex flex-row">
+            <!-- @change: Удаляем тело ответа и ключ-->
+            <v-radio-group
+                v-model="question.type_id"
+                @change="question.body = null; right_answer.answer = null;"
+                row
+                class="d-flex flex-row"
+            >
               <v-radio
                   v-for="n in question_types"
                   :key="n.id"
@@ -133,16 +139,9 @@ export default {
       mode: null,
       loading: false,
       html_extensions,
-      // data
-      question: {
-        text: "",
-        commentary: "",
-        level: null,
-        body: [],
-        category_id: null,
-        type_id: null,
-      },
-      right_answer: []
+      // init in beforeRouteEnter
+      question: null,
+      right_answer: null
     }
   },
   computed: {
@@ -195,41 +194,38 @@ export default {
     },
     clear() {
       this.question = {
-        text: "",
-        commentary: "",
+        text: null,
+        commentary: null,
         level: null,
         body: null,
         category_id: null,
         type_id: null,
       };
-      this.right_answer = [];
+      this.right_answer = null;
       // clear form valid
       this.$refs.form.resetValidation();
     }
   },
   watch: {
-    'question.type_id'(_, oldVal) {
-      if (oldVal) {
-        this.question.body = null;
-        this.right_answer = [];
-      }
-    },
     'question.text'() {
       let el = this.$el.querySelector(".html-editor--error");
       if (el) el.classList.remove('html-editor--error');
     }
   },
   beforeRouteEnter(to, from, next) {
-    if (to.name === "EditQuestion") {
-      next(vm => {
+    next(vm => {
+      vm.clear();
+      // Страница редактирования. Получаем тест для редактирования
+      if (to.name === "EditQuestion") {
         vm.mode = "edit";
-        vm.question = JSON.parse(JSON.stringify(vm.getQuestionById(Number(vm.$route.params.id))));
+        let question_origin = vm.getQuestionById(Number(vm.$route.params.id));
+        vm.question = {...question_origin};
+        console.log(vm.question);
         vm.right_answer = JSON.parse(JSON.stringify(vm.getRightAnswerByQuestionId(Number(vm.$route.params.id))));
-      })
-    } else next(vm => {
-      if (vm.mode === "edit") vm.clear();
-      vm.mode = "create";
-    });
+      }
+      // Страница создания теста
+      else vm.mode = "create";
+    })
   }
 }
 </script>

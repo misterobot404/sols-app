@@ -302,6 +302,9 @@ export default {
         start: null,
         end: null
       };
+      this.show_range = true;
+      this.show_duration = true;
+      this.show_password = false;
       // clear form valid
       this.$refs.form.resetValidation();
     }
@@ -327,6 +330,10 @@ export default {
     if (to.name === "EditTest") {
       next(vm => {
         vm.mode = "edit";
+        vm.show_range = false;
+        vm.show_duration = false;
+        vm.show_password = false;
+
         Object.assign(vm.test, vm.getTestById(Number(vm.$route.params.id)));
 
         if (vm.test.date_of_beginning && vm.test.date_of_finishing) {

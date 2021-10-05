@@ -76,10 +76,11 @@ export default {
             },
         ],
         active_tests: [
-            /*{
+            {
                 id: 1,
                 user_id: 1,
-                test_id: 1,
+                test_id: 4,
+                created_at: new Date(),
                 questions: [
                     {
                         question_id: 1,
@@ -87,22 +88,22 @@ export default {
                     },
                     {
                         question_id: 2,
-                        data: null
+                        answer: null
                     },
                     {
                         question_id: 3,
-                        data: null
+                        answer: null
                     },
                     {
                         question_id: 4,
-                        data: null
+                        answer: null
                     },
                     {
                         question_id: 5,
-                        data: null
+                        answer: null
                     },
                 ]
-            }*/
+            }
         ],
         test_types: ["Тест", "Викторина", "Опрос"],
         questions: [
@@ -145,7 +146,7 @@ export default {
                 commentary: null,
                 level: "Сложный",
                 text: '<p>Расположите события в порядке следования</p>',
-                body: ["Событие 1","Событие 2","Событие 3"],
+                body: ["Событие 1", "Событие 2", "Событие 3"],
                 // refs
                 category_id: 3,
                 type_id: 4
@@ -156,78 +157,13 @@ export default {
                 level: "Сложный",
                 text: '<p>Соотнесите события</p>',
                 body: {
-                    left_list: ["Событие 1","Событие 2","Событие 3"],
+                    left_list: ["Событие 1", "Событие 2", "Событие 3"],
                     right_list: ["1998", "2000"]
                 },
                 // refs
                 category_id: 3,
                 type_id: 5
-            },
-            {
-                id: 6,
-                commentary: null,
-                level: "Средний",
-                text: '<p>Как называется первый язык программирования? 2</p>',
-                // refs
-                category_id: 2,
-                type_id: 3
-            },
-            {
-                id: 7,
-                commentary: null,
-                level: "Средний",
-                text: '<p>Как называется первый язык программирования? 3</p>',
-                // refs
-                category_id: 2,
-                type_id: 3
-            },
-            {
-                id: 8,
-                commentary: null,
-                level: "Средний",
-                text: '<p>Как называется первый язык программирования? 4</p>',
-                // refs
-                category_id: 2,
-                type_id: 3
-            },
-            {
-                id: 9,
-                commentary: null,
-                level: "Средний",
-                text: '<p>Как называется первый язык программирования? 5</p>',
-                // refs
-                category_id: 2,
-                type_id: 3
-            },
-            {
-                id: 10,
-                commentary: null,
-                level: "Лёгкий",
-                text: '<p>Что из перечисленного относится к трём китам ООП (три основные понятия)? 2</p>',
-                body: ["Модульность", "Однозначность", "Наследование", "Полиморфизм", "Разделение обязанностей", "Строгая типизация", "Инкапсуляция"],
-                // refs
-                category_id: 2,
-                type_id: 2
-            },
-            {
-                id: 11,
-                commentary: null,
-                level: "Лёгкий",
-                text: '<p>Что из перечисленного относится к трём китам ООП (три основные понятия)? 3</p>',
-                body: ["Модульность", "Однозначность", "Наследование", "Полиморфизм", "Разделение обязанностей", "Строгая типизация", "Инкапсуляция"],
-                // refs
-                category_id: 2,
-                type_id: 2
-            },
-            {
-                id: 12,
-                commentary: null,
-                level: "Средний",
-                text: '<p>Как называется первый язык программирования? 12312</p>',
-                // refs
-                category_id: 2,
-                type_id: 3
-            },
+            }
         ],
         question_types: [
             {
@@ -287,12 +223,12 @@ export default {
             {
                 id: 4,
                 question_id: 4,
-                answer: [3,1,2],
+                answer: [3, 1, 2],
             },
             {
                 id: 5,
                 question_id: 5,
-                answer: [1,1,2],
+                answer: [1, 1, 2],
             },
         ],
     },
@@ -345,11 +281,11 @@ export default {
 
         createTest({commit}, test) {
             return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('CREATE_TEST', test);
-                        resolve();
-                    }, 800)
-                })
+                setTimeout(() => {
+                    commit('CREATE_TEST', test);
+                    resolve();
+                }, 800)
+            })
         },
         updateTest({commit}, test) {
             return new Promise((resolve) => {
@@ -437,7 +373,28 @@ export default {
             // data will be added to backend
             active_test.id = Math.max(...state.active_tests.map(el => el.id)) + 1;
             active_test.created_at = new Date();
-
+            active_test.questions = [
+                {
+                    question_id: 1,
+                    answer: "Ключ ответа"
+                },
+                {
+                    question_id: 2,
+                    answer: null
+                },
+                {
+                    question_id: 3,
+                    answer: null
+                },
+                {
+                    question_id: 4,
+                    answer: null
+                },
+                {
+                    question_id: 5,
+                    answer: null
+                },
+            ];
             state.active_tests.push(active_test);
         },
 

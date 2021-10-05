@@ -131,10 +131,5 @@ export const routes = [
             title: "SOLS - Мои ответы",
             middlewareAuth: "Student"
         }
-    },
-    /* Dev */
-    {
-        path: '/devtest',
-        component: () => import('../pages/devtest'),
-    },
+    }
 ];
