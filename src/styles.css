@@ -1,27 +1,17 @@
-/* Navbar */
-.navbar-active-link h2 {
-    color: #1976D3 !important;
+.v-application {
+    font-family: Nunito, sans-serif !important;
 }
 
-.navbar-active-link .material-icons {
-    color: #1976D3 !important;
+.v-btn {
+    text-transform: none !important;
 }
 
-.navbar-link {
-    color: rgba(0, 0, 0, 0.48) !important;
-    transition: color 0.18s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
-}
-
-.navbar-link:hover {
-    color: rgba(0, 0, 0, 0.68) !important;
-}
-
-.navbar-link:hover .material-icons {
-    color: rgba(0, 0, 0, 0.68);
+html {
+    overflow-y: auto !important;
 }
 
 /* После адаптации интерфейса под более низкие разрешения, изменить min values */
-html, body {
+/*html, body {
     overflow-x: hidden;
     overflow-y: auto;
     min-width: 360px;
@@ -138,4 +128,4 @@ table {
 @font-face {
     font-family: Inter-Light;
     src: url(assets/fonts/Inter-Light.ttf);
-}
+}*/

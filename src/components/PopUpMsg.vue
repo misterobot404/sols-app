@@ -1,17 +1,17 @@
 <template>
   <v-snackbar
       v-model="m_popupMsg"
-      :color="popupMsg.type"
+      :color="popup_msg.type"
       top
       right
       rounded
       class="h4"
       :class="$vuetify.breakpoint.lgAndUp ? 'lg-margin' : null"
       content-class="text-center"
-      :timeout="popupMsg.timeout"
+      :timeout="popup_msg.timeout"
       transition="slide-y-transition"
   >
-    {{ popupMsg.text }}
+    {{ popup_msg.text }}
   </v-snackbar>
 </template>
 
@@ -19,12 +19,12 @@
 import {mapMutations, mapState} from "vuex";
 
 export default {
-  name: "PopUpMsg",
+  name: "popup_msg",
   computed: {
-    ...mapState('layout', ["popupMsg"]),
+    ...mapState('layout', ["popup_msg"]),
     m_popupMsg: {
       get() {
-        return this.popupMsg.show
+        return this.popup_msg.show
       },
       set() {
         this.HIDE_MSG_DIALOG()

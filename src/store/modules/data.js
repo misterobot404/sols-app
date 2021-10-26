@@ -268,7 +268,7 @@ export default {
                 setTimeout(() => {
                     commit('CREATE_ACTIVE_TEST', {test_id: test_id});
                     resolve();
-                }, 800)
+                }, 400)
             })
         },
         /*getAllActiveTests({state}) {
@@ -284,7 +284,7 @@ export default {
                 setTimeout(() => {
                     commit('CREATE_TEST', test);
                     resolve();
-                }, 800)
+                }, 400)
             })
         },
         updateTest({commit}, test) {
@@ -292,7 +292,7 @@ export default {
                     setTimeout(() => {
                         commit('UPDATE_TEST', test);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -301,7 +301,7 @@ export default {
                     setTimeout(() => {
                         commit('DELETE_TEST', id);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -316,7 +316,7 @@ export default {
                             right_answer: right_answer
                         })
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -326,7 +326,7 @@ export default {
                         commit('UPDATE_QUESTION', question);
                         commit('UPDATE_RIGHT_ANSWER', right_answer);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -335,7 +335,7 @@ export default {
                     setTimeout(() => {
                         commit('DELETE_QUESTION', id);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -345,7 +345,7 @@ export default {
                     setTimeout(() => {
                         commit('CREATE_CATEGORY', category);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -354,7 +354,7 @@ export default {
                     setTimeout(() => {
                         commit('UPDATE_CATEGORY', category);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },
@@ -363,7 +363,7 @@ export default {
                     setTimeout(() => {
                         commit('DELETE_CATEGORY', id);
                         resolve();
-                    }, 800)
+                    }, 400)
                 }
             )
         },

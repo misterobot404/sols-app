@@ -4,7 +4,7 @@
     <v-progress-linear
         color="blue darken-3"
         top
-        :active="pageLoading"
+        :active="page_loading"
         indeterminate
         absolute
         style="z-index: 10"
@@ -13,8 +13,7 @@
     <PopUpMsg/>
     <v-main>
       <!-- Navigation -->
-      <NavigationTeacher v-if="role === 'Teacher'"/>
-      <NavigationStudent v-else-if="role === 'Student'"/>
+      <Navigation v-if="user"/>
       <!-- Page -->
       <keep-alive>
         <router-view/>
@@ -25,20 +24,20 @@
 
 <script>
 import {mapState} from 'vuex'
-import NavigationTeacher from "./components/NavigationTeacher";
-import NavigationStudent from "./components/NavigationStudent";
+import Navigation from "./components/Navigation";
 import PopUpMsg from "@/components/PopUpMsg";
 
 export default {
   name: 'App',
   components: {
     PopUpMsg,
-    NavigationStudent,
-    NavigationTeacher
+    Navigation
   },
   computed: {
-    ...mapState('auth', ["role"]),
-    ...mapState('layout', ["pageLoading"]),
+    ...mapState({
+      page_loading: state => state.layout.page_loading,
+      user: state => state.auth.user,
+    })
   }
 }
 </script>

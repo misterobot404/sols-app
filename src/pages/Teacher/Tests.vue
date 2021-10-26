@@ -27,7 +27,7 @@
               single-line
               hide-details
           />
-          <v-btn icon class="ml-2" @click="sync">
+          <v-btn icon class="ml-2" @click="sync" :loading="loading">
             <v-icon>
               sync
             </v-icon>
@@ -40,21 +40,26 @@
               <v-icon style="opacity: 0.8">grid_view</v-icon>
             </v-btn>
           </v-btn-toggle>
+          <v-btn
+              @click="$router.push({name: 'CreateTest'})"
+              class="ml-5"
+              color="primary"
+          >
+            Создать тест
+          </v-btn>
         </v-toolbar>
         <!-- Table -->
         <v-data-table
             v-show="show_type === 'table'"
-            :headers="headers"
+            :headers="table.headers"
             :items="processedData"
-            :loading="loading"
-            loader-height="2"
             :search="search"
             no-results-text="Данные не найдены"
             no-data-text="Нет данных"
             multi-sort
             show-expand
             :footer-props="{'items-per-page-text':'Строк на странице:'}"
-            :expanded.sync="expanded"
+            :expanded.sync="table.expanded"
         >
           <template v-slot:item.actions="{ item }">
             <v-btn icon :to="'/tests/' + item.id">
@@ -126,6 +131,12 @@
               </v-card-subtitle>
               <v-card-actions>
                 <v-spacer/>
+                <v-btn
+                    icon
+                    :to="'/teacher/tests/' + test.id + '/edit'"
+                >
+                  <v-icon>edit</v-icon>
+                </v-btn>
                 <v-menu
                     rounded="lg"
                     offset-y
@@ -139,9 +150,8 @@
                       <v-icon>settings</v-icon>
                     </v-btn>
                   </template>
-
                   <v-list>
-                    <v-list-item :to="'/Teacher/tests/' + test.id + '/edit'">
+                    <v-list-item :to="'/teacher/tests/' + test.id + '/edit'">
                       <v-list-item-title>Редактировать</v-list-item-title>
                     </v-list-item>
                     <v-list-item @click="share(test)">
@@ -175,46 +185,43 @@
           </v-col>
         </v-row>
         <!-- Delete dialog -->
-        <DeleteConfirmation
-            :show.sync="show_delete_dialog"
-            header="Удалить этот тест?"
-            :body="selected_test_to_delete ? 'Вы собираетесь удалить тест \'' + selected_test_to_delete.name + '\'. Восстановить его будет нельзя.' : null"
-            @confirm="lDeleteTest"
-        />
+        <DeleteTestDialog :test="delete_test_dialog.test" :show.sync="delete_test_dialog.show"/>
       </v-col>
     </div>
   </v-container>
 </template>
 
 <script>
-import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
-import DeleteConfirmation from "@/components/DeleteConfirmation";
+import {mapMutations, mapState, mapGetters} from 'vuex'
+import DeleteTestDialog from "@/components/DeleteTestDialog";
 
 export default {
   name: "Tests",
-  components: {DeleteConfirmation},
+  components: {DeleteTestDialog},
   data() {
     return {
       loading: false,
       show_active: true,
       show_type: localStorage.getItem("tests_show_type") ? localStorage.getItem("tests_show_type") : "cards",
       search: "",
-      // table
-      expanded: [],
-      headers: [
-        {text: 'Название', value: 'name', class: ''},
-        {text: 'Тип', value: 'type', class: ''},
-        {text: 'Кол-во вопросов', value: 't_count_of_questions_by_lvl'},
-        {text: 'Время прохождения (мин.)', value: 'testing_time', class: 'small-table-col'},
-        {text: 'Дата начала', value: 'date_of_beginning'},
-        {text: 'Дата окончания', value: 'date_of_finishing'},
-        {text: 'Пароль', value: 'password', class: ''},
-        {text: 'Дата создания', value: 'created_at'},
-        {value: 'actions', sortable: false, align: 'right'},
-      ],
-      // delete dialog
-      show_delete_dialog: false,
-      selected_test_to_delete: null
+      table: {
+        expanded: [],
+        headers: [
+          {text: 'Название', value: 'name', class: ''},
+          {text: 'Тип', value: 'type', class: ''},
+          {text: 'Кол-во вопросов', value: 't_count_of_questions_by_lvl'},
+          {text: 'Время прохождения (мин.)', value: 'testing_time', class: 'small-table-col'},
+          {text: 'Дата начала', value: 'date_of_beginning'},
+          {text: 'Дата окончания', value: 'date_of_finishing'},
+          {text: 'Пароль', value: 'password', class: ''},
+          {text: 'Дата создания', value: 'created_at'},
+          {value: 'actions', sortable: false, align: 'right'},
+        ]
+      },
+      delete_test_dialog: {
+        show: false,
+        test: null
+      }
     }
   },
   computed: {
@@ -255,15 +262,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions('data', ['deleteTest']),
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST', 'DELETE_TEST']),
+    ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST']),
     share(test) {
       try {
         navigator.clipboard.writeText(test.name)
             .then(() => this.SHOW_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"}))
       } catch (err) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Ссылка не может быть скопирована"})
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Ссылка не может быть скопирована. Используйте защищенное соединение"})
       }
     },
     archiveTest(test) {
@@ -279,20 +285,11 @@ export default {
       setTimeout(() => {
         this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
         this.loading = false;
-      }, 1000);
+      }, 400);
     },
-    openDeleteDialog(question) {
-      this.selected_test_to_delete = question;
-      this.show_delete_dialog = true;
-    },
-    lDeleteTest() {
-      this.loading = true;
-      this.deleteTest(this.selected_test_to_delete.id)
-          .then(() => {
-            this.loading = false;
-            this.SHOW_MSG_DIALOG({type: 'primary', text: 'Тест удален'});
-          });
-      this.selected_test_to_delete = null;
+    openDeleteDialog(test) {
+      this.delete_test_dialog.test = test;
+      this.delete_test_dialog.show = true;
     }
   }
 }

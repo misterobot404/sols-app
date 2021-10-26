@@ -6,7 +6,7 @@ export const routes = [
     /* testing */
     {
         path: '/tests/:id',
-        component: () => import('@/pages/Testing'),
+        component: () => import('@/pages/TestingProcess'),
         meta: {
             title: "SOLS - Прохождение теста"
         }
@@ -43,93 +43,103 @@ export const routes = [
             hideForAuth: true
         }
     },
-    /* Teacher */
+
+    // TEACHER
     {
-        path: '/Teacher',
-        redirect: '/Teacher/home'
+
+        path: '/teacher',
+        redirect: '/teacher/home'
     },
     {
-        path: '/Teacher/home',
+        name: "TeacherHome",
+        path: '/teacher/home',
         component: () => import('../pages/Teacher/Home'),
         meta: {
             title: "SOLS - Кабинет преподавателя",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
     // tests
     {
-        path: '/Teacher/tests',
+        name: "Tests",
+        path: '/teacher/tests',
         component: () => import('../pages/Teacher/Tests'),
         meta: {
             title: "SOLS - Список тестов",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
     {
         name: "CreateTest",
-        path: '/Teacher/tests/create',
+        path: '/teacher/tests/create',
         component: () => import('../pages/Teacher/SetTestData'),
         meta: {
             title: "SOLS - Создание теста",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
     {
         name: "EditTest",
-        path: '/Teacher/tests/:id/edit',
+        path: '/teacher/tests/:id/edit',
         component: () => import('../pages/Teacher/SetTestData'),
         meta: {
             title: "SOLS - Редактирование теста",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
     // questions
     {
-        name: "QuestionСategories",
-        path: '/Teacher/categories/:id?',
-        component: () => import('../pages/Teacher/CaQ'),
+        name: "BaseOfQuestions",
+        path: '/teacher/categories/:id?',
+        component: () => import('../pages/Teacher/BaseOfQuestions'),
         meta: {
             title: "SOLS - База вопросов",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
     {
         name: "CreateQuestion",
-        path: '/Teacher/questions/create',
+        path: '/teacher/questions/create',
         component: () => import('../pages/Teacher/SetQuestionData'),
         meta: {
             title: "SOLS - Конструктор вопросов",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
     {
         name: "EditQuestion",
-        path: '/Teacher/questions/:id/edit',
+        path: '/teacher/questions/:id/edit',
         component: () => import('../pages/Teacher/SetQuestionData'),
         meta: {
             title: "SOLS - Редактирование вопроса",
-            middlewareAuth: "Teacher"
+            middlewareAuth: "teacher"
         }
     },
-    /* Student */
+
+    // STUDENT
     {
-        path: '/Student',
-        redirect: '/Student/home'
+        path: '/student',
+        redirect: '/student/home'
     },
     {
-        path: '/Student/home',
+        path: '/student/home',
         component: () => import('../pages/Student/Home'),
         meta: {
             title: "SOLS - Кабинет студента",
-            middlewareAuth: "Student"
+            middlewareAuth: "student"
         }
     },
     {
-        path: '/Student/answers',
+        path: '/student/answers',
         component: () => import('../pages/Student/Answers'),
         meta: {
             title: "SOLS - Мои ответы",
-            middlewareAuth: "Student"
+            middlewareAuth: "student"
         }
-    }
+    },
+
+    {
+        path: '*',
+        redirect: '/',
+    },
 ];

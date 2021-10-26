@@ -1,14 +1,12 @@
-
 export default {
     namespaced: true,
-
     state: {
         // show / hide feedback dialog
-        feedbackDialog: false,
+        feedback_dialog: false,
         // show / hide progress line
-        pageLoading: false,
+        page_loading: false,
         // popup msg
-        popupMsg: {
+        popup_msg: {
             show: false,
             defaultTimeout: 2400,
             timeout: 2400,
@@ -20,26 +18,26 @@ export default {
     },
     mutations: {
         SHOW_PAGE_LOADING(state) {
-            state.pageLoading = true;
+            state.page_loading = true;
         },
         HIDE_PAGE_LOADING(state) {
-            state.pageLoading = false;
+            state.page_loading = false;
         },
         SHOW_FEEDBACK_DIALOG(state) {
-            state.feedbackDialog = true;
+            state.feedback_dialog = true;
         },
         HIDE_FEEDBACK_DIALOG(state) {
-            state.feedbackDialog = false;
+            state.feedback_dialog = false;
         },
         SHOW_MSG_DIALOG(state, payload) {
-            state.popupMsg.type = payload.type;
-            state.popupMsg.text = payload.text;
-            if (payload.timeout) state.popupMsg.timeout = payload.timeout;
-            state.popupMsg.show = true;
+            state.popup_msg.type = payload.type;
+            state.popup_msg.text = payload.text;
+            if (payload.timeout) state.popup_msg.timeout = payload.timeout;
+            state.popup_msg.show = true;
         },
         HIDE_MSG_DIALOG(state) {
-            state.popupMsg.show = false;
-            state.popupMsg.timeout = state.popupMsg.defaultTimeout;
+            state.popup_msg.show = false;
+            state.popup_msg.timeout = state.popup_msg.defaultTimeout;
         },
     }
 }

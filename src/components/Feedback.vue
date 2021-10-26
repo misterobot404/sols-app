@@ -15,7 +15,7 @@
       <v-icon>help_outline</v-icon>
     </v-btn>
     <v-fab-transition>
-      <div class="feedback-dialog" v-if="feedbackDialog">
+      <div class="feedback-dialog" v-if="feedback_dialog">
         <!-- Dialog -->
         <v-card v-click-outside="HIDE_FEEDBACK_DIALOG">
           <!-- Header -->
@@ -153,7 +153,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('layout', ["feedbackDialog"]),
+    ...mapState('layout', ["feedback_dialog"]),
   },
   methods: {
     ...mapMutations('layout', ["HIDE_FEEDBACK_DIALOG", "SHOW_FEEDBACK_DIALOG"]),

@@ -36,7 +36,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon :to="'/Teacher/questions/' + item.id + '/edit'">
+        <v-btn icon :to="'/teacher/questions/' + item.id + '/edit'">
           <v-icon class="material-icons-outlined">
             edit
           </v-icon>
@@ -59,7 +59,7 @@
 
 <script>
 import {mapMutations, mapGetters, mapState, mapActions} from 'vuex'
-import DeleteConfirmation from "@/components/DeleteConfirmation";
+import DeleteConfirmation from "@/components/DeleteTestDialog";
 
 export default {
   name: "QuestionTable",

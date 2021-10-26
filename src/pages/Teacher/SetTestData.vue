@@ -282,7 +282,7 @@ export default {
             .then(() => {
               this.loading = false;
               this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
-              this.$router.push("/Teacher/tests");
+              this.$router.push("/teacher/tests");
             })
       }
     },

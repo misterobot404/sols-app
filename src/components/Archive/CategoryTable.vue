@@ -68,7 +68,7 @@
 <script>
 import {mapMutations, mapState, mapActions} from 'vuex'
 import SetCategoryDataDialog from "@/components/Category/SetCategoryDataDialog";
-import DeleteConfirmation from "@/components/DeleteConfirmation";
+import DeleteConfirmation from "@/components/DeleteTestDialog";
 
 export default {
   name: "CategoryTable",
@@ -147,15 +147,6 @@ export default {
     openDeleteDialog(category) {
       this.selected_category_to_delete = category;
       this.showDeleteDialog = true;
-    },
-    lDeleteCategory() {
-      this.loading = true;
-      this.deleteCategory(this.selected_category_to_delete.id)
-          .then(() => {
-            this.loading = false;
-            this.SHOW_MSG_DIALOG({type: 'primary', text: 'Категория удалена'});
-          });
-      this.selected_category_to_delete = null;
     }
   }
 }

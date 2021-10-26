@@ -3,17 +3,13 @@ import router from './../../routes'
 
 export default {
     namespaced: true,
-
     state: {
         auth_host: "http://192.168.77.13",
-        // Teacher, Student or null
-        role: window.localStorage.getItem('role'),
+        user: window.localStorage.getItem('user') ? JSON.parse(window.localStorage.getItem('user')) : null,
         token: window.localStorage.getItem('token')
     },
-    getters: {
-        role: state => state.role
-    },
     actions: {
+        // Login
         // payload: login, password
         login({state, commit}, payload) {
             let formData = new FormData();
@@ -24,9 +20,14 @@ export default {
                 headers: {"Content-Type": "multipart/form-data"}
             })
                 .then(response =>
-                    commit('LOGIN', {token: response.data.token, role: response.data.is_teacher ? "Teacher" : "Student"})
+                    commit('LOGIN', {
+                        token: response.data.token,
+                        user: {...response.data.info, role: response.data.is_teacher ? "teacher" : "student"}
+                    })
                 )
         },
+        // Registration + login
+        // payload: login, password, confirm_password
         register({state, commit}, payload) {
             let formData = new FormData();
             formData.append('login', payload.login);
@@ -36,42 +37,39 @@ export default {
             return axios.post(state.auth_host + '/api/registration', formData, {
                 headers: {"Content-Type": "multipart/form-data"}
             })
-                .then(response => commit('LOGIN', {token: response.data.token, role: response.data.is_teacher ? "Teacher" : "Student"}))
+                .then(response => {
+                    commit('LOGIN', {
+                        token: response.data.token,
+                        user: {...response.data.info, role: response.data.is_teacher ? "teacher" : "student"}
+                    });
+                })
         }
     },
     mutations: {
-        /**
-         * Set authentication data
-         *
-         * @param state
-         * @param payload: role + token + user
-         */
+        // Set authentication data
+        // payload: user, token, user
         LOGIN: (state, payload) => {
-            state.role = payload.role;
+            state.user = payload.user;
             state.token = payload.token;
 
             // add token to axios header
             axios.defaults.headers.common['token'] = payload.token;
             // saving auth token between sessions
-            window.localStorage.setItem('role', state.role);
+            window.localStorage.setItem('user', JSON.stringify(state.user));
             window.localStorage.setItem('token', payload.token);
 
-            router.push("/" + state.role).then();
+            router.push("/" + state.user.role).then();
         },
-        /**
-         * Remove authentication data from state and localStorage. Remove token from axios header.
-         *
-         * @param state
-         */
+        // Remove authentication data from state and localStorage. Remove token from axios header.
         LOGOUT: state => {
-            state.role = null;
+            state.user = null;
             state.token = null;
 
             // remove auth token between sessions
-            window.localStorage.removeItem('role');
+            window.localStorage.removeItem('user');
             window.localStorage.removeItem('token');
 
-            // add token to axios header
+            // remove token from axios header
             delete axios.defaults.headers.common['token'];
 
             if (router.currentRoute.path !== '/signin')
