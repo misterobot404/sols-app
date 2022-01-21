@@ -3,8 +3,6 @@ export default {
     state: {
         // show / hide feedback dialog
         feedback_dialog: false,
-        // show / hide progress line
-        page_loading: false,
         // popup msg
         popup_msg: {
             show: false,
@@ -14,15 +12,8 @@ export default {
             // primary or error
             type: ""
         },
-
     },
     mutations: {
-        SHOW_PAGE_LOADING(state) {
-            state.page_loading = true;
-        },
-        HIDE_PAGE_LOADING(state) {
-            state.page_loading = false;
-        },
         SHOW_FEEDBACK_DIALOG(state) {
             state.feedback_dialog = true;
         },

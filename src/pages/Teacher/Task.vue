@@ -17,12 +17,12 @@
         class="rounded-lg d-flex flex-column align-center align-center pt-12 pb-6 mb-8"
         style="margin-top: 30px; background: #FEFEFF;"
     >
-      <v-col cols="11" md="10" xl="9" v-if="question">
+      <v-col cols="11" md="10" xl="9" v-if="task">
         <v-row class="align-center justify-center">
           <v-col cols="12" md="6">
             <h4>Выберите категорию</h4>
             <v-select
-                v-model="question.category_id"
+                v-model="task.category_id"
                 :items="categories"
                 :item-text="'name'"
                 :item-value="'id'"
@@ -35,14 +35,14 @@
           <v-col cols="12" md="6" align-self="start" class="pl-md-8">
             <h4>Уровень сложности</h4>
             <v-radio-group
-                v-model="question.level"
-                :rules="[ !!question.level || '']"
+                v-model="task.level"
+                :rules="[ !!task.level || '']"
                 row
                 class="d-flex justify-space-between"
                 hide-details
             >
               <v-radio
-                  v-for="n in question_levels"
+                  v-for="n in task_levels"
                   :key="n"
                   :label="n"
                   :value="n"
@@ -54,7 +54,7 @@
           <v-col cols="12">
             <h4>Текст вопроса</h4>
             <tiptap-vuetify
-                v-model="question.text"
+                v-model="task.text"
                 class="mt-3"
                 :toolbar-attributes="{ color: 'rgba(0, 0, 0, 0.04)' }"
                 :extensions="html_extensions"
@@ -64,7 +64,7 @@
           <v-col cols="12">
             <h4>Примечание к вопросу</h4>
             <v-text-field
-                v-model="question.commentary"
+                v-model="task.commentary"
                 required
                 hide-details
                 append-icon="error_outline"
@@ -77,13 +77,13 @@
             <h4>Тип ответа</h4>
             <!-- @change: Удаляем тело ответа и ключ-->
             <v-radio-group
-                v-model="question.type_id"
-                @change="question.body = null; right_answer.answer = null;"
+                v-model="task.type_id"
+                @change="task.body = null; right_answer.answer = null;"
                 row
                 class="d-flex flex-row"
             >
               <v-radio
-                  v-for="n in question_types"
+                  v-for="n in task_types"
                   :key="n.id"
                   :value="n.id"
                   class="col-md-3 col-6 justify-start mr-0"
@@ -97,11 +97,11 @@
               </v-radio>
             </v-radio-group>
           </v-col>
-          <v-col cols="12" v-if="question.type_id">
+          <v-col cols="12" v-if="task.type_id">
             <component
-                :is="getQuestionTypeById(question.type_id).component"
-                :data="mode === 'create' ? null : { body: question.body, right_answer: right_answer.answer }"
-                @done="(v) => mode === 'create' ? lCreateQuestion(v) : lUpdateQuestion(v)"
+                :is="getTaskTypeById(task.type_id).component"
+                :data="mode === 'create' ? null : { body: task.body, right_answer: right_answer.answer }"
+                @done="(v) => mode === 'create' ? lCreateTask(v) : lUpdateTask(v)"
                 :loading="loading"
             />
           </v-col>
@@ -115,15 +115,15 @@
 import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
 import {TiptapVuetify} from 'tiptap-vuetify'
 import html_extensions from '@/plugins/tiptapDefaultExtensions'
-import FileUpload from "../../components/CreateQuestion/FileUpload";
-import SingleChoice from "../../components/CreateQuestion/SingleChoice";
-import MultiChoice from "../../components/CreateQuestion/MultiChoice";
-import Conformity from "../../components/CreateQuestion/Conformity";
-import Ranging from "../../components/CreateQuestion/Ranging";
-import TextInput from "../../components/CreateQuestion/TextInput";
+import FileUpload from "../../components/Tasks/FileUpload"
+import SingleChoice from "../../components/Tasks/SingleChoice"
+import MultiChoice from "../../components/Tasks/MultiChoice"
+import Conformity from "../../components/Tasks/Conformity"
+import Ranging from "../../components/Tasks/Ranging"
+import TextInput from "../../components/Tasks/TextInput"
 
 export default {
-  name: "SetQuestionData",
+  name: "Task",
   components: {
     TiptapVuetify,
     // answer types
@@ -140,22 +140,22 @@ export default {
       loading: false,
       html_extensions,
       // init in beforeRouteEnter
-      question: null,
+      task: null,
       right_answer: null
     }
   },
   computed: {
-    ...mapState('data', ["categories", "question_levels", "question_types"]),
-    ...mapGetters('data', ['getQuestionTypeById', 'getQuestionById', 'getRightAnswerByQuestionId']),
+    ...mapState('data', ["categories", "task_levels", "task_types"]),
+    ...mapGetters('data', ['getTaskTypeById', 'getTaskById', 'getRightAnswerByTaskId']),
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data', ['createQuestion', 'updateQuestion']),
-    lCreateQuestion({body, right_answer}) {
-      if (this.$refs.form.validate() && this.question.text) {
+    ...mapActions('data', ['createTask', 'updateTask']),
+    lCreateTask({body, right_answer}) {
+      if (this.$refs.form.validate() && this.task.text) {
         this.loading = true;
-        this.question.body = body;
-        this.createQuestion({question: this.question, right_answer: right_answer})
+        this.task.body = body;
+        this.createTask({task: this.task, right_answer: right_answer})
             .then(() => {
               this.loading = false;
               this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
@@ -163,7 +163,7 @@ export default {
             });
       } else {
         // set error to html editor
-        if (!this.question.text) this.$el.querySelector(".html-editor").classList.add('html-editor--error');
+        if (!this.task.text) this.$el.querySelector(".html-editor").classList.add('html-editor--error');
         // scroll to error
         this.$nextTick(() => {
           let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
@@ -171,12 +171,12 @@ export default {
         });
       }
     },
-    lUpdateQuestion({body, right_answer}) {
-      if (this.$refs.form.validate() && this.question.text) {
+    lUpdateTask({body, right_answer}) {
+      if (this.$refs.form.validate() && this.task.text) {
         this.loading = true;
-        this.question.body = body;
+        this.task.body = body;
         this.right_answer.answer = right_answer;
-        this.updateQuestion({question: this.question, right_answer: this.right_answer})
+        this.updateTask({task: this.task, right_answer: this.right_answer})
             .then(() => {
               this.loading = false;
               this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
@@ -184,7 +184,7 @@ export default {
             })
       } else {
         // set error to html editor
-        if (!this.question.text) this.$el.querySelector(".html-editor").classList.add('html-editor--error');
+        if (!this.task.text) this.$el.querySelector(".html-editor").classList.add('html-editor--error');
         // scroll to first error
         this.$nextTick(() => {
           let el = this.$el.querySelector(".error--text:first-of-type") || this.$el.querySelector(".html-editor--error");
@@ -193,7 +193,7 @@ export default {
       }
     },
     clear() {
-      this.question = {
+      this.task = {
         text: null,
         commentary: null,
         level: null,
@@ -207,7 +207,7 @@ export default {
     }
   },
   watch: {
-    'question.text'() {
+    'task.text'() {
       let el = this.$el.querySelector(".html-editor--error");
       if (el) el.classList.remove('html-editor--error');
     }
@@ -216,12 +216,12 @@ export default {
     next(vm => {
       vm.clear();
       // Страница редактирования. Получаем тест для редактирования
-      if (to.name === "EditQuestion") {
+      if (to.name === "EditTask") {
         vm.mode = "edit";
-        let question_origin = vm.getQuestionById(Number(vm.$route.params.id));
-        vm.question = {...question_origin};
-        console.log(vm.question);
-        vm.right_answer = JSON.parse(JSON.stringify(vm.getRightAnswerByQuestionId(Number(vm.$route.params.id))));
+        let task_origin = vm.getTaskById(Number(vm.$route.params.id));
+        vm.task = {...task_origin};
+
+        vm.right_answer = JSON.parse(JSON.stringify(vm.getRightAnswerByTaskId(Number(vm.$route.params.id))));
       }
       // Страница создания теста
       else vm.mode = "create";

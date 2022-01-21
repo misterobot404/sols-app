@@ -80,7 +80,7 @@ export default {
     return {
       loading: false,
       search: "",
-      sortBy: 'count_of_questions',
+      sortBy: 'count_of_tasks',
       sortDesc: true,
       headers: [
         {
@@ -90,7 +90,7 @@ export default {
         {text: 'Лёгких вопросов', value: 'count_of_easy_q', align: 'center'},
         {text: 'Средних вопросов', value: 'count_of_normal_q', align: 'center'},
         {text: 'Сложных вопросов', value: 'count_of_hard_q', align: 'center'},
-        {text: 'Всего вопросов', value: 'count_of_questions', align: 'center'},
+        {text: 'Всего вопросов', value: 'count_of_tasks', align: 'center'},
         {value: 'actions', sortable: false, align: 'right'}
       ],
       // Edit dialog
@@ -102,21 +102,21 @@ export default {
     }
   },
   computed: {
-    ...mapState('data', ["categories", "questions"]),
+    ...mapState('data', ["categories", "tasks"]),
     tableData() {
       // DATE FORMATTING FOR PRINTF TO TABLE
       let result = this.categories.map(a => Object.assign({}, a));
       result.forEach(category => {
-        category.count_of_questions = 0;
+        category.count_of_tasks = 0;
         category.count_of_easy_q = 0;
         category.count_of_normal_q = 0;
         category.count_of_hard_q = 0;
-        this.questions.forEach(question => {
-          if (question.category_id === category.id) {
-            if (question.level === "Лёгкий") category.count_of_easy_q++;
-            else if (question.level === "Средний") category.count_of_normal_q++;
-            else if (question.level === "Сложный") category.count_of_hard_q++;
-            category.count_of_questions++;
+        this.tasks.forEach(task => {
+          if (task.category_id === category.id) {
+            if (task.level === "Лёгкий") category.count_of_easy_q++;
+            else if (task.level === "Средний") category.count_of_normal_q++;
+            else if (task.level === "Сложный") category.count_of_hard_q++;
+            category.count_of_tasks++;
           }
         })
       })

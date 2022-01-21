@@ -4,15 +4,15 @@
       <v-row>
         <v-col/>
         <v-col cols="3">
-          <h1 @click="$router.push('/').catch(()=>{});" class="site-title primary--text cursor-pointer">
-            SOLS<span class="d-none d-md-inline"> - Онлайн опросы</span>
+          <h1 class="site-title primary--text" style="font-size: 48px; line-height: 1.2">
+            SOLS<span class="d-none d-md-inline"> - Система тестирования</span>
           </h1>
           <img class="svg-people" :src="require('@/assets/svg/Personal-main-1.svg')" alt="Человек">
         </v-col>
         <v-col/>
         <v-col cols="2">
           <img width="374" height="423" :src="require('@/assets/svg/Vector-1.svg')" alt="Клякса">
-          <img width="100%" height="290" style="margin-top: 220px; position: relative; z-index: 1" :src="require('@/assets/svg/Vector-2.svg')" alt="Клякса">
+          <img width="100%" height="290" style="margin-top: 200px; position: relative; z-index: 1" :src="require('@/assets/svg/Vector-2.svg')" alt="Клякса">
         </v-col>
         <v-col cols="1">
           <component :is="componentForPage"/>
@@ -22,14 +22,19 @@
         </v-col>
       </v-row>
     </v-container>
-    <div class="text-center p-14-medium" style="position:absolute; bottom: 38px; z-index: 3; width: 100vw">
-      <router-link to="/" class="mx-xl-10 mx-5 black--text">
-        О сайте
-      </router-link>
-      <router-link to="/" class="mx-xl-10 mx-5 black--text">
-        Служба поддержки
-      </router-link>
-    </div>
+    <footer class="d-flex justify-center" style="position:absolute; bottom: 8px; z-index: 3; width: 100vw">
+      <v-col cols="6" class="d-flex pa-0 align-center justify-end">
+        <router-link to="/" class="black--text">
+          <h4>О сайте</h4>
+        </router-link>
+        <span style="opacity: 0.7">&#160&#160•&#160&#160</span>
+      </v-col>
+      <v-col cols="6" class="pa-0 d-flex align-center">
+        <router-link to="/" class="black--text">
+          <h4>Служба поддержки</h4>
+        </router-link>
+      </v-col>
+    </footer>
   </div>
 </template>
 
@@ -64,7 +69,7 @@ export default {
 
 <style scoped>
 .site-title {
-  margin-top: 171px;
+  margin-top: 120px;
 }
 
 .svg-people {
@@ -78,7 +83,7 @@ export default {
 /* Изменение разметки под более низкое разрешение */
 @media screen and (max-width: 1280px) {
   .site-title {
-    margin-top: 89px;
+    margin-top: 80px;
   }
 
   .svg-people {

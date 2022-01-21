@@ -13,7 +13,7 @@
             <v-icon color="primary" class="mr-1 pb-1">info</v-icon>
             Подтверждение
           </h2>
-          <p class="p-14-medium" style="text-align: justify;">
+          <p class="font-s-14" style="text-align: justify;">
             После начала, Вы не сможете приостановить время тестирования или начать тест заново. Продолжить?
           </p>
           <v-checkbox v-model="skip_confirm" label="Не показывать больше"/>

@@ -10,7 +10,7 @@
             hide-details
         >
           <template v-slot:label>
-            <span class="p-12-regular" style="color: #152536">Правильный ответ</span>
+            <span class="font-s-12" style="color: #152536">Правильный ответ</span>
           </template>
         </v-checkbox>
         <v-spacer/>

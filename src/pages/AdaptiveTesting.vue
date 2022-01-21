@@ -22,17 +22,17 @@
           Высокий уровень знаний
         </v-stepper-step>
       </v-stepper-header>
-      <!--  Question -->
+      <!--  Tasks -->
       <div class="ma-8 mb-0">
-        <div v-if="currentQuestion" class="d-flex flex-column align-baseline mt-4">
+        <div v-if="currentTask" class="d-flex flex-column align-baseline mt-4">
           <!-- Type: singleradiobutton -->
-          <template v-if="currentQuestion.type === 'singleradiobutton'">
-            <h3 v-text="currentQuestion.text" class="mb-0"/>
+          <template v-if="currentTask.type === 'singleradiobutton'">
+            <h3 v-text="currentTask.text" class="mb-0"/>
             <!-- if have img -->
-            <v-img v-if="currentQuestion.img" :src="currentQuestion.img" style="border-radius: 8px; margin-top: 16px"></v-img>
+            <v-img v-if="currentTask.img" :src="currentTask.img" style="border-radius: 8px; margin-top: 16px"></v-img>
             <v-radio-group v-model="answer">
               <v-radio
-                  v-for="(n, index) in currentQuestion.variants"
+                  v-for="(n, index) in currentTask.variants"
                   :key="n"
                   :label="n"
                   :value="index"
@@ -40,11 +40,11 @@
             </v-radio-group>
           </template>
           <!-- Type: multiradiobutton -->
-          <template v-else-if="currentQuestion.type === 'multiradiobutton'">
-            <h4 v-text="currentQuestion.text" class="mb-0"/>
+          <template v-else-if="currentTask.type === 'multiradiobutton'">
+            <h4 v-text="currentTask.text" class="mb-0"/>
             <v-radio-group v-model="answer" multiple>
               <v-radio
-                  v-for="(n, index) in currentQuestion.variants"
+                  v-for="(n, index) in currentTask.variants"
                   :key="n"
                   :label="n"
                   :value="index"
@@ -52,32 +52,32 @@
             </v-radio-group>
           </template>
           <!-- Type: text -->
-          <template v-else-if="currentQuestion.type === 'text'">
-            <h3 v-text="currentQuestion.text"/>
+          <template v-else-if="currentTask.type === 'text'">
+            <h3 v-text="currentTask.text"/>
             <v-textarea v-model.trim="answer" filled auto-grow style="width: 100%"></v-textarea>
           </template>
           <!-- Type: relation -->
-          <template v-else-if="currentQuestion.type === 'relation'">
+          <template v-else-if="currentTask.type === 'relation'">
             <h3 class="font-weight-bold">Установите соответствия:</h3>
             <div class="d-flex my-4" style="width: 100%">
               <div class="d-flex flex-column align-baseline flex-grow-1">
-                <h3 v-text="currentQuestion.title1" class="mb-6 text-decoration-underline"/>
-                <div class="d-flex align-center my-2" v-for="(el, index) in currentQuestion.variants1" :key="index">
+                <h3 v-text="currentTask.title1" class="mb-6 text-decoration-underline"/>
+                <div class="d-flex align-center my-2" v-for="(el, index) in currentTask.variants1" :key="index">
                   <p v-text="el" class="mb-0"/>
                   <v-select
                       dense
                       hide-details
                       style="width: 70px"
                       v-model="answer[index]"
-                      :items="(Array.apply(null, {length: currentQuestion.variants2.length}).map(Number.call, Number)).map(el => el + 1)"
+                      :items="(Array.apply(null, {length: currentTask.variants2.length}).map(Number.call, Number)).map(el => el + 1)"
                       outlined
                       class="ml-4"
                   />
                 </div>
               </div>
               <div class="d-flex flex-column align-baseline flex-grow-1">
-                <h3 v-text="currentQuestion.title2" class="mb-6 text-decoration-underline"/>
-                <div v-for="el in currentQuestion.variants2" :key="el">
+                <h3 v-text="currentTask.title2" class="mb-6 text-decoration-underline"/>
+                <div v-for="el in currentTask.variants2" :key="el">
                   <p v-text="el" class="my-3"/>
                 </div>
               </div>
@@ -122,8 +122,8 @@ export default {
 
       levelRepeat: [null, 0, 1, 0],
       currentPointForNextLvl: 0,
-      currentQuestion: null,
-      questions: [
+      currentTask: null,
+      tasks: [
         // lvl 1
         {
           level: 1,
@@ -249,19 +249,19 @@ export default {
     }
   },
   methods: {
-    nextQuestion() {
-      let currentLvlQuestions = this.questions.filter(el => el.level === this.level && JSON.stringify(this.currentQuestion) !== JSON.stringify(el));
-      this.currentQuestion = currentLvlQuestions.rand();
+    nextTask() {
+      let currentLvlTasks = this.tasks.filter(el => el.level === this.level && JSON.stringify(this.currentTask) !== JSON.stringify(el));
+      this.currentTask = currentLvlTasks.rand();
       this.answer = null;
     },
     confirm() {
       this.showSnackbar = true;
 
       let answerIsTrue = false;
-      if (this.currentQuestion.type === "text" && this.currentQuestion.trueAnswerText === this.answer) answerIsTrue = true;
-      if (this.currentQuestion.type === "singleradiobutton" && this.currentQuestion.trueAnswerNumber === this.answer) answerIsTrue = true;
-      if (this.currentQuestion.type === "multiradiobutton" && this.currentQuestion.trueAnswerNumber.length === this.answer.length && JSON.stringify(this.answer.sort((a, b) => a - b)) === JSON.stringify(this.currentQuestion.trueAnswerNumber.sort((a, b) => a - b))) answerIsTrue = true;
-      if (this.currentQuestion.type === "relation" && JSON.stringify(this.answer) === JSON.stringify(this.currentQuestion.trueAnswer)) answerIsTrue = true;
+      if (this.currentTask.type === "text" && this.currentTask.trueAnswerText === this.answer) answerIsTrue = true;
+      if (this.currentTask.type === "singleradiobutton" && this.currentTask.trueAnswerNumber === this.answer) answerIsTrue = true;
+      if (this.currentTask.type === "multiradiobutton" && this.currentTask.trueAnswerNumber.length === this.answer.length && JSON.stringify(this.answer.sort((a, b) => a - b)) === JSON.stringify(this.currentTask.trueAnswerNumber.sort((a, b) => a - b))) answerIsTrue = true;
+      if (this.currentTask.type === "relation" && JSON.stringify(this.answer) === JSON.stringify(this.currentTask.trueAnswer)) answerIsTrue = true;
 
       if (answerIsTrue) {
         this.currentPointForNextLvl++;
@@ -289,15 +289,15 @@ export default {
       /* Out */
       if (this.level === 0) this.$router.push({name: 'result', params: {lvl: "1"}});
       if (this.level === 4) this.$router.push({name: 'result', params: {lvl: "3"}});
-      this.nextQuestion();
+      this.nextTask();
     },
     clear() {
-      this.currentQuestion.type === "relation" ? this.answer = new Array(this.currentQuestion.variants1.length) : this.answer = null
+      this.currentTask.type === "relation" ? this.answer = new Array(this.currentTask.variants1.length) : this.answer = null
     }
   },
   watch: {
-    currentQuestion(val) {
-      if (val.type === "relation") this.answer = new Array(this.currentQuestion.variants1.length)
+    currentTask(val) {
+      if (val.type === "relation") this.answer = new Array(this.currentTask.variants1.length)
     }
   },
   mounted() {
@@ -306,7 +306,7 @@ export default {
       return this[Math.floor(Math.random() * this.length)];
     }
     // Устанавливаем начальный вопрос
-    this.nextQuestion();
+    this.nextTask();
   }
 }
 </script>

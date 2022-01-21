@@ -53,7 +53,7 @@
               </div>
               <div style="border: 1px rgba(0,0,0, 0.4) solid;" class="flex-grow-1 rounded-lg mt-4 pa-4">
                 <div/>
-                <div v-text="active_test.questions"/>
+                <div v-text="active_test.tasks"/>
               </div>
             </div>
             <div style="width: 60px; height: 100%">
@@ -68,16 +68,16 @@
         <v-col v-else cols="10" lg="8">
           <v-img height="240" class="rounded-xl" :src="require('@/assets/testing.jpg')"/>
           <h1 class="text-center mt-6" style="font-size: 32px" v-text="test.name"/>
-          <div class="p-14-medium text-center mt-1">
-            <span v-text="test.type"/>&nbsp;• Вопросов:&nbsp;<span v-text="test.count_of_questions_by_lvl.reduce((a, b) => a + b, 0)"/>
+          <div class="font-s-14 text-center mt-1">
+            <span v-text="test.type"/>&nbsp;• Вопросов:&nbsp;<span v-text="test.count_of_tasks_by_lvl.reduce((a, b) => a + b, 0)"/>
           </div>
-          <p class="p-14-regular mt-4" style="text-align:justify; line-height: 2em">Всего 22% рабочего населения довольны своей профессией (по данным опроса
+          <p class="font-s-14 mt-4" style="text-align:justify; line-height: 2em">Всего 22% рабочего населения довольны своей профессией (по данным опроса
             Райффайзенбанка в 2021 г.).
             Поэтому важно выбирать любимое направление деятельности для получения удовольствия от работы и достижения наивысших результатов, например, с помощью
             теста на профориентацию. The simplest way to add a space in HTML (besides hitting the spacebar) is with the non-breaking space entity, written as &nbsp;
             or &#160;. Multiple adjacent non-breaking spaces won’t be collapsed by the browser, letting you “force” several visible spaces between words or other
             page elements.</p>
-          <div class="p-14-medium">
+          <div class="font-s-14">
             Автор: <a>Анастасия Павлова</a>
           </div>
           <v-row class="mt-4 flex-column-reverse flex-md-row">

@@ -6,7 +6,7 @@ axios.interceptors.response.use(
     error => {
         // Обращение к защищенному ресурсу без прав
         if (error.response.status === 401 || error.response.status === 403) {
-            if (store.state["auth/token"]) store.commit("auth/LOGOUT", null, {root: true});
+            if (store.state["auth/token"]) store.dispatch("auth/logout");
             return Promise.reject(error);
         } else return Promise.reject(error);
     });
@@ -16,6 +16,4 @@ let authToken = window.localStorage.getItem('token');
 if (authToken) {
     // add token to axios header
     axios.defaults.headers.common['token'] = authToken;
-    // get user data
-    // store.dispatch('maps/getMaps', null, {root: true}).then();
 }

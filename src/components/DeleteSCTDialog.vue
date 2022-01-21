@@ -1,7 +1,6 @@
 <template>
   <v-dialog
-      :value="show"
-      @input="$emit('update:show', null)"
+      v-model="m_show"
       max-width="400"
       overlay-opacity="0.1"
   >
@@ -15,16 +14,16 @@
               'Удалить ' +
               show === 'delete_subject' ? 'эту тему ?' :
                   show === ' delete_category' ? 'эту тему ?' :
-                      show === 'delete_question' ? 'эту тему ?' :
+                      show === 'delete_task' ? 'эту тему ?' :
                           null
             }}
           </h2>
-          <p class="p-14-medium">
+          <p class="font-s-14">
             {{
               'Вы собираетесь удалить ' +
               show === 'delete_subject' ? 'предмет \'' + el.name + '\'. Восстановить её будет нельзя. Все вложенные темы и вопросы будут удалены. Категория так же будет исключена из всех тестов.' :
                   show === 'delete_category' ? 'тему \'' + el.name + '\'. Восстановить её будет нельзя. Все вложенные вопросы будут удалены. Категория так же будет исключена из всех тестов.' :
-                      show === 'delete_question' ? 'вопрос \'' + el.name + '\'. Восстановить его будет нельзя. Тема так же будет исключена из всех тестов.' :
+                      show === 'delete_task' ? 'вопрос \'' + el.name + '\'. Восстановить его будет нельзя. Тема так же будет исключена из всех тестов.' :
                           null
             }}
           </p>
@@ -36,7 +35,7 @@
             class="h4 px-4 mr-1"
             text
             style="text-transform: none; background-color: rgba(0, 0, 0, 0.06)"
-            @click="$emit('update:show', null)"
+            @click="$emit('update:show', false)"
         >
           Отмена
         </v-btn>
@@ -61,6 +60,16 @@ export default {
     "show",
     "el"
   ],
+  computed: {
+    m_show: {
+      get() {
+        return this.show === 'delete_subject' || this.show === ' delete_category' || this.show === 'delete_task'
+      },
+      set(v) {
+        this.$emit('update:show', v);
+      },
+    }
+  },
   methods: {
     confirm() {
       switch (this.show) {
@@ -70,8 +79,8 @@ export default {
         case 'delete_category':
           this.lDeleteCategory();
           break;
-        case 'delete_question':
-          this.lDeleteQuestion();
+        case 'delete_task':
+          this.lDeleteTask();
           break;
       }
     },
@@ -93,9 +102,9 @@ export default {
           });
       this.el = null;
     },
-    lDeleteQuestion() {
+    lDeleteTask() {
       this.loading = true;
-      this.deleteQuestion(this.el.id)
+      this.deleteTask(this.el.id)
           .then(() => {
             this.loading = false;
             this.SHOW_MSG_DIALOG({type: 'primary', text: 'Вопрос удален'});

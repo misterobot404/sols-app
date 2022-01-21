@@ -1,21 +1,16 @@
 <template>
   <v-app :style="{background: $vuetify.theme.themes['light'].background}">
-    <!-- Page loading process -->
-    <v-progress-linear
-        color="blue darken-3"
-        top
-        :active="page_loading"
-        indeterminate
-        absolute
-        style="z-index: 10"
-    />
     <!-- Popup msg -->
     <PopUpMsg/>
     <v-main>
       <!-- Navigation -->
-      <Navigation v-if="user"/>
+      <Navigation v-if="isAuth"/>
+
+      <!-- Загрузка данных после авторизации пользователя -->
+      <!-- Проверка делается для исключения загрузки данных для неавторизованных пользователей -->
+      <LoadingData v-if="isAuth && !data_loaded"/>
       <!-- Page -->
-      <keep-alive>
+      <keep-alive v-else>
         <router-view/>
       </keep-alive>
     </v-main>
@@ -23,21 +18,22 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapGetters, mapState} from 'vuex';
 import Navigation from "./components/Navigation";
-import PopUpMsg from "@/components/PopUpMsg";
+import PopUpMsg from "./components/PopUpMsg";
+import LoadingData from "@/components/LoadingData";
 
 export default {
   name: 'App',
   components: {
+    LoadingData,
     PopUpMsg,
     Navigation
   },
   computed: {
-    ...mapState({
-      page_loading: state => state.layout.page_loading,
-      user: state => state.auth.user,
-    })
-  }
+    ...mapState('layout', ['page_loading']),
+    ...mapState('data', ['data_loaded']),
+    ...mapGetters('auth', ['isAuth'])
+  },
 }
 </script>

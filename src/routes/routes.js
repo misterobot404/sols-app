@@ -3,55 +3,31 @@ export const routes = [
         path: '/',
         redirect: '/signin',
     },
-    /* testing */
-    {
-        path: '/tests/:id',
-        component: () => import('@/pages/TestingProcess'),
-        meta: {
-            title: "SOLS - Прохождение теста"
-        }
-    },
-    {
-        path: '/beta',
-        component: () => import('@/pages/AdaptiveTesting'),
-        meta: {
-            title: "SOLS - Прохождение теста"
-        }
-    },
-    /* auth */
+
+    // AUTH
     {
         path: '/signin',
         component: () => import('../pages/Auth'),
-        meta: {
-            title: "SOLS - Вход",
-            hideForAuth: true
-        }
+        meta: {title: "SOLS - Вход"}
     },
     {
         path: '/signup',
         component: () => import('../pages/Auth'),
-        meta: {
-            title: "SOLS - Регистрация",
-            hideForAuth: true
-        }
+        meta: {title: "SOLS - Регистрация"}
     },
     {
         path: '/password/reset',
         component: () => import('../pages/Auth'),
-        meta: {
-            title: "SOLS - Восстановление пароля",
-            hideForAuth: true
-        }
+        meta: {title: "SOLS - Восстановление пароля"}
     },
 
     // TEACHER
+    // tests
     {
-
         path: '/teacher',
         redirect: '/teacher/home'
     },
     {
-        name: "TeacherHome",
         path: '/teacher/home',
         component: () => import('../pages/Teacher/Home'),
         meta: {
@@ -61,7 +37,6 @@ export const routes = [
     },
     // tests
     {
-        name: "Tests",
         path: '/teacher/tests',
         component: () => import('../pages/Teacher/Tests'),
         meta: {
@@ -72,7 +47,7 @@ export const routes = [
     {
         name: "CreateTest",
         path: '/teacher/tests/create',
-        component: () => import('../pages/Teacher/SetTestData'),
+        component: () => import('../pages/Teacher/Test'),
         meta: {
             title: "SOLS - Создание теста",
             middlewareAuth: "teacher"
@@ -81,37 +56,45 @@ export const routes = [
     {
         name: "EditTest",
         path: '/teacher/tests/:id/edit',
-        component: () => import('../pages/Teacher/SetTestData'),
+        component: () => import('../pages/Teacher/Test'),
         meta: {
             title: "SOLS - Редактирование теста",
             middlewareAuth: "teacher"
         }
     },
-    // questions
+    // subjects / categories / tasks
     {
-        name: "BaseOfQuestions",
-        path: '/teacher/categories/:id?',
-        component: () => import('../pages/Teacher/BaseOfQuestions'),
+        path: '/teacher/tasks',
+        component: () => import('../pages/Teacher/BaseOfTasks'),
         meta: {
-            title: "SOLS - База вопросов",
+            title: "SOLS - База заданий",
             middlewareAuth: "teacher"
         }
     },
     {
-        name: "CreateQuestion",
-        path: '/teacher/questions/create',
-        component: () => import('../pages/Teacher/SetQuestionData'),
+        name: "CreateTask",
+        path: '/teacher/task/create',
+        component: () => import('../pages/Teacher/Task'),
         meta: {
-            title: "SOLS - Конструктор вопросов",
+            title: "SOLS - Конструктор заданий",
             middlewareAuth: "teacher"
         }
     },
     {
-        name: "EditQuestion",
-        path: '/teacher/questions/:id/edit',
-        component: () => import('../pages/Teacher/SetQuestionData'),
+        name: "EditTask",
+        path: '/teacher/task/:id/edit',
+        component: () => import('../pages/Teacher/Task'),
         meta: {
-            title: "SOLS - Редактирование вопроса",
+            title: "SOLS - Редактирование задания",
+            middlewareAuth: "teacher"
+        }
+    },
+    // groups
+    {
+        path: '/teacher/groups',
+        component: () => import('../pages/Teacher/Groups'),
+        meta: {
+            title: "SOLS - Учебные группы",
             middlewareAuth: "teacher"
         }
     },
@@ -119,22 +102,41 @@ export const routes = [
     // STUDENT
     {
         path: '/student',
-        redirect: '/student/home'
+        redirect: '/student/tests'
     },
+    // Активные и доступные тесты
     {
-        path: '/student/home',
-        component: () => import('../pages/Student/Home'),
+        path: '/student/tests',
+        component: () => import('../pages/Student/Tests'),
         meta: {
             title: "SOLS - Кабинет студента",
             middlewareAuth: "student"
         }
     },
+    // Результаты тестирования
     {
-        path: '/student/answers',
-        component: () => import('../pages/Student/Answers'),
+        path: '/student/results',
+        component: () => import('../pages/Student/Results'),
         meta: {
-            title: "SOLS - Мои ответы",
+            title: "SOLS - Результаты тестирования",
             middlewareAuth: "student"
+        }
+    },
+    // Прохождение теста
+    {
+        path: '/student/tests/:id',
+        component: () => import('@/pages/Student/Testing'),
+        meta: {
+            title: "SOLS - Прохождение теста"
+        }
+    },
+
+    // Адаптивное тестирование
+    {
+        path: '/beta',
+        component: () => import('@/pages/AdaptiveTesting'),
+        meta: {
+            title: "SOLS - Прохождение теста"
         }
     },
 

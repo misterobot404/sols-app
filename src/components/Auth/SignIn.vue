@@ -13,37 +13,41 @@
         elevation="2"
         style="text-align: left"
     >
-      <h4>Такое сочетании электронной почты и пароля - не существует.</h4>
+      Такое сочетание электронной почты и пароля - не существует.
     </v-alert>
     <form @submit.prevent="auth()">
-      <div class="mt-8">
-        <h4>Электронная почта</h4>
-        <v-text-field
-            v-model.trim="username"
-            prepend-inner-icon="email"
-            required
-            hide-details
-            outlined
-            type="email"
-            class="mt-2 mb-1 rounded-lg"
-            background-color="white"
-        />
+      <div class="mt-6">
+        <label>
+          <h4>Электронная почта</h4>
+          <v-text-field
+              v-model.trim="username"
+              prepend-inner-icon="email"
+              required
+              hide-details
+              outlined
+              type="email"
+              class="mt-2 mb-1 rounded-lg"
+              background-color="white"
+          />
+        </label>
       </div>
       <div class="mt-6">
-        <h4>Пароль</h4>
-        <v-text-field
-            v-model.trim="password"
-            :append-icon="password ? (show_password ? 'visibility_off' : 'visibility') : null"
-            @click:append="() => (show_password = !show_password)"
-            :type="show_password ?  'text' : 'password'"
-            prepend-inner-icon="lock"
-            required
-            hide-details
-            outlined
-            class="mt-2 mb-1 rounded-lg"
-            background-color="white"
-        />
-        <router-link to="/password/reset" class="p-14-medium">Забыли пароль?</router-link>
+        <label>
+          <h4>Пароль</h4>
+          <v-text-field
+              v-model.trim="password"
+              :append-icon="password ? (show_password ? 'visibility_off' : 'visibility') : null"
+              @click:append="() => (show_password = !show_password)"
+              :type="show_password ?  'text' : 'password'"
+              prepend-inner-icon="lock"
+              required
+              hide-details
+              outlined
+              class="mt-2 mb-1 rounded-lg"
+              background-color="white"
+          />
+        </label>
+        <router-link to="/password/reset" class="font-s-14">Забыли пароль?</router-link>
       </div>
       <v-row class="mt-6 ">
         <v-col cols="12" md="6">

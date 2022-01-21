@@ -1,33 +1,21 @@
-// import axios from "axios";
+import axios from "axios";
 
 export default {
     namespaced: true,
     state: {
-        categories: [
-            {
-                id: 1,
-                name: "Математика",
-            },
-            {
-                id: 2,
-                name: "Программирование",
-            },
-            {
-                id: 3,
-                name: "История",
-            },
-            {
-                id: 4,
-                name: "География",
-            }
-        ],
+        host: "http://192.168.77.13",
+        // Признак загрузки данных
+        // При состоянии false будет производится переход на страницу получения данных /update
+        data_loaded: false,
+
+        // groups: [],
         tests: [
             {
                 id: 1,
                 is_active: true,
                 type: "Тест",
                 name: "Тестовое задание 1",
-                count_of_questions_by_lvl: [3, 6, 3],
+                count_of_tasks_by_lvl: [3, 6, 3],
                 category_ids: [2, 1],
                 date_of_beginning: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)"),
                 date_of_finishing: new Date("Thu Jul 30 2021 17:32:35 GMT+1000 (GMT+10:00)"),
@@ -40,7 +28,7 @@ export default {
                 is_active: true,
                 type: "Тест",
                 name: "Тестовое задание 2",
-                count_of_questions_by_lvl: [3, 6, 3],
+                count_of_tasks_by_lvl: [3, 6, 3],
                 category_ids: [2, 1],
                 date_of_beginning: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)"),
                 date_of_finishing: new Date("Thu Jul 30 2021 17:32:35 GMT+1000 (GMT+10:00)"),
@@ -53,7 +41,7 @@ export default {
                 is_active: true,
                 type: "Тест",
                 name: "Тестовое задание 3",
-                count_of_questions_by_lvl: [3, 6, 3],
+                count_of_tasks_by_lvl: [3, 6, 3],
                 category_ids: [2, 1],
                 date_of_beginning: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)"),
                 date_of_finishing: new Date("Thu Jul 30 2021 17:32:35 GMT+1000 (GMT+10:00)"),
@@ -66,7 +54,7 @@ export default {
                 is_active: true,
                 type: "Тест",
                 name: "Тест без времени",
-                count_of_questions_by_lvl: [3, 3, 3],
+                count_of_tasks_by_lvl: [3, 3, 3],
                 category_ids: [2, 1],
                 date_of_beginning: null,
                 date_of_finishing: null,
@@ -75,38 +63,63 @@ export default {
                 created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
             },
         ],
-        active_tests: [
+        subjects: [
             {
                 id: 1,
-                user_id: 1,
-                test_id: 4,
-                created_at: new Date(),
-                questions: [
-                    {
-                        question_id: 1,
-                        answer: "Ключ ответа"
-                    },
-                    {
-                        question_id: 2,
-                        answer: null
-                    },
-                    {
-                        question_id: 3,
-                        answer: null
-                    },
-                    {
-                        question_id: 4,
-                        answer: null
-                    },
-                    {
-                        question_id: 5,
-                        answer: null
-                    },
-                ]
+                name: 'Резание материалов',
+            },
+            {
+                id: 2,
+                name: 'Управление персоналом',
+            },
+            {
+                id: 3,
+                name: 'Психология и педагогика',
+            },
+        ],
+        categories: [
+            {
+                id: 1,
+                subject_id: 1,
+                name: 'Наростообразование',
+            },
+            {
+                id: 2,
+                subject_id: 1,
+                name: 'Геометрические параметры инструмента',
+            },
+            {
+                id: 3,
+                subject_id: 1,
+                name: 'Деформация стружки',
+            },
+            {
+                id: 4,
+                subject_id: 1,
+                name: 'Стужкообразование при резании',
+            },
+            {
+                id: 5,
+                subject_id: 2,
+                name: 'Наростообразование2',
+            },
+            {
+                id: 6,
+                subject_id: 2,
+                name: 'Геометрические параметры инструмента2',
+            },
+            {
+                id: 7,
+                subject_id: 2,
+                name: 'Деформация стружки2',
+            },
+            {
+                id: 8,
+                subject_id: 2,
+                name: 'Стужкообразование при резании2',
             }
         ],
-        test_types: ["Тест", "Викторина", "Опрос"],
-        questions: [
+        tasks: [
             {
                 id: 1,
                 commentary: null,
@@ -165,7 +178,40 @@ export default {
                 type_id: 5
             }
         ],
-        question_types: [
+
+        active_tests: [
+            {
+                id: 1,
+                user_id: 1,
+                test_id: 4,
+                created_at: new Date(),
+                tasks: [
+                    {
+                        task_id: 1,
+                        answer: "Ключ ответа"
+                    },
+                    {
+                        task_id: 2,
+                        answer: null
+                    },
+                    {
+                        task_id: 3,
+                        answer: null
+                    },
+                    {
+                        task_id: 4,
+                        answer: null
+                    },
+                    {
+                        task_id: 5,
+                        answer: null
+                    },
+                ]
+            }
+        ],
+        test_types: ["Тест", "Викторина", "Опрос"],
+
+        task_types: [
             {
                 id: 1,
                 component: "SingleChoice",
@@ -203,31 +249,31 @@ export default {
                 name: "Загрузка файла"
             }
         ],
-        question_levels: ["Лёгкий", "Средний", "Сложный"],
+        task_levels: ["Лёгкий", "Средний", "Сложный"],
         right_answers: [
             {
                 id: 1,
-                question_id: 1,
+                task_id: 1,
                 answer: ["Паскаль"],
             },
             {
                 id: 2,
-                question_id: 2,
+                task_id: 2,
                 answer: ["Наследование", "Полиморфизм", "Инкапсуляция"],
             },
             {
                 id: 3,
-                question_id: 3,
+                task_id: 3,
                 answer: "If <условие> Then <оператор 1>",
             },
             {
                 id: 4,
-                question_id: 4,
+                task_id: 4,
                 answer: [3, 1, 2],
             },
             {
                 id: 5,
-                question_id: 5,
+                task_id: 5,
                 answer: [1, 1, 2],
             },
         ],
@@ -236,17 +282,17 @@ export default {
         getCategoryById: state => id => {
             return state.categories.find(category => category.id === id);
         },
-        getQuestionsByCategoryId: state => category_id => {
-            return state.questions.filter(question => question.category_id === category_id);
+        getTasksByCategoryId: state => category_id => {
+            return state.tasks.filter(task => task.category_id === category_id);
         },
-        getQuestionById: state => id => {
-            return state.questions.find(question => question.id === id);
+        getTaskById: state => id => {
+            return state.tasks.find(task => task.id === id);
         },
-        getRightAnswerByQuestionId: state => question_id => {
-            return (state.right_answers.find(answer => answer.question_id === question_id));
+        getRightAnswerByTaskId: state => task_id => {
+            return (state.right_answers.find(answer => answer.task_id === task_id));
         },
-        getQuestionTypeById: state => id => {
-            return (state.question_types.find(type => type.id === id));
+        getTaskTypeById: state => id => {
+            return (state.task_types.find(type => type.id === id));
         },
         getTestById: state => id => {
             return state.tests.find(test => test.id === id);
@@ -256,29 +302,29 @@ export default {
         }
     },
     actions: {
-        /*getActiveTest() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve();
-                }, 800)
-            })
-        },*/
-        startTest({commit}, test_id) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    commit('CREATE_ACTIVE_TEST', {test_id: test_id});
-                    resolve();
-                }, 400)
-            })
+        // Получить все данные пользователя
+        getAllData({dispatch}) {
+            return dispatch('getTests');
         },
-        /*getAllActiveTests({state}) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve();
-                }, 800)
+
+        //// КАБИНЕТ ПРЕПОДОВАТЕЛЯ
+        // GROUP
+        /*getGroups({state, commit}) {
+            return axios.get(state.host + '/api/groups', {
+                params: {
+                    department: "ПУРИС"
+                }
+            }).then(response => {
+                commit('SET_GROUPS', response.data.data);
             })
         },*/
-
+        // TEST
+        getTests({state, commit}) {
+            return axios.get(state.host + '/api/tests')
+                .then(response => {
+                    //commit('SET_TESTS', response.data.info);
+                })
+        },
         createTest({commit}, test) {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -305,41 +351,8 @@ export default {
                 }
             )
         },
-
-        createQuestion({state, commit}, {question, right_answer}) {
-            return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('CREATE_QUESTION', question);
-                        // Костыль. в будущем id созданного вопроса мы будем получать из api
-                        commit('CREATE_RIGHT_ANSWER', {
-                            question_id: state.questions[state.questions.length - 1].id,
-                            right_answer: right_answer
-                        })
-                        resolve();
-                    }, 400)
-                }
-            )
-        },
-        updateQuestion({commit}, {question, right_answer}) {
-            return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('UPDATE_QUESTION', question);
-                        commit('UPDATE_RIGHT_ANSWER', right_answer);
-                        resolve();
-                    }, 400)
-                }
-            )
-        },
-        deleteQuestion({commit}, id) {
-            return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('DELETE_QUESTION', id);
-                        resolve();
-                    }, 400)
-                }
-            )
-        },
-
+        // SUBJECT
+        // CATEGORY
         createCategory({commit}, category) {
             return new Promise((resolve) => {
                     setTimeout(() => {
@@ -367,37 +380,79 @@ export default {
                 }
             )
         },
-    },
-    mutations: {
-        CREATE_ACTIVE_TEST(state, active_test) {
-            // data will be added to backend
-            active_test.id = Math.max(...state.active_tests.map(el => el.id)) + 1;
-            active_test.created_at = new Date();
-            active_test.questions = [
-                {
-                    question_id: 1,
-                    answer: "Ключ ответа"
-                },
-                {
-                    question_id: 2,
-                    answer: null
-                },
-                {
-                    question_id: 3,
-                    answer: null
-                },
-                {
-                    question_id: 4,
-                    answer: null
-                },
-                {
-                    question_id: 5,
-                    answer: null
-                },
-            ];
-            state.active_tests.push(active_test);
+        // TASK
+        createTask({state, commit}, {task, right_answer}) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('CREATE_TASK', task);
+                        // Костыль. в будущем id созданного вопроса мы будем получать из api
+                        commit('CREATE_RIGHT_ANSWER', {
+                            task_id: state.tasks[state.tasks.length - 1].id,
+                            right_answer: right_answer
+                        })
+                        resolve();
+                    }, 400)
+                }
+            )
+        },
+        updateTask({commit}, {task, right_answer}) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('UPDATE_TASK', task);
+                        commit('UPDATE_RIGHT_ANSWER', right_answer);
+                        resolve();
+                    }, 400)
+                }
+            )
+        },
+        deleteTask({commit}, id) {
+            return new Promise((resolve) => {
+                    setTimeout(() => {
+                        commit('DELETE_TASK', id);
+                        resolve();
+                    }, 400)
+                }
+            )
         },
 
+        //// КАБИНЕТ СТУДЕНТА
+        // ACTIVE TEST
+        getActiveTest() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 800)
+            })
+        },
+        startTest({commit}, test_id) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    commit('CREATE_ACTIVE_TEST', {test_id: test_id});
+                    resolve();
+                }, 400)
+            })
+        },
+        getAllActiveTests({state}) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 800)
+            })
+        },
+    },
+    mutations: {
+        SET_DATA_LOADED(state, status) {
+            state.data_loaded = status;
+        },
+
+        // GROUP
+        SET_GROUPS(state, groups) {
+            state.groups = groups;
+        },
+        // TEST
+        SET_TESTS(state, tests) {
+            state.tests = tests;
+        },
         CREATE_TEST(state, test) {
             // data will be added to backend
             test.id = Math.max(...state.tests.map(el => el.id)) + 1;
@@ -418,31 +473,9 @@ export default {
         DELETE_TEST(state, id) {
             state.tests = state.tests.filter((item) => item.id !== id);
         },
+        // SUBJECT
 
-        CREATE_QUESTION(state, question) {
-            // data will be added to backend
-            question.id = Math.max(...state.questions.map(el => el.id)) + 1;
-
-            state.questions.push(question);
-        },
-        UPDATE_QUESTION(state, question) {
-            Object.assign(state.questions.find(el => el.id === question.id), question);
-        },
-        DELETE_QUESTION(state, id) {
-            state.questions = state.questions.filter((item) => item.id !== id);
-        },
-
-        CREATE_RIGHT_ANSWER(state, {question_id, right_answer}) {
-            state.right_answers.push({
-                id: Math.max(...state.right_answers.map(el => el.id)) + 1,
-                question_id: question_id,
-                answer: right_answer
-            });
-        },
-        UPDATE_RIGHT_ANSWER(state, right_answer) {
-            Object.assign(state.right_answers.find(el => el.id === right_answer.id), right_answer);
-        },
-
+        // CATEGORY
         CREATE_CATEGORY(state, category) {
             // data will be added to backend
             category.id = Math.max(...state.categories.map(el => el.id)) + 1;
@@ -456,9 +489,62 @@ export default {
             // удаление категории из тестов
             state.tests.forEach(el => el.category_ids = el.category_ids.filter((item) => item !== id));
             // удаление вопросов относящихся к категории
-            state.questions = state.questions.filter((item) => item.category_id !== id)
+            state.tasks = state.tasks.filter((item) => item.category_id !== id)
             // удаление категории
             state.categories = state.categories.filter((item) => item.id !== id);
+        },
+        // TASK
+        CREATE_TASK(state, task) {
+            // data will be added to backend
+            task.id = Math.max(...state.tasks.map(el => el.id)) + 1;
+
+            state.tasks.push(task);
+        },
+        UPDATE_TASK(state, task) {
+            Object.assign(state.tasks.find(el => el.id === task.id), task);
+        },
+        DELETE_TASK(state, id) {
+            state.tasks = state.tasks.filter((item) => item.id !== id);
+        },
+        // RIGHT_ANSWER
+        CREATE_RIGHT_ANSWER(state, {task_id, right_answer}) {
+            state.right_answers.push({
+                id: Math.max(...state.right_answers.map(el => el.id)) + 1,
+                task_id: task_id,
+                answer: right_answer
+            });
+        },
+        UPDATE_RIGHT_ANSWER(state, right_answer) {
+            Object.assign(state.right_answers.find(el => el.id === right_answer.id), right_answer);
+        },
+        // ACTIVE_TEST
+        CREATE_ACTIVE_TEST(state, active_test) {
+            // data will be added to backend
+            active_test.id = Math.max(...state.active_tests.map(el => el.id)) + 1;
+            active_test.created_at = new Date();
+            active_test.tasks = [
+                {
+                    task_id: 1,
+                    answer: "Ключ ответа"
+                },
+                {
+                    task_id: 2,
+                    answer: null
+                },
+                {
+                    task_id: 3,
+                    answer: null
+                },
+                {
+                    task_id: 4,
+                    answer: null
+                },
+                {
+                    task_id: 5,
+                    answer: null
+                },
+            ];
+            state.active_tests.push(active_test);
         },
     }
 }

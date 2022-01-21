@@ -13,52 +13,58 @@
         elevation="2"
         style="text-align: left"
     >
-      <h4 v-text="error"/>
+      {{ error }}
     </v-alert>
     <form @submit.prevent="lRegister()">
-      <div class="mt-9">
-        <h4>Электронная почта</h4>
-        <v-text-field
-            prepend-inner-icon="email"
-            v-model.trim="email"
-            required
-            :error-messages="error_email ? 'Введите корректный адрес электронной почты' : null"
-            type="email"
-            outlined
-            class="mt-2 rounded-lg"
-            background-color="white"
-        />
+      <div class="mt-7">
+        <label>
+          <h4>Электронная почта</h4>
+          <v-text-field
+              prepend-inner-icon="email"
+              v-model.trim="email"
+              required
+              :error-messages="error_email ? 'Введите корректный адрес электронной почты' : null"
+              type="email"
+              outlined
+              class="mt-2 rounded-lg"
+              background-color="white"
+          />
+        </label>
       </div>
       <div class="mt-2">
-        <h4>Пароль</h4>
-        <v-text-field
-            v-model.trim="password"
-            :append-icon="password ? (show_password ? 'visibility_off' : 'visibility') : null"
-            @click:append="() => (show_password = !show_password)"
-            :type="show_password ?  'text' : 'password'"
-            prepend-inner-icon="lock"
-            required
-            :error-messages="error_password_length ? 'Введите не менее 8 символов' : null"
-            hint="Не менее 8 символов"
-            outlined
-            class="mt-2 rounded-lg"
-            background-color="white"
-        />
+        <label>
+          <h4>Пароль</h4>
+          <v-text-field
+              v-model.trim="password"
+              :append-icon="password ? (show_password ? 'visibility_off' : 'visibility') : null"
+              @click:append="() => (show_password = !show_password)"
+              :type="show_password ?  'text' : 'password'"
+              prepend-inner-icon="lock"
+              required
+              :error-messages="error_password_length ? 'Введите не менее 8 символов' : null"
+              hint="Не менее 8 символов"
+              outlined
+              class="mt-2 rounded-lg"
+              background-color="white"
+          />
+        </label>
       </div>
       <div class="mt-2">
-        <h4>Подтвердите пароль</h4>
-        <v-text-field
-            v-model.trim="confirm_password"
-            :append-icon="confirm_password ? (show_confirm_password ? 'visibility_off' : 'visibility') : null"
-            @click:append="() => (show_confirm_password = !show_confirm_password)"
-            :type="show_confirm_password ?  'text' : 'password'"
-            prepend-inner-icon="lock"
-            :error-messages="error_password_same ? 'Пароли не совпадают' : null"
-            required
-            outlined
-            class="mt-2 rounded-lg"
-            background-color="white"
-        />
+        <label>
+          <h4>Подтвердите пароль</h4>
+          <v-text-field
+              v-model.trim="confirm_password"
+              :append-icon="confirm_password ? (show_confirm_password ? 'visibility_off' : 'visibility') : null"
+              @click:append="() => (show_confirm_password = !show_confirm_password)"
+              :type="show_confirm_password ?  'text' : 'password'"
+              prepend-inner-icon="lock"
+              :error-messages="error_password_same ? 'Пароли не совпадают' : null"
+              required
+              outlined
+              class="mt-2 rounded-lg"
+              background-color="white"
+          />
+        </label>
       </div>
       <v-btn
           type="submit"

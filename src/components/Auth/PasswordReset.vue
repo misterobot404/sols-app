@@ -1,50 +1,54 @@
 <template>
   <div class="password-forget-dialog">
     <div class="text-center">
-      <h1>Восстановление пароля</h1>
+      <h1>Восстановление<br>пароля</h1>
     </div>
     <form @submit.prevent="passwordReset()">
-      <div class="mt-8">
-        <h4>Электронная почта</h4>
-        <v-text-field
-            required
-            outlined
-            v-model="email"
-            append-icon="email"
-            type="email"
-            :error-messages="error_email ? 'qwe' : null"
-            class="mt-2 mb-1 rounded-lg"
-            background-color="white"
-            hide-details
-        >
-          <template v-slot:append>
-            <div class="mr-1">
-              <v-progress-circular
-                  v-if="sendingCode"
-                  size="24"
-                  color="info"
-                  indeterminate
-              />
-              <div v-else class="pt-1 p-14-medium primary--text cursor-pointer" @click="sendCode">Отправить код</div>
-            </div>
-          </template>
-        </v-text-field>
+      <div class="mt-7">
+        <label>
+          <h4>Электронная почта</h4>
+          <v-text-field
+              required
+              outlined
+              v-model="email"
+              append-icon="email"
+              type="email"
+              :error-messages="error_email ? 'qwe' : null"
+              class="mt-2 mb-1 rounded-lg"
+              background-color="white"
+              hide-details
+          >
+            <template v-slot:append>
+              <div class="mr-1">
+                <v-progress-circular
+                    v-if="sendingCode"
+                    size="24"
+                    color="info"
+                    indeterminate
+                />
+                <div v-else class="pt-1 font-s-14 primary--text cursor-pointer" @click="sendCode">Отправить код</div>
+              </div>
+            </template>
+          </v-text-field>
+        </label>
       </div>
       <div class="mt-5">
-        <h4>Код</h4>
-        <v-text-field
-            required
-            outlined
-            :disabled="!codeSend"
-            class="mt-2 mb-1 rounded-lg"
-            background-color="white"
-            hint="Введите код, отправленный Вам на почту"
-            :persistent-hint="codeSend"
-        />
+        <label>
+          <h4>Код</h4>
+          <v-text-field
+              required
+              outlined
+              :disabled="!codeSend"
+              class="mt-2 mb-1 rounded-lg"
+              background-color="white"
+              hint="Введите код, отправленный Вам на почту"
+              :persistent-hint="codeSend"
+          />
+        </label>
       </div>
       <v-btn
           block
-          class="success rounded-lg h4 mt-4"
+          class="success rounded-lg h4 mt-2"
           type="submit"
           style="height: 54px;"
           :loading="loading"

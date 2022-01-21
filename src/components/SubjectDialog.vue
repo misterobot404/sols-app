@@ -1,17 +1,15 @@
 <template>
   <v-dialog
       max-width="400"
-      :value="show"
+      v-model="m_show"
       overlay-opacity="0.1"
-      @input="v => $emit('update:show', v)"
   >
-    <!-- Dialog -->
     <v-card>
       <v-card-text class="pt-6">
         <v-form ref="form">
           <h2 class="mb-6" style="color: rgba(0, 0, 0, 0.8)">
             <v-icon color="primary" class="mr-1 pb-1">{{ mode === 'create' ? "create_new_folder" : "edit" }}</v-icon>
-            {{ mode === 'create' ? "Создание категории" : "Изменение категории" }}
+            {{ mode === 'create' ? "Создание предмета" : "Изменение предмета" }}
           </h2>
           <v-text-field
               v-model="category.name"
@@ -53,7 +51,7 @@
 import {mapActions, mapMutations, mapGetters} from 'vuex'
 
 export default {
-  name: "SetCategoryDataDialog",
+  name: "SubjectDialog",
   props: ["show", "subject_id"],
   data() {
     return {
@@ -65,7 +63,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('data', ['getCategoryById'])
+    ...mapGetters('data', ['getCategoryById']),
+    m_show: {
+      get() {
+        return this.show === 'subject'
+      },
+      set(v) {
+        this.$emit('update:show', v);
+      },
+    }
   },
   watch: {
     show: {

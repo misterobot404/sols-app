@@ -11,23 +11,18 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    // hide page for auth users
-    if (to.matched.some(record => record.meta.hideForAuth && store.state.auth.user))
-        next({ path: '/' + store.state.auth.user.role });
-    // page access check
-    else if (to.matched.some(record => record.meta.middlewareAuth && record.meta.middlewareAuth !== store.state.auth.user.role)) {
-        store.commit("auth/LOGOUT", null, {root: true});
+    // Запретить переход на страницы: авторизация, регистрация и восстановление пароля для авторизированного пользователя
+    if ((to.path === '/signin' || to.path === '/signup' || to.path === '/password/reset') && store.getters['auth/isAuth'])
+        next({path: '/' + store.state.auth.user.role});
+    // Выходить из системы при переходе на страницу без доступа
+    else if (to.matched.some(record => record.meta.middlewareAuth !== store.state.auth.user?.role)) {
+        store.dispatch("auth/logout");
         next(false);
-    } else {
-        // enable page loading effect
-        store.commit("layout/SHOW_PAGE_LOADING", null, {root: true});
-        next()
     }
+    else next()
 });
-// eslint-disable-next-line no-unused-vars
+
 router.afterEach((to, from) => {
-    // disable page loading effect
-    store.commit("layout/HIDE_PAGE_LOADING", null, {root: true});
     // set meta
     document.title = to.meta.title;
     if (to.meta.description) document.description = to.meta.description;

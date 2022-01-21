@@ -40,7 +40,7 @@
                       </h4>
                     </template>
                     <template v-slot:item="{ item }">
-                <span class="d-flex justify-center p-14-medium" style="width: 100%;">
+                <span class="d-flex justify-center font-s-14" style="width: 100%;">
                   {{ item }}
                 </span>
                     </template>

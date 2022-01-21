@@ -1,66 +1,76 @@
 <template>
+  <!-- Desktop  -->
   <v-navigation-drawer
-      :width="$vuetify.breakpoint.lgAndDown ? 280 : 320"
-      style="min-height: 100%"
+      v-if="$vuetify.breakpoint.smAndUp"
+      :width="$vuetify.breakpoint.lgAndUp ? 320 : 210"
       permanent
-      :mini-variant="$vuetify.breakpoint.smAndDown"
-      mini-variant-width="70"
+      class="px-4 px-lg-8"
       app
   >
     <!-- Лого сайта -->
-    <v-list-item class="text-center mt-6 d-none d-md-block">
+    <v-list-item class="text-center mt-8">
       <router-link :to="'/' + user.role" class="mx-auto">
         <v-list-item-content>
-          <v-list-item-title class="primary--text h1">SOLS</v-list-item-title>
-          <v-list-item-subtitle v-if="user.role === 'teacher'" class="p-14-regular primary--text">для преподавателей</v-list-item-subtitle>
-          <v-list-item-subtitle v-else-if="user.role === 'student'" class="p-14-regular primary--text">для студентов</v-list-item-subtitle>
+          <v-list-item-title class="primary--text"><h1 class="text-h3">SOLS</h1></v-list-item-title>
+          <v-list-item-subtitle v-if="user.role === 'teacher'" class="primary--text">для преподавателей</v-list-item-subtitle>
+          <v-list-item-subtitle v-else-if="user.role === 'student'" class="primary--text">для студентов</v-list-item-subtitle>
         </v-list-item-content>
       </router-link>
     </v-list-item>
     <!-- Панель пользователя -->
     <v-divider class="mt-6"/>
-    <v-list-item class="text-center mt-6 d-none d-md-block">
-      <div>
-        <img :src="require('@/assets/avatar.png')" alt="avatar"/>
+    <v-list-item class="text-center mt-6 d-block">
+      <img :src="require('@/assets/avatar.png')" alt="avatar"/>
+      <div class="d-flex justify-center">
         <h4 v-text="user.login"/>
-        <v-list-item-subtitle class="mt-1">
-          {{ user.role === "teacher" ? 'Преподаватель' : user.role === "student" ? 'Студент' : null }}
-        </v-list-item-subtitle>
-        <v-btn text small @click="this['auth/LOGOUT']" style="text-transform: none; margin-top: 4px">Выход</v-btn>
+        <v-btn icon small @click="this['auth/logout']" style="margin-left: 4px; padding-bottom: 1px">
+          <v-icon small>logout</v-icon>
+        </v-btn>
       </div>
+      <v-list-item-subtitle class="font-f-nunito">
+        {{ user.role === "teacher" ? 'Преподаватель' : user.role === "student" ? 'Студент' : null }}
+      </v-list-item-subtitle>
     </v-list-item>
-    <v-divider class="mt-4"/>
+    <v-divider class="mt-6"/>
     <!-- Навигация -->
-    <div class="px-4 px-md-9">
+    <ul class="pl-0">
       <router-link
-          v-for="link in user.role === 'teacher' ? teacher_links : user.role === 'student' ? student_links : []"
-          :key="link.title"
-          class="d-flex my-9 navbar-link"
+          v-for="route in user.role === 'teacher' ? teacher_links : user.role === 'student' ? student_links : []"
+          :key="route.title"
+          tag="li"
+          class="d-flex my-6 my-lg-9 navbar-link"
           active-class="navbar-active-link"
-          :to="{name: link.name}"
+          :to="route.url"
       >
-        <v-icon x-large class="material-icons" v-text="link.icon"/>
-        <h2 class="my-auto pt-1" style="margin-left: 14px" v-text="link.title"/>
+        <v-icon x-large class="material-icons" v-text="route.icon"/>
+        <h2 class="my-auto pt-1" style="margin-left: 14px" v-text="route.title"/>
       </router-link>
-      <!-- Костыль. Link only for TEACHER -->
-      <router-link
-          v-if="user.role === 'teacher'"
-          class="d-flex my-11 navbar-link"
-          style="opacity: 0.5"
-          active-class="navbar-active-link"
-          to="/teacher/groups"
-          :disabled="true"
-          :event="''"
-      >
-        <v-icon x-large class="material-icons">groups</v-icon>
-        <h2 class="my-auto pt-1" style="margin-left: 14px">Учебные группы</h2>
-      </router-link>
-    </div>
+    </ul>
   </v-navigation-drawer>
+  <!-- Mobile  -->
+  <v-bottom-navigation
+      v-else
+      fixed
+      background-color="#f5f5f5"
+      height="62"
+      grow
+  >
+    <v-btn
+        v-for="link in user.role === 'teacher' ? teacher_links : user.role === 'student' ? student_links : []"
+        :key="link.title"
+        :to="link.url"
+        class="navbar-link px-2"
+        active-class="navbar-active-link"
+        height="100%"
+    >
+      <span style="display: block;width: 100px; white-space: normal; text-align: center" v-text="link.title"/>
+      <v-icon v-text="link.icon"/>
+    </v-btn>
+  </v-bottom-navigation>
 </template>
 
 <script>
-import {mapMutations, mapState} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default {
   name: "Navigation",
@@ -68,49 +78,52 @@ export default {
     return {
       teacher_links: [
         {
-          name: "TeacherHome",
+          url: "/teacher/home",
           title: 'Рабочая область',
           icon: 'home'
         },
         {
-          name: "Tests",
+          url: "/teacher/tests",
           title: 'Список тестов',
-          icon: 'receipt_long',
+          icon: 'article'
         },
         {
-          name: "BaseOfQuestions",
-          title: 'База вопросов',
-          icon: 'folder_open',
+          url: "/teacher/tasks",
+          title: 'База заданий',
+          icon: 'task_alt'
+        },
+        {
+          url: "/teacher/groups",
+          title: 'Учебные группы',
+          icon: 'groups'
         }
       ],
       student_links: [
         {
-          url: "/student/home",
-          title: 'Домашняя',
-          icon: 'portrait'
+          url: "/student/tests",
+          title: 'Тесты',
+          icon: 'article'
         },
         {
-          url: "/student/answers",
-          title: 'Мои ответы',
-          icon: 'done_all',
+          url: "/student/results",
+          title: 'Результаты',
+          icon: 'task_alt',
         }
       ],
     }
   },
   computed: {
-    ...mapState({
-      user: state => state.auth.user
-    }),
+    ...mapState({user: state => state.auth.user}),
   },
   methods: {
-    ...mapMutations(['auth/LOGOUT'])
+    ...mapActions(['auth/logout'])
   }
 }
 </script>
 
 <style scoped>
 /* Navbar */
-.navbar-active-link h2 {
+.navbar-active-link h2, .navbar-active-link span {
   color: #1976D3 !important;
 }
 
@@ -121,6 +134,8 @@ export default {
 .navbar-link {
   color: rgba(0, 0, 0, 0.52) !important;
   transition: color 0.18s cubic-bezier(0.25, 0.8, 0.5, 1), visibility 0s;
+  cursor: pointer;
+  user-select: none;
 }
 
 .navbar-link:hover {

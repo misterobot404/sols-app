@@ -1,49 +1,24 @@
 <template>
   <v-row>
     <v-col v-for="(el, index) in answers" cols="12" :key="index">
-      <h4 class="mb-3">Вариант ответа</h4>
-      <v-row no-gutters align="center">
-        <v-textarea
-            v-model="el.text"
+      <div class="d-flex align-center mb-3">
+        <h4>Вариант ответа</h4>
+        <v-checkbox
+            :input-value="right_answer.find(v => v.id === el.id)"
+            @click="rightAnswerClick(el)"
+            class="mx-4 my-0"
             hide-details
-            outlined
-            auto-grow
-            class="rounded-lg"
-        />
-        <v-tooltip top>
-          <template v-slot:activator="{ on }">
-            <v-select
-                v-on="on"
-                @input="on.blur"
-                :items="Array.from({length: answers.length}, (v, k) => k + 1)"
-                v-model="right_answer[index]"
-                filled
-                hide-details
-                class="ml-4 elevation-1"
-                append-icon=""
-                rounded
-                style="max-width: 54px"
-            >
-              <template v-slot:selection="{ item }">
-                <span class="d-flex justify-center p-14-medium" style="width: 100%;">
-                  {{ item }}
-                </span>
-              </template>
-              <template v-slot:item="{ item }">
-                <span class="d-flex justify-center p-14-medium" style="width: 100%;">
-                  {{ item }}
-                </span>
-              </template>
-            </v-select>
+        >
+          <template v-slot:label>
+            <span class="text-caption font-s-12" style="color: #152536">Правильный ответ</span>
           </template>
-          <span>Правильный порядок</span>
-        </v-tooltip>
+        </v-checkbox>
+        <v-spacer/>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
                 v-bind="attrs"
                 v-on="on"
-                class="ml-2"
                 @click="removeAnswer(index)"
                 icon
             >
@@ -52,7 +27,14 @@
           </template>
           <span>Удалить ответ</span>
         </v-tooltip>
-      </v-row>
+      </div>
+      <v-textarea
+          v-model="el.text"
+          hide-details
+          outlined
+          auto-grow
+          class="rounded-lg"
+      />
     </v-col>
     <v-col cols="12" class="mt-4 d-flex justify-space-between align-center">
       <v-btn
@@ -72,10 +54,11 @@
 </template>
 
 <script>
+
 import {mapMutations} from "vuex";
 
 export default {
-  name: "RangingAnswer",
+  name: "ChoiceAnswer",
   props: ["data", "loading"],
   data() {
     return {
@@ -83,7 +66,7 @@ export default {
         {id: 1, text: ""},
         {id: 2, text: ""},
       ],
-      right_answer: [],
+      right_answer: []
     }
   },
   watch: {
@@ -91,12 +74,10 @@ export default {
       handler(val) {
         if (val.body && val.right_answer) {
           let next_id = 1;
-          this.answers = val.body.map(el => {
-            return {id: next_id++, text: el}
+          this.answers = val.body.map(el => {return {id: next_id++, text: el}});
+          this.right_answer = val.right_answer.map(el => {
+            return {id: this.answers.find(answer => answer.text === el).id, text: el}
           });
-          this.right_answer = [...val.right_answer];
-        } else {
-          this.right_answer = Array.from({length: this.answers.length}, (v, k) => k + 1);
         }
       },
       immediate: true
@@ -122,29 +103,28 @@ export default {
         this.SHOW_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 2"});
         return;
       }
-      // check true answer duplicate
-      for (let i = 0; i < this.right_answer.length; i++) {
-        for (let j = 0; j < this.right_answer.length; j++) {
-          if (i !== j && this.right_answer[i] === this.right_answer[j]) {
-            this.SHOW_MSG_DIALOG({type: 'error', text: "Номера в ключах ответа дублируются"});
-            return;
-          }
-        }
+      // check true answer
+      if (!this.right_answer.length) {
+        this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите хотя бы один правильный ответ"});
+        return;
       }
       // emit answers to parent
       this.$emit('done', {
         body: this.answers.map(el => el.text),
-        right_answer: this.right_answer
+        right_answer: this.right_answer.map(el => el.text),
       })
     },
     addAnswer() {
       let next_id = Math.max(...this.answers.map(user => user.id)) + 1;
-      this.answers.push({id: next_id, text: ""});
-      this.right_answer.push(this.answers.length);
+      this.answers.push({id: next_id, text: ""})
     },
     removeAnswer(index) {
       this.answers.splice(index, 1);
-      this.right_answer.splice(index, 1);
+    },
+    rightAnswerClick(answer) {
+      if (this.right_answer.find(el => el.id === answer.id))
+        this.right_answer = this.right_answer.filter(el => el.id !== answer.id)
+      else this.right_answer.push(answer);
     }
   }
 }

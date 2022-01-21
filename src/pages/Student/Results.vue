@@ -1,12 +1,12 @@
 <template>
   <div>
-    Мои ответы
+    Результаты
   </div>
 </template>
 
 <script>
 export default {
-  name: "Answers"
+  name: "Result"
 }
 </script>
 

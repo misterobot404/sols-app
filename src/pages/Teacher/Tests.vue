@@ -1,5 +1,5 @@
 <template>
-  <v-container class="px-4 px-lg-6">
+  <v-container class="px-4 px-lg-8">
     <!-- Logo -->
     <v-row class="mt-4 mt-xl-5 justify-center align-center flex-grow-0">
       <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-end">
@@ -10,7 +10,7 @@
       </v-col>
     </v-row>
     <!-- Body -->
-    <div class="rounded-lg d-flex flex-column align-center pt-12 pb-8 mb-4" style="margin-top: 30px; background: #FEFEFF;">
+    <v-card width="100%" class="rounded-lg d-flex flex-column align-center pt-12 pb-8 mb-4" style="margin-top: 30px; background: #FEFEFF;">
       <v-col cols="11" class="pa-0">
         <!-- Filters  -->
         <v-toolbar flat class="hide-padding mb-4">
@@ -48,6 +48,9 @@
             Создать тест
           </v-btn>
         </v-toolbar>
+        <!-- TODO Добавить третий вид отображения задания - Без редактирования -->
+        <!-- Rows -->
+
         <!-- Table -->
         <v-data-table
             v-show="show_type === 'table'"
@@ -110,14 +113,14 @@
         </v-data-table>
         <!-- Cards -->
         <v-row class="pt-4 justify-center" v-show="show_type === 'cards'">
-          <v-col cols="11" sm="6" lg="4" xl="3" class="pa-4" v-for="(test, index) in processedData" :key="index">
-            <v-card>
+          <v-col cols="11" sm="6" lg="4" xl="3" class="pa-4" v-for="(test, index) in processedData.filter(el => el.name.toLowerCase().indexOf(search.toLowerCase()) !== -1)" :key="index">
+            <v-card class="elevation-3">
               <v-img
                   src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
                   height="200px"
               />
-              <v-card-subtitle class="pb-0 p-14-medium">
-                <span v-text="test.type"/> • Вопросов: <span v-text="test.count_of_questions_by_lvl.reduce((a, b) => a + b, 0)"/>
+              <v-card-subtitle class="pb-0 font-s-14">
+                <span v-text="test.type"/> • Вопросов: <span v-text="test.count_of_tasks_by_lvl.reduce((a, b) => a + b, 0)"/>
               </v-card-subtitle>
               <v-card-title v-text="test.name" class="mb-2 pt-2"/>
               <v-card-subtitle>
@@ -187,7 +190,7 @@
         <!-- Delete dialog -->
         <DeleteTestDialog :test="delete_test_dialog.test" :show.sync="delete_test_dialog.show"/>
       </v-col>
-    </div>
+    </v-card>
   </v-container>
 </template>
 
@@ -209,7 +212,7 @@ export default {
         headers: [
           {text: 'Название', value: 'name', class: ''},
           {text: 'Тип', value: 'type', class: ''},
-          {text: 'Кол-во вопросов', value: 't_count_of_questions_by_lvl'},
+          {text: 'Кол-во вопросов', value: 't_count_of_tasks_by_lvl'},
           {text: 'Время прохождения (мин.)', value: 'testing_time', class: 'small-table-col'},
           {text: 'Дата начала', value: 'date_of_beginning'},
           {text: 'Дата окончания', value: 'date_of_finishing'},
@@ -233,8 +236,8 @@ export default {
       result = result.filter(el => el.is_active === this.show_active);
 
       // DATE FORMATTING FOR PRINTF TO TABLE
-      // count + level of question
-      result.forEach(el => el.t_count_of_questions_by_lvl = el.count_of_questions_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' ( ' + el.count_of_questions_by_lvl.join(' / ') + ' )');
+      // count + level of task
+      result.forEach(el => el.t_count_of_tasks_by_lvl = el.count_of_tasks_by_lvl.reduce((a, b) => Number(a) + Number(b)) + ' ( ' + el.count_of_tasks_by_lvl.join(' / ') + ' )');
       // datetime
       result.forEach(el => el.date_of_beginning ? el.date_of_beginning = el.date_of_beginning.toLocaleDateString('ru-RU') + ' ' + el.date_of_beginning.toLocaleTimeString('ru-RU', {
         hour: '2-digit',

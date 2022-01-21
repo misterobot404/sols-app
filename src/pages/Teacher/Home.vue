@@ -1,5 +1,5 @@
 <template>
-  <v-container style="min-height: 100%" class="d-flex flex-column px-8 px-xl-12">
+  <v-container style="min-height: 100%" class="d-flex flex-column px-8 px-lg-8">
     <template v-if="active_tests.length > 0">
       <!-- Active Tests Header -->
       <v-row class="mx-1 mt-8 primary--text flex-grow-0">
@@ -16,9 +16,9 @@
               max-width="344"
               :key="index"
           >
-            <v-card-subtitle class="pb-0 p-14-medium">
+            <v-card-subtitle class="pb-0">
               <span v-text="getTestById(active_test.test_id).type"/> • Вопросов: <span
-                v-text="getTestById(active_test.test_id).count_of_questions_by_lvl.reduce((a, b) => a + b, 0)"/>
+                v-text="getTestById(active_test.test_id).count_of_tasks_by_lvl.reduce((a, b) => a + b, 0)"/>
             </v-card-subtitle>
             <v-card-title v-text="getTestById(active_test.test_id).name" class="mb-2 pt-2"/>
             <v-card-subtitle>

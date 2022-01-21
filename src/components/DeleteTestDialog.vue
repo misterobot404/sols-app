@@ -12,7 +12,7 @@
             <v-icon class="mr-1 pb-1" color="error">warning</v-icon>
             Удалить этот тест?
           </h2>
-          <p class="p-14-medium">
+          <p class="font-s-14">
             {{ 'Вы собираетесь удалить тест \'' + test.name + '\'. Восстановить его будет нельзя.' }}
           </p>
         </v-form>
@@ -23,7 +23,7 @@
             class="h4 px-4 mr-1"
             text
             style="text-transform: none; background-color: rgba(0, 0, 0, 0.06)"
-            @click="$emit('update:test', false)"
+            @click="$emit('update:show', false)"
         >
           Отмена
         </v-btn>

@@ -36,7 +36,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon :to="'/teacher/questions/' + item.id + '/edit'">
+        <v-btn icon :to="'/teacher/task/' + item.id + '/edit'">
           <v-icon class="material-icons-outlined">
             edit
           </v-icon>
@@ -52,7 +52,7 @@
         :show.sync="showDeleteDialog"
         header="Удалить этот вопрос?"
         body="Вы собираетесь удалить вопрос. Восстановить его будет нельзя."
-        @confirm="lDeleteQuestion"
+        @confirm="lDeleteTask"
     />
   </div>
 </template>
@@ -62,7 +62,7 @@ import {mapMutations, mapGetters, mapState, mapActions} from 'vuex'
 import DeleteConfirmation from "@/components/DeleteTestDialog";
 
 export default {
-  name: "QuestionTable",
+  name: "TaskTable",
   components: {DeleteConfirmation},
   props: {
     categoryId: {
@@ -83,23 +83,23 @@ export default {
       ],
       // Delete dialog
       showDeleteDialog: false,
-      selected_question_to_delete: null
+      selected_task_to_delete: null
     }
   },
   computed: {
     ...mapGetters('data', [
       'getCategoryById',
-      'getQuestionsByCategoryId',
-      'getQuestionTypeById'
+      'getTasksByCategoryId',
+      'getTaskTypeById'
     ]),
-    ...mapState('data', ["categories", "questions"]),
+    ...mapState('data', ["categories", "tasks"]),
     tableData() {
       // DATE FORMATTING FOR PRINTF TO TABLE
-      let result = this.getQuestionsByCategoryId(this.categoryId).map(a => Object.assign({}, a));
-      result.forEach(question => {
-        question.type_name = this.getQuestionTypeById(question.type_id).name;
+      let result = this.getTasksByCategoryId(this.categoryId).map(a => Object.assign({}, a));
+      result.forEach(task => {
+        task.type_name = this.getTaskTypeById(task.type_id).name;
         // remove html tags
-        question.text = question.text.replace(/(<([^>]+)>)/gi, "");
+        task.text = task.text.replace(/(<([^>]+)>)/gi, "");
       });
       result.forEach(el => el.commentary ? null : el.commentary = "Не установлено");
       return result.reverse();
@@ -107,7 +107,7 @@ export default {
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data',['deleteQuestion']),
+    ...mapActions('data',['deleteTask']),
     sync() {
       this.loading = true;
       setTimeout(() => {
@@ -115,18 +115,18 @@ export default {
         this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
       }, 1000);
     },
-    openDeleteDialog(question) {
-      this.selected_question_to_delete = question;
+    openDeleteDialog(task) {
+      this.selected_task_to_delete = task;
       this.showDeleteDialog = true;
     },
-    lDeleteQuestion() {
+    lDeleteTask() {
       this.loading = true;
-      this.deleteQuestion(this.selected_question_to_delete.id)
+      this.deleteTask(this.selected_task_to_delete.id)
           .then(() => {
             this.loading = false;
             this.SHOW_MSG_DIALOG({type: 'primary', text: 'Вопрос удален'});
           });
-      this.selected_question_to_delete = null;
+      this.selected_task_to_delete = null;
     }
   }
 }
