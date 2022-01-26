@@ -1,289 +1,316 @@
 <template>
-  <v-container class="px-4 px-lg-8 px-xl-12">
-    <!-- Logo -->
-    <v-row class="mt-4 mt-xl-5 justify-center align-center flex-grow-0">
-      <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-end">
-        <img class="create-test-svg pr-lg-4" :src="require('@/assets/svg/Create-1.svg')" alt="Иконка создания">
-      </v-col>
-      <v-col cols="12" lg="6" class="d-flex justify-center justify-lg-start">
-        <span class="create-test-title primary--text text-center text-lg-left" style="white-space: pre-line">
-          {{ mode === "create" ? "Создайте свой \n опросник" : "Редактируйте \n опросник" }}
-        </span>
-      </v-col>
-    </v-row>
-    <!-- Body -->
-    <v-form ref="form">
-      <v-card class="rounded-lg my-8">
-        <v-stepper v-model="e1" width="100%" non-linear>
-          <v-stepper-header>
-            <!-- TODO Сделать проверку на завершение шага -->
-            <v-stepper-step editable step="1">
-              Общие настройки
-            </v-stepper-step>
-            <v-divider/>
-            <v-stepper-step step="2" editable>
-              Настройки сценария
-            </v-stepper-step>
-            <v-divider/>
-            <v-stepper-step step="3" editable>
-              Настройки доступа
-            </v-stepper-step>
-          </v-stepper-header>
-
-          <v-stepper-items>
-            <v-stepper-content step="1">
-              <v-col cols="11" md="10" xl="8" class="mx-auto">
-                <v-row class="align-center">
-                  <v-col cols="12" md="6">
-                    <h4>Название</h4>
-                    <v-text-field
-                        v-model="test.name"
-                        required
-                        :rules="[(v) => !!v ||  '']"
-                        hide-details
-                        append-icon="title"
-                        outlined
-                        class="mt-2 mb-1 rounded-lg"
-                        background-color="white"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <h4>Тип</h4>
-                    <v-select
-                        v-model="test.type"
-                        required
-                        hide-details
-                        :items="test_types"
-                        :rules="[(v) => !!v ||  '']"
-                        outlined
-                        class="mt-2 mb-1 rounded-lg"
-                        background-color="white"
-                        hint="Выберите тип"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <h4>Категории вопросов</h4>
-                    <v-select
-                        v-model="test.category_ids"
-                        :items="categories"
-                        :item-text="'name'"
-                        :item-value="'id'"
-                        chips
-                        required
-                        :rules="[(v) => (!!v && v.length > 0) ||  '']"
-                        outlined
-                        hide-details
-                        clearable
-                        multiple
-                        class="mt-2 mb-1 rounded-lg"
-                    />
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <h4 class="mb-3">Количество вопросов</h4>
-                    <v-row
+  <div>
+    <!-- Шапка -->
+    <v-container fluid class="d-flex align-center px-4 py-4 px-lg-8">
+      <img height="80px" class="mr-4" :src="require('@/assets/test.png')" alt="Иконка создания">
+      <h2 style="font-weight: bolder" v-text="mode === 'create' ? 'Создание теста' : 'Изменение теста'"/>
+    </v-container>
+    <v-divider/>
+    <!-- Содержание -->
+    <v-container fluid class="px-4 px-lg-8 py-4 py-lg-8">
+      <v-form ref="form">
+        <v-card class="rounded-lg">
+          <v-stepper v-model="step" width="100%" non-linear>
+            <!-- Шапка шагов -->
+            <v-stepper-header>
+              <!-- TODO Сделать проверку на завершение шага -->
+              <v-stepper-step editable step="1" class="px-10">
+                Общие настройки
+              </v-stepper-step>
+              <v-divider/>
+              <v-stepper-step step="2" editable class="px-10">
+                Настройки сценария
+              </v-stepper-step>
+              <v-divider/>
+              <v-stepper-step step="3" editable class="px-10">
+                Настройки доступа
+              </v-stepper-step>
+            </v-stepper-header>
+            <!-- Содержание шагов -->
+            <v-stepper-items>
+              <!-- Шаг 1. Общие настройки -->
+              <v-stepper-content step="1">
+                <v-col cols="11" md="10" xl="7" class="mx-auto">
+                  <!-- Содержание -->
+                  <v-row>
+                    <!-- Название -->
+                    <v-col cols="12" md="6">
+                      <h4>Название <span class="red--text">*</span></h4>
+                      <v-text-field
+                          v-model="test.name"
+                          required
+                          :rules="[(v) => !!v ||  '']"
+                          hide-details
+                          append-icon="title"
+                          outlined
+                          class="my-1 rounded-lg"
+                          background-color="white"
+                      />
+                    </v-col>
+                    <!-- Тип -->
+                    <v-col cols="12" md="6">
+                      <h4>Тип <span class="red--text">*</span></h4>
+                      <v-select
+                          v-model="test.type"
+                          required
+                          hide-details
+                          :items="test_types"
+                          item-value="name"
+                          item-text="name"
+                          :item-disabled="(v) => v.name !== 'Тест'"
+                          :rules="[(v) => !!v ||  '']"
+                          outlined
+                          class="my-1 rounded-lg"
+                          background-color="white"
+                          hint="Выберите тип"
+                      />
+                    </v-col>
+                    <!-- Количество заданий -->
+                    <v-col cols="12" md="6">
+                      <h4>Количество заданий <span class="red--text">*</span></h4>
+                      <v-text-field
+                          v-model.number="test.count_of_task"
+                          required
+                          outlined
+                          append-icon="task_alt"
+                          :rules="[(v) => !!v ||  '']"
+                          hide-details
+                          type="number"
+                          min="0"
+                          class="rounded-lg my-1"
+                      />
+                    </v-col>
+                    <!-- Время прохождения -->
+                    <v-col cols="12" md="6">
+                      <h4>
+                        Время для прохождения (в минутах)
+                        <v-tooltip top>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                small
+                                class="material-icons-outlined"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              help_outline
+                            </v-icon>
+                          </template>
+                          <span>Для отключения ограничения времени, оставьте это поле пустым</span>
+                        </v-tooltip>
+                      </h4>
+                      <v-text-field
+                          v-model.number="test.testing_time"
+                          append-icon="schedule"
+                          outlined
+                          hide-details
+                          type="number"
+                          min="0"
+                          class="my-1 rounded-lg"
+                          background-color="white"
+                      />
+                    </v-col>
+                    <!-- Период тестирования -->
+                    <v-col cols="12" class="pa-0">
+                      <vc-date-picker
+                          ref="datapicker"
+                          v-model="range"
+                          is-range
+                          mode='dateTime'
+                          :popover="{ placement: $screens({ default: 'top', md: 'right' }) }"
+                          is24hr
+                          :minute-increment="5"
+                          :min-date='new Date()'
+                          :firstDayOfWeek="2"
+                          locale="ru"
+                          class="d-flex flex-wrap"
+                      >
+                        <template v-slot="{ inputValue, inputEvents }">
+                          <v-col cols="12" md="6">
+                            <h4>Дата начала <span class="red--text">*</span></h4>
+                            <v-text-field
+                                ref="startDateTextField"
+                                :value="inputValue.start"
+                                v-on="inputEvents.start"
+                                required
+                                :rules="[(v) => !!v || '']"
+                                hide-details
+                                outlined
+                                readonly
+                                class="my-1 rounded-lg"
+                                append-icon="date_range"
+                            />
+                          </v-col>
+                          <v-col cols="12" md="6">
+                            <h4>Дата окончания <span class="red--text">*</span></h4>
+                            <v-text-field
+                                ref="endDateTextField"
+                                :value="inputValue.end"
+                                v-on="inputEvents.end"
+                                required
+                                readonly
+                                :rules="[(v) => !!v || '']"
+                                hide-details
+                                outlined
+                                class="my-1 rounded-lg"
+                                append-icon="date_range"
+                            />
+                          </v-col>
+                        </template>
+                      </vc-date-picker>
+                    </v-col>
+                    <!-- Описание -->
+                    <v-col cols="12" class="pt-2">
+                      <h4>Описание</h4>
+                      <v-textarea
+                          v-model="test.description"
+                          hide-details
+                          outlined
+                          auto-grow
+                          class="my-1 rounded-lg"
+                      />
+                    </v-col>
+                  </v-row>
+                  <!-- Навигация -->
+                  <div class="d-flex align-center justify-center justify-md-end pt-5">
+                    <v-btn text @click="step--" class="mr-1">
+                      Назад
+                    </v-btn>
+                    <v-btn
+                        @click="step++"
+                        width="120"
+                        color="primary"
+                        large
                     >
-                      <v-col cols="12" md="4" v-for="(_, i) in test.count_of_tasks_by_lvl" :key="i">
-                        <v-text-field
-                            v-model.number="test.count_of_tasks_by_lvl[i]"
-                            required
-                            outlined
-                            :rules="[(v) => !!v ||  '']"
-                            hide-details
-                            type="number"
-                            min="0"
-                            :label="i === 0 ? 'Лёгкие' : i === 1 ? 'Средние' : 'Сложные'"
-                            class="rounded-lg"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                  <v-col cols="12" class="mt-4">
-                    <h4 class="mb-2">Дополнительные возможности:</h4>
-                    <v-row>
-                      <v-col>
-                        <v-switch
-                            label="Ограничение доступа к тесту"
-                            v-model="show_password"
-                            hide-details
-                            class="mr-8 my-2"
-                        />
-                      </v-col>
-                      <v-col>
-                        <v-switch
-                            label="Ограничение периода тестирования"
-                            v-model="show_range"
-                            hide-details
-                            class="mr-8 my-2"
-                        />
-                      </v-col>
-                      <v-col>
-                        <v-switch
-                            label="Ограничение времени тестирования"
-                            v-model="show_duration"
-                            hide-details
-                            class="mr-8 my-2"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                  <v-col cols="12" class="pa-0" v-show="show_range">
-                    <vc-date-picker
-                        ref="datapicker"
-                        v-model="range"
-                        is-range
-                        mode='dateTime'
-                        is24hr
-                        :minute-increment="5"
-                        :min-date='new Date()'
-                        :firstDayOfWeek="2"
-                        locale="ru"
-                        class="d-flex flex-wrap"
+                      Далее
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-stepper-content>
+              <!-- Шаг 2. Настройки сценария -->
+              <v-stepper-content step="2">
+                <!-- Содержание -->
+                <v-col cols="12" md="10" class="mx-auto">
+                  <!-- Компонент будет менять состояние данных родителя -->
+                  <ScriptSetup :attached_subjects="test.attached_subjects" :attached_categories="test.attached_categories"/>
+                  <!-- Навигация -->
+                  <div class="d-flex align-center justify-center justify-md-end pt-6">
+                    <v-btn text @click="step--" class="mr-1">
+                      Назад
+                    </v-btn>
+                    <v-btn
+                        color="primary"
+                        large
+                        width="120"
+                        class="ma-1"
+                        @click="step++"
                     >
-                      <template v-slot="{ inputValue, inputEvents }">
-                        <v-col cols="12" md="6">
-                          <h4>Дата начала</h4>
-                          <v-text-field
-                              ref="startDateTextField"
-                              :value="inputValue.start"
-                              v-on="inputEvents.start"
-                              required
-                              :rules="[(v) => !show_range || !!v || '']"
-                              hide-details
-                              outlined
-                              readonly
-                              class="mt-2 mb-1 rounded-lg"
-                              append-icon="calendar_today"
-                          />
-                        </v-col>
-                        <v-col cols="12" md="6">
-                          <h4>Дата окончания</h4>
-                          <v-text-field
-                              ref="endDateTextField"
-                              :value="inputValue.end"
-                              v-on="inputEvents.end"
-                              required
-                              readonly
-                              :rules="[(v) => !show_range || !!v || '']"
-                              hide-details
-                              outlined
-                              class="mt-2 mb-1 rounded-lg"
-                              append-icon="calendar_today"
-                          />
-                        </v-col>
+                      Далее
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-stepper-content>
+              <!-- Шаг 3. Настройки доступа -->
+              <v-stepper-content step="3">
+                <v-col cols="12" xl="8" class="mx-auto">
+                  <!-- Информация -->
+                  <v-row>
+                    <!--  Типы доступа  -->
+                    <v-col cols="12" md="6">
+                      <h4>Тип доступа <span class="red--text">*</span></h4>
+                      <v-select
+                          v-model="test.access_type"
+                          required
+                          hide-details
+                          :items="[{name: 'Доступ на группу', value: 'group'},{name: 'Доступ на студента (в разработке)', value: 'student'},{name: 'Доступ по ссылке (в разработке)', value: 'link'}]"
+                          item-value="value"
+                          item-text="name"
+                          :item-disabled="(v) => v.name !== 'Доступ на группу'"
+                          :rules="[(v) => !!v ||  '']"
+                          outlined
+                          class="my-1 rounded-lg"
+                          background-color="white"
+                          hint="Выберите тип"
+                      />
+                    </v-col>
+                    <!--  Пароль  -->
+                    <v-col cols="12" md="6">
+                      <h4>
+                        Пароль
+                        <v-tooltip top max-width="400">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                small
+                                class="material-icons-outlined"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              help_outline
+                            </v-icon>
+                          </template>
+                          <span>При заполнении поля, студенту потребуется ввести пароль для начала тестирования</span>
+                        </v-tooltip>
+                      </h4>
+                      <v-text-field
+                          v-model="test.password"
+                          hide-details
+                          outlined
+                          type="password"
+                          append-icon="vpn_key"
+                          class="my-1 rounded-lg"
+                          background-color="white"
+                      />
+                    </v-col>
+                    <!-- Выбранные группы -->
+                    <v-col cols="12" class="d-flex align-center flex-wrap" style="min-height: 56px">
+                      <h4 class="mr-4">Выбранные группы: <span class="red--text">*</span></h4>
+                      <h4 v-if="!test.attach_groups.length" class="text-decoration-underline">Не выбрано</h4>
+                      <template v-else>
+                        <v-chip
+                            v-for="(chip, i) in test.attach_groups"
+                            :key="i"
+                            class="mr-2"
+                            close
+                            @click:close="test.attach_groups.splice(i, 1)"
+                        >
+                          {{ chip }}
+                        </v-chip>
                       </template>
-                    </vc-date-picker>
-                  </v-col>
-                  <v-col cols="12" md="6" v-show="show_duration">
-                    <h4>Время для прохождения (в минутах)</h4>
-                    <v-text-field
-                        v-model.number="test.testing_time"
-                        :rules="[(v) => !show_duration || !!v ||  '']"
-                        required
-                        append-icon="timer"
-                        hide-details
-                        outlined
-                        type="number"
-                        min="0"
-                        class="mt-2 mb-1 rounded-lg"
-                        background-color="white"
-                    />
-                  </v-col>
-                  <v-col align-self="end" cols="12" md="6" v-show="show_password">
-                    <h4>Пароль</h4>
-                    <v-text-field
-                        v-model="test.password"
-                        hide-details
-                        outlined
-                        type="password"
-                        append-icon="vpn_key"
-                        class="mt-2 mb-1 rounded-lg"
-                        background-color="white"
-                        :rules="[(v) => !show_password || !!v ||  '']"
-                    />
-                  </v-col>
-                  <v-col align-self="end" class="d-flex justify-end mb-2 mt-2">
+                    </v-col>
+                    <!-- Выбор групп -->
+                    <v-col cols="12">
+                      <!-- Компонент будет менять состояние данных родителя -->
+                      <GroupSelection :attach_groups="test.attach_groups"/>
+                    </v-col>
+                  </v-row>
+                  <!-- Навигация -->
+                  <div class="d-flex align-center justify-center justify-md-end pt-6">
+                    <v-btn text @click="step--" class="mr-1">
+                      Назад
+                    </v-btn>
                     <v-btn
                         @click="mode === 'create' ? lCreateTest() : lUpdateTest()"
-                        class="success rounded-lg h4 ml-2"
-                        x-large
-                        :loading="loading">
-                      Сохранить
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-
-              <div class="d-flex align-center">
-                <v-spacer/>
-                <v-btn
-                    text
-                    to="/teacher/tests"
-                    exact-path
-                    class="mr-1"
-                >
-                  Отмена
-                </v-btn>
-                <v-btn
-                    color="primary"
-                    large
-                    @click="e1 = 2"
-                >
-                  Далее
-                </v-btn>
-              </div>
-            </v-stepper-content>
-
-            <v-stepper-content step="2">
-              <SelectTestTasks/>
-
-              <div class="d-flex align-center">
-                <v-spacer/>
-                <v-btn text @click="e1--" class="mr-1">
-                  Назад
-                </v-btn>
-
-                <v-btn
-                    color="primary"
-                    large
-                    @click="e1 = 3"
-                >
-                  Далее
-                </v-btn>
-              </div>
-            </v-stepper-content>
-
-            <v-stepper-content step="3">
-              <v-card
-                  class="mb-12"
-                  color="grey lighten-1"
-                  height="200px"
-              ></v-card>
-
-              <div class="d-flex align-center">
-                <v-spacer/>
-                <v-btn text @click="e1--" class="mr-1">
-                  Назад
-                </v-btn>
-                <v-btn
-                    color="primary"
-                    large
-                >
-                  Сохранить
-                </v-btn>
-              </div>
-            </v-stepper-content>
-          </v-stepper-items>
-        </v-stepper>
-      </v-card>
-    </v-form>
-  </v-container>
+                        color="primary"
+                        large
+                        :loading="loading"
+                        v-text="mode === 'create' ? 'Создать тест' : 'Сохранить изменения'"
+                    />
+                  </div>
+                </v-col>
+              </v-stepper-content>
+            </v-stepper-items>
+          </v-stepper>
+        </v-card>
+      </v-form>
+    </v-container>
+  </div>
 </template>
 
 <script>
 import Vue from 'vue'
 import {mapMutations, mapState, mapActions, mapGetters} from 'vuex'
 import VCalendar from 'v-calendar';
-import SelectTestTasks from "@/components/SelectTestTasks";
+import ScriptSetup from "@/components/Test/ScriptSetup";
+import GroupSelection from "@/components/Test/GroupSelection";
 
 // Use v-calendar & v-date-picker components
 Vue.use(VCalendar, {
@@ -292,29 +319,20 @@ Vue.use(VCalendar, {
 
 export default {
   name: "Test",
-  components: {SelectTestTasks},
+  components: {
+    GroupSelection,
+    ScriptSetup
+  },
   data() {
     return {
       mode: null,
       loading: false,
       valid: false,
-      show_range: true,
-      show_duration: true,
-      show_password: false,
-      // Разделы
-      e1: 1,
-      // test data
-      test: {
-        type: null,
-        name: null,
-        count_of_tasks_by_lvl: [null, null, null],
-        category_ids: null,
-        date_of_beginning: null,
-        date_of_finishing: null,
-        testing_time: null,
-        password: null,
-      },
-      // datepicker работает с объектом, поэтому будем зеркалить поля date_of_beginning и date_of_finishing сюда
+      // Текущий шаг создания/редактирования теста
+      step: 1,
+      // Тест
+      test: this.getNewTest(),
+      // Период начала/окончания тестирования. datepicker работает с объектом, поэтому будем требуется дублировать поля date_of_beginning и date_of_finishing сюда
       range: {
         start: null,
         end: null
@@ -323,19 +341,15 @@ export default {
   },
   computed: {
     ...mapState('data', ["categories", "test_types"]),
-    ...mapGetters('data', ['getTestById'])
+    ...mapGetters('data', ['getTestById']),
   },
   methods: {
     ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
     ...mapActions('data', ['createTest', 'updateTest']),
     lCreateTest() {
       if (this.$refs.form.validate()) {
-        if (this.show_range) {
-          this.test.date_of_beginning = this.range.start;
-          this.test.date_of_finishing = this.range.end;
-        }
-        if (!this.show_duration) this.test.testing_time = null;
-        if (!this.show_password) this.test.password = null;
+        this.test.date_of_beginning = this.range.start;
+        this.test.date_of_finishing = this.range.end;
 
         this.loading = true;
         this.createTest(this.test)
@@ -351,15 +365,10 @@ export default {
     },
     lUpdateTest() {
       if (this.$refs.form.validate()) {
+        this.test.date_of_beginning = this.range.start;
+        this.test.date_of_finishing = this.range.end;
+
         this.loading = true;
-
-        if (this.show_range) {
-          this.test.date_of_beginning = this.range.start;
-          this.test.date_of_finishing = this.range.end;
-        }
-        if (!this.show_duration) this.test.testing_time = null;
-        if (!this.show_password) this.test.password = null;
-
         this.updateTest(this.test)
             .then(() => {
               this.loading = false;
@@ -368,32 +377,39 @@ export default {
             })
       }
     },
-    clear() {
-      // clear data
-      this.test = {
-        type: null,
+    getNewTest() {
+      return {
+        // Общие настройки
         name: null,
-        count_of_tasks_by_lvl: [null, null, null],
-        category_ids: null,
+        type: null,
+        testing_time: null,
+        count_of_task: null,
         date_of_beginning: null,
         date_of_finishing: null,
-        testing_time: null,
-        password: null
+        description: null,
+        // Настройки сценария
+        attached_subjects: [],
+        attached_categories: [],
+        // Настройки доступа
+        access_type: "group",
+        attach_groups: [],
+        password: null,
       }
+    },
+    clear() {
+      // clear data
+      this.test = this.getNewTest();
       this.range = {
         start: null,
         end: null
       };
-      this.show_range = true;
-      this.show_duration = true;
-      this.show_password = false;
+
       // clear form valid
       this.$refs.form.resetValidation();
-    }
+    },
   },
   mounted() {
-    // CRUTCH
-    // v-text-field inside date-picker call error on init
+    // Костыль. v-text-field inside date-picker call error on init
     let dropError = true;
     this.$watch(
         () => {
@@ -409,64 +425,26 @@ export default {
     );
   },
   beforeRouteEnter(to, from, next) {
+    // Страница изменения теста
     if (to.name === "EditTest") {
       next(vm => {
         vm.mode = "edit";
-        vm.show_range = false;
-        vm.show_duration = false;
-        vm.show_password = false;
-
+        // Копируем существующий тест для изменения
         Object.assign(vm.test, vm.getTestById(Number(vm.$route.params.id)));
-
+        // Приводим переменные с данными начала/окончания тестирования к типу Data
         if (vm.test.date_of_beginning && vm.test.date_of_finishing) {
           vm.range.start = new Date(vm.test.date_of_beginning);
           vm.range.end = new Date(vm.test.date_of_finishing);
           vm.$refs.datapicker.value_ = vm.range;
-          vm.show_range = true;
-        }
-        if (vm.test.testing_time) {
-          vm.show_duration = true;
-        }
-        if (vm.test.password) {
-          vm.show_password = true;
         }
       })
-    } else next(vm => {
+    }
+    // Страница создания теста
+    else next(vm => {
+      // Очищаем предыдущие данные
       if (vm.mode === "edit") vm.clear();
       vm.mode = "create";
     });
   }
 }
 </script>
-
-<style scoped>
-
-.create-test-svg {
-  height: 250px;
-}
-
-.create-test-title {
-  font-family: Inter-Medium, sans-serif;
-  font-size: 40px;
-  line-height: 48px;
-}
-
-/* Изменение разметки под более низкое разрешение */
-@media screen and (max-width: 600px) {
-  .create-test-svg {
-    width: 200px;
-    height: 200px;
-  }
-
-  .create-test-title {
-    font-family: Inter-Medium, sans-serif;
-    font-size: 22px;
-    line-height: 27px;
-  }
-}
-</style>
-<style>
-.v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--box .v-select__selections, .v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--enclosed .v-select__selections {
-  min-height: 56px !important;
-}
-</style>

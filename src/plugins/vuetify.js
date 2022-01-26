@@ -13,7 +13,7 @@ export default new Vuetify({
                 orange: "#FF7D49",
                 green: "#41C284",
                 grey: "#C7C7CF",
-                background: "#ECECF9",
+                background: "#ececfd",
             }
         }
     },

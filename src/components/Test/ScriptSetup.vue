@@ -16,12 +16,12 @@
       >
         <template v-slot:append="{ item }">
           <template v-if="item.children">
-            <v-btn @click.s.stop="selectAllChildren(item)" icon>
+            <v-btn @click.stop="selectAllChildren(item)" icon>
               <v-icon>
                 done_all
               </v-icon>
             </v-btn>
-            <v-btn icon small class="ml-2" @click.s.stop="uncheckAllChildren(item)">
+            <v-btn icon small class="ml-2" @click.stop="uncheckAllChildren(item)">
               <v-icon>
                 remove_done
               </v-icon>
@@ -32,9 +32,26 @@
     </v-col>
     <v-divider vertical/>
     <v-col cols="6" class="pl-8">
+      <!-- Инструкция -->
       <template v-if="!pure_selection.length">
-        Узлы не выбраны
+        <p class="font-italic text-decoration-underline">Инструкция</p>
+        <p class="text-justify">
+          Для формирования сценария тестирования необходимо выбрать дисциплины и(или) темы в динамическом дереве.
+          На первом уровне дерева находятся дисциплины, а на втором - темы.
+        </p>
+        <p class="text-justify">
+          При выборе дисциплины, будут использованы все темы, зарегистрированные для данной дисциплины.
+          Для исключения из использования определённой темы зарегистрированной для дисциплины, добавьте все темы дисциплины, кроме той, которую необходимо исключить.
+        <p/>
+        <p class="mb-2 text-justify">По умолчанию сложность заданий для выбранных дисциплин и(или) тем установлена следующая:</p>
+        <ul class="mb-4">
+          <li>Лёгкие задания - 25%</li>
+          <li>Средние задания - 50%</li>
+          <li>Сложные задания - 25%</li>
+        </ul>
+        <p class="text-justify">При необходимости, для каждой выбранной дисциплины и темы можно настроить индивидуальную сложность.</p>
       </template>
+      <!-- Выбранный сценарий -->
       <template v-else>
         <v-switch label="Тест по сценарию" v-model="script_enable"/>
         <div v-if="!script_enable" class="d-flex mb-8 align-center">
@@ -92,29 +109,30 @@
           </template>
         </div>
         <!-- Вопросы -->
-        <h3>Выбранные вопросы:</h3>
-        <div
-            v-for="(node,i) in pure_selection.filter(node => node.category_id)"
-            :key="i"
-            class="d-flex my-4 align-center"
-        >
-          <div class="mr-5">
-            {{ node }}
-          </div>
-          <template v-if="!node.category_id && script_enable">
-            <div style="width: 100%">
-              <div>{{ 'Всего вопросов: ' + getCountOfTaskByNode(node).reduce((a, b) => a + b, 0) }}</div>
-              <div class="d-flex mt-4">
-                <v-text-field style="width: 60px;" class="mr-2" min="0" :max="getCountOfTaskByNode(node)[0]" label="Лёгкие" outlined
-                              :value="getCountOfTaskByNode(node)[0]" hide-details type="number"/>
-                <v-text-field style="width: 60px;" class="mr-2" min="0" :max="getCountOfTaskByNode(node)[1]" label="Средние" outlined
-                              :value="getCountOfTaskByNode(node)[1]" hide-details type="number"/>
-                <v-text-field style="width: 60px;" class="mr-2" min="0" :max="getCountOfTaskByNode(node)[2]" label="Сложные" outlined
-                              :value="getCountOfTaskByNode(node)[2]" hide-details type="number"/>
-              </div>
-            </div>
-          </template>
-        </div>
+        <!--        <h3>Выбранные вопросы:</h3>
+                <div
+                    v-for="(node,i) in pure_selection.filter(node => node.category_id)"
+                    :key="i"
+                    class="d-flex my-4 align-center"
+                >
+                  <div class="mr-5">
+                    {{ node }}
+                  </div>
+                  <template v-if="!node.category_id && script_enable">
+                    <div style="width: 100%">
+                      <div>{{ 'Всего вопросов: ' + getCountOfTaskByNode(node).reduce((a, b) => a + b, 0) }}</div>
+                      <div class="d-flex mt-4">
+                        <v-text-field style="width: 60px;" class="mr-2" min="0" :max="getCountOfTaskByNode(node)[0]" label="Лёгкие" outlined
+                                      :value="getCountOfTaskByNode(node)[0]" hide-details type="number"/>
+                        <v-text-field style="width: 60px;" class="mr-2" min="0" :max="getCountOfTaskByNode(node)[1]" label="Средние" outlined
+                                      :value="getCountOfTaskByNode(node)[1]" hide-details type="number"/>
+                        <v-text-field style="width: 60px;" class="mr-2" min="0" :max="getCountOfTaskByNode(node)[2]" label="Сложные" outlined
+                                      :value="getCountOfTaskByNode(node)[2]" hide-details type="number"/>
+                      </div>
+                    </div>
+                  </template>
+                </div>-->
+
         <div class="d-flex justify-center">
           <v-btn @click="selection = []" rounded class="mt-4">Очистить выбор</v-btn>
         </div>
@@ -126,6 +144,16 @@
 <script>
 export default {
   name: "SelectTestTasks",
+  props: {
+    attached_subjects: {
+      type: Array,
+      required: true
+    },
+    attached_categories: {
+      type: Array,
+      required: true
+    },
+  },
   data() {
     return {
       script_enable: false,

@@ -31,7 +31,6 @@ export default {
     Navigation
   },
   computed: {
-    ...mapState('layout', ['page_loading']),
     ...mapState('data', ['data_loaded']),
     ...mapGetters('auth', ['isAuth'])
   },

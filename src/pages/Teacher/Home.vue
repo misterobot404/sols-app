@@ -63,7 +63,7 @@
       </v-col>
     </v-row>
     <!-- Result Content -->
-    <div class="d-flex justify-center flex-wrap rounded-lg mt-5" style="padding: 24px 100px; background: #FEFEFF;">
+    <div class="d-flex justify-center flex-wrap rounded-lg mt-5 elevation-2" style="padding: 24px 100px; background: #FEFEFF;">
       <v-row class="justify-center">
         <div
             v-for="(result, index) in results"
@@ -93,7 +93,7 @@
       </v-col>
     </v-row>
     <!-- Help Content -->
-    <div class="d-flex justify-center flex-wrap rounded-lg mt-5" style="padding: 24px 100px; background: #FEFEFF;">
+    <div class="d-flex justify-center flex-wrap rounded-lg mt-5 elevation-2" style="padding: 24px 100px; background: #FEFEFF;">
       <img
           v-for="(url, index) in help"
           :src="url"
