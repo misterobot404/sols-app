@@ -20,7 +20,7 @@
 <script>
 import {mapGetters, mapState} from 'vuex';
 import Navigation from "./components/Navigation";
-import PopUpMsg from "./components/PopUpMsg";
+import PopUpMsg from "./components/PopUpErrorMsg";
 import LoadingData from "@/components/LoadingData";
 
 export default {

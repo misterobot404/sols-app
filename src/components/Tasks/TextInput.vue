@@ -71,23 +71,23 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     done() {
       // check empty answer
       if (this.right_answers.find(el => !el.text)) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
         return;
       }
       // check duplicate
       for (let i = 0; i < this.right_answers.length; i++) {
         if (this.right_answers.find(v => this.right_answers[i].id !== v.id && this.right_answers[i].text === v.text)) {
-          this.SHOW_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
+          this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
           return;
         }
       }
       // check answer count
       if (this.right_answers.length < 1) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 1"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 1"});
         return;
       }
       this.$emit('done', {

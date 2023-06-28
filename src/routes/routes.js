@@ -1,5 +1,17 @@
 export const routes = [
     {
+        path: '/reports',
+        component: () => import('../pages/Reports.vue'),
+        meta: {title: "SOLS - Отчёты"}
+    },
+    {
+        path: '/reports/:id',
+        component: () => import('../pages/ReportsOne.vue'),
+        meta: {title: "SOLS - Отчёт"}
+    },
+
+
+    {
         path: '/',
         redirect: '/signin',
     },
@@ -65,7 +77,7 @@ export const routes = [
     // subjects / categories / tasks
     {
         path: '/teacher/tasks',
-        component: () => import('../pages/Teacher/BaseOfTasks'),
+        component: () => import('../pages/Teacher/Base'),
         meta: {
             title: "SOLS - База заданий",
             middlewareAuth: "teacher"

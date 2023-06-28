@@ -26,7 +26,7 @@
               :error-messages="error_email ? 'Введите корректный адрес электронной почты' : null"
               type="email"
               outlined
-              class="mt-2 rounded-lg"
+              class="mt-1 rounded-lg"
               background-color="white"
           />
         </label>
@@ -44,7 +44,7 @@
               :error-messages="error_password_length ? 'Введите не менее 8 символов' : null"
               hint="Не менее 8 символов"
               outlined
-              class="mt-2 rounded-lg"
+              class="mt-1 rounded-lg"
               background-color="white"
           />
         </label>
@@ -61,7 +61,7 @@
               :error-messages="error_password_same ? 'Пароли не совпадают' : null"
               required
               outlined
-              class="mt-2 rounded-lg"
+              class="mt-1 rounded-lg"
               background-color="white"
           />
         </label>

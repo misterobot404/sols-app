@@ -43,10 +43,10 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     done() {
       if (!this.selected_types.length) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Выберите допустимый тип файлов"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Выберите допустимый тип файлов"});
         return;
       }
       // emit answers to parent

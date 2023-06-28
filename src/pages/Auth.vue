@@ -22,19 +22,6 @@
         </v-col>
       </v-row>
     </v-container>
-    <footer class="d-flex justify-center" style="position:absolute; bottom: 8px; z-index: 3; width: 100vw">
-      <v-col cols="6" class="d-flex pa-0 align-center justify-end">
-        <router-link to="/" class="black--text">
-          <h4>О сайте</h4>
-        </router-link>
-        <span style="opacity: 0.7">&#160&#160•&#160&#160</span>
-      </v-col>
-      <v-col cols="6" class="pa-0 d-flex align-center">
-        <router-link to="/" class="black--text">
-          <h4>Служба поддержки</h4>
-        </router-link>
-      </v-col>
-    </footer>
   </div>
 </template>
 

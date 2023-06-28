@@ -53,8 +53,8 @@
       </template>
       <!-- Выбранный сценарий -->
       <template v-else>
-        <v-switch label="Тест по сценарию" v-model="script_enable"/>
-        <div v-if="!script_enable" class="d-flex mb-8 align-center">
+        <v-switch label="Тест по сценарию" v-model="dynamic_script"/>
+        <div v-if="!dynamic_script" class="d-flex mb-8 align-center">
           <span class="mr-4">Общая сложность (в процентах):</span>
           <v-text-field style="width: 60px;" class="mx-2" outlined value="25" hide-details type="number"/>
           <v-text-field style="width: 60px;" class="mx-2" outlined value="50" hide-details type="number"/>
@@ -70,7 +70,7 @@
           <div class="mr-5">
             {{ node }}
           </div>
-          <template v-if="!node.category_id && script_enable">
+          <template v-if="!node.category_id && dynamic_script">
             <div style="width: 100%">
               <div>{{ 'Всего вопросов: ' + getCountOfTaskByNode(node).reduce((a, b) => a + b, 0) }}</div>
               <div class="d-flex mt-4">
@@ -94,7 +94,7 @@
           <div class="mr-5">
             {{ node }}
           </div>
-          <template v-if="!node.category_id && script_enable">
+          <template v-if="!node.category_id && dynamic_script">
             <div style="width: 100%">
               <div>{{ 'Всего вопросов: ' + getCountOfTaskByNode(node).reduce((a, b) => a + b, 0) }}</div>
               <div class="d-flex mt-4">
@@ -118,7 +118,7 @@
                   <div class="mr-5">
                     {{ node }}
                   </div>
-                  <template v-if="!node.category_id && script_enable">
+                  <template v-if="!node.category_id && dynamic_script">
                     <div style="width: 100%">
                       <div>{{ 'Всего вопросов: ' + getCountOfTaskByNode(node).reduce((a, b) => a + b, 0) }}</div>
                       <div class="d-flex mt-4">
@@ -143,7 +143,7 @@
 
 <script>
 export default {
-  name: "SelectTestTasks",
+  name: "ScriptSetup",
   props: {
     attached_subjects: {
       type: Array,
@@ -156,7 +156,7 @@ export default {
   },
   data() {
     return {
-      script_enable: false,
+      dynamic_script: false,
       selection: [],
       nodes: [
         {

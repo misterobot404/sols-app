@@ -103,30 +103,30 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     done() {
       // check empty answer
       if (this.answers.find(el => !el.text)) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Заполните все созданные варианты ответов"});
         return;
       }
       // check duplicate
       for (let i = 0; i < this.answers.length; i++) {
         if (this.answers.find(v => this.answers[i].id !== v.id && this.answers[i].text === v.text)) {
-          this.SHOW_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
+          this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Варианты ответа дублируются"});
           return;
         }
       }
       // check answer count
       if (this.answers.length < 2) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 2"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Минимальное количество ответов: 2"});
         return;
       }
       // check true answer duplicate
       for (let i = 0; i < this.right_answer.length; i++) {
         for (let j = 0; j < this.right_answer.length; j++) {
           if (i !== j && this.right_answer[i] === this.right_answer[j]) {
-            this.SHOW_MSG_DIALOG({type: 'error', text: "Номера в ключах ответа дублируются"});
+            this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Номера в ключах ответа дублируются"});
             return;
           }
         }

@@ -1,7 +1,7 @@
 <template>
-  <v-container class="px-4 px-lg-8">
+  <div class="px-4 px-xl-8 py-3 py-xl-6">
     <!-- Body -->
-    <v-card width="100%" class="rounded-lg my-4">
+    <v-card width="100%" class="rounded-lg">
       <v-card-title class="primary white--text">
         <template v-if="!selected_group">
           <v-icon large color="white" class="material-icons mr-2" v-text="'groups'"/>
@@ -65,6 +65,8 @@
           :headers="group_headers"
           :items="groups"
           :search="search"
+          :sort-by="'КоличествоСтудентов'"
+          :sort-desc="true"
           :loading="loading"
           :footer-props="{'items-per-page-text':'Количество строк:'}"
           loader-height="2"
@@ -99,7 +101,7 @@
         Успеваемость. <br>
       </v-container>
     </v-card>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -168,7 +170,7 @@ export default {
     getFaculties() {
       this.students = null
       axios.get(this.host + '/api/faculties').then(response => {
-        this.faculties = response.data.data;
+        this.faculties = response.data;
       })
     },
     getDepartments(faculty) {
@@ -178,7 +180,7 @@ export default {
           faculty: faculty
         }
       }).then(response => {
-        this.departments = response.data.data;
+        this.departments = response.data;
       })
     },
     getGroups(department) {
@@ -190,7 +192,7 @@ export default {
         }
       }).then(response => {
         this.loading = false;
-        this.groups = response.data.data;
+        this.groups = response.data;
       })
     },
     getStudents(group) {
@@ -201,7 +203,7 @@ export default {
         }
       }).then(response => {
         this.loading = false;
-        this.students = response.data.data.СписокСтудентов;
+        this.students = response.data.СписокСтудентов;
         this.selected_group = group;
       })
     },

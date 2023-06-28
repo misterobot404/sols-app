@@ -16,6 +16,7 @@
       Такое сочетание электронной почты и пароля - не существует.
     </v-alert>
     <form @submit.prevent="auth()">
+      <!-- Email -->
       <div class="mt-6">
         <label>
           <h4>Электронная почта</h4>
@@ -26,12 +27,13 @@
               hide-details
               outlined
               type="email"
-              class="mt-2 mb-1 rounded-lg"
+              class="my-1 rounded-lg"
               background-color="white"
           />
         </label>
       </div>
-      <div class="mt-6">
+      <!-- Password -->
+      <div class="mt-4">
         <label>
           <h4>Пароль</h4>
           <v-text-field
@@ -43,13 +45,14 @@
               required
               hide-details
               outlined
-              class="mt-2 mb-1 rounded-lg"
+              class="my-1 rounded-lg"
               background-color="white"
           />
         </label>
         <router-link to="/password/reset" class="font-s-14">Забыли пароль?</router-link>
       </div>
-      <v-row class="mt-6 ">
+      <!-- Buttons -->
+      <v-row class="mt-4 ">
         <v-col cols="12" md="6">
           <v-btn
               :to="{path: '/signup'}"
@@ -73,6 +76,16 @@
           </v-btn>
         </v-col>
       </v-row>
+      <!-- Links -->
+      <div class="mt-6 d-flex flex-column justify-center align-center">
+        <v-divider style="width: 300px" class="mt-1"/>
+        <a href="https://student.knastu.ru/" class="mt-4">
+          <h4>Вход через домен</h4>
+        </a>
+        <router-link to="/" class="mt-1">
+          <h4>Абитуриенту</h4>
+        </router-link>
+      </div>
     </form>
   </div>
 </template>
@@ -116,9 +129,9 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   z-index: 4;
-  width: 450px;
+  width: 500px;
   background: #ECECF9;
-  padding: 34px 30px 40px;
+  padding: 30px 30px 22px;
   border: 3px solid #41C284;
   box-sizing: border-box;
   border-radius: 10px;

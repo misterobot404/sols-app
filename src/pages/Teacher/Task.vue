@@ -149,7 +149,7 @@ export default {
     ...mapGetters('data', ['getTaskTypeById', 'getTaskById', 'getRightAnswerByTaskId']),
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     ...mapActions('data', ['createTask', 'updateTask']),
     lCreateTask({body, right_answer}) {
       if (this.$refs.form.validate() && this.task.text) {
@@ -158,7 +158,7 @@ export default {
         this.createTask({task: this.task, right_answer: right_answer})
             .then(() => {
               this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
+              this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: "Вопрос успешно добавлен"});
               this.clear();
             });
       } else {
@@ -179,7 +179,7 @@ export default {
         this.updateTask({task: this.task, right_answer: this.right_answer})
             .then(() => {
               this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
+              this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
               this.$router.back();
             })
       } else {

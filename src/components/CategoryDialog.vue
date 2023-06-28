@@ -6,21 +6,42 @@
   >
     <!-- Dialog -->
     <v-card>
-      <v-card-text class="pt-6">
+      <v-toolbar
+          height="64"
+          flat
+          class="pr-1"
+      >
+        <v-icon color="primary" class="mr-1 pb-1">{{ mode === 'create' ? "library_add" : "edit" }}</v-icon>
+        <v-toolbar-title class="ml-1" v-text="mode === 'create' ? 'Добавление темы' : 'Изменение темы'"/>
+        <v-spacer/>
+        <v-btn
+            icon
+            @click="$emit('update:show', false)"
+        >
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-divider/>
+      <!-- Содержание -->
+      <div class="pa-6 pt-3">
         <v-form ref="form">
-          <h2 class="mb-6" style="color: rgba(0, 0, 0, 0.8)">
-            <v-icon color="primary" class="mr-1 pb-1">{{ mode === 'create' ? "create_new_folder" : "edit" }}</v-icon>
-            {{ mode === 'create' ? "Создание темы" : "Изменение темы" }}
-          </h2>
           <v-text-field
-              v-model="category.name"
+              v-if="mode=== 'edit' && old_category"
+              v-model="old_category.name"
+              label="Старое название"
+              disabled
+              required
+          />
+          <v-text-field
+              v-model="new_category.name"
+              autofocus
               autocomplete="off"
-              label="Название"
+              :label="mode === 'edit' ? 'Новое название' : 'Название'"
               hide-details
               required
           />
         </v-form>
-      </v-card-text>
+      </div>
       <v-card-actions class="px-6 pb-4">
         <v-spacer/>
         <v-btn
@@ -36,9 +57,9 @@
             color="primary"
             text
             style="text-transform: none;"
-            :style="category.name.trim() ? 'background-color: rgba(25, 118, 211, 0.1)' : 'background-color: rgba(0, 0, 0, 0.06)'"
+            :style="new_category.name.trim() ? 'background-color: rgba(25, 118, 211, 0.1)' : 'background-color: rgba(0, 0, 0, 0.06)'"
             :loading="loading"
-            :disabled="!category.name.trim()"
+            :disabled="!new_category.name.trim()"
             @click="mode === 'create' ? lCreateCategory() : lUpdateCategory()"
         >
           Подтвердить
@@ -53,13 +74,17 @@ import {mapActions, mapMutations, mapGetters} from 'vuex'
 
 export default {
   name: "CategoryDialog",
-  props: ["show", "category_id"],
+  props: ["show", "category_id", "subject_id"],
   data() {
     return {
       mode: null,
       loading: false,
-      category: {
-        name: ""
+      // Тема до редактирования
+      old_category: null,
+      // Тема до редактирования
+      new_category: {
+        name: "",
+        subject_id: null
       }
     }
   },
@@ -79,44 +104,40 @@ export default {
       handler(val) {
         if (val) {
           if (this.category_id) {
-            Object.assign(this.category, this.getCategoryById(this.category_id));
+            this.old_category = this.getCategoryById(this.category_id);
+            Object.assign(this.new_category, this.old_category);
             this.mode = "edit"
-          } else this.mode = "create"
+          } else {
+            this.mode = "create";
+            this.new_category.subject_id = this.subject_id;
+          }
         } else this.clear();
       },
       immediate: true
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data', ["updateCategory",'createCategory']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
+    ...mapActions('data', ["updateCategory", 'createCategory']),
     lCreateCategory() {
       if (this.$refs.form.validate()) {
-        this.loading = true;
-        this.createCategory(this.category)
-            .then(() => {
-              this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Категория создана"});
-              this.$emit('update:show', false);
-            })
+        this.createCategory(this.new_category);
+        this.$emit('update:show', false);
       }
     },
     lUpdateCategory() {
       if (this.$refs.form.validate()) {
-        this.loading = true;
-        this.updateCategory(this.category)
-            .then(() => {
-              this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
-              this.$emit('update:show', false);
-            })
+        this.$emit('update:show', false);
+        this.updateCategory(this.new_category);
       }
     },
     clear() {
-      this.category = {
-        name: ""
+      this.new_category = {
+        name: "",
+        subject_id: null
       }
     }
   }
 }
 </script>
+

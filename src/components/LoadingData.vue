@@ -23,7 +23,7 @@ export default {
     ...mapActions('data', ['getAllData']),
     ...mapMutations('data', ['SET_DATA_LOADED'])
   },
-  beforeMount() {
+  created() {
     this.getAllData().then(() => this.SET_DATA_LOADED(true))
   }
 }

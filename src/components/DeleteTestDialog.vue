@@ -68,13 +68,13 @@ export default {
   },
   methods: {
     ...mapActions('data', ['deleteTest']),
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     lDeleteTest() {
       this.loading = true;
       this.deleteTest(this.test.id)
           .then(() => {
             this.loading = false;
-            this.SHOW_MSG_DIALOG({type: 'primary', text: 'Тест удален'});
+            this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: 'Тест удален'});
             this.$emit('update:show', null);
           });
     }

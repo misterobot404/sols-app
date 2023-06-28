@@ -124,7 +124,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     ...mapActions('data', ['deleteCategory']),
     goToCategory(category) {
       this.$router.push("categories/" + category.id)
@@ -132,7 +132,7 @@ export default {
     sync() {
       this.loading = true;
       setTimeout(() => {
-        this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
         this.loading = false;
       }, 1000);
     },

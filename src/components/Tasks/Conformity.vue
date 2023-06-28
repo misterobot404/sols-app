@@ -142,22 +142,22 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     done() {
       // check empty el
       if (this.left_list.includes("") || this.right_list.includes("")) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все созданные элементы списков"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Заполните все созданные элементы списков"});
         return;
       }
       // check empty answer
       if (this.right_answer.includes("") || this.right_answer.includes(null)) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Заполните все соответствия"});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Заполните все соответствия"});
         return;
       }
       // check true answer duplicate
       for (let i = 0; i < this.right_list.length; i++) {
         if (this.right_answer.indexOf(i+1) === -1) {
-          this.SHOW_MSG_DIALOG({type: 'error', text: "Не на все элементы правого списка существуют связи"});
+          this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Не на все элементы правого списка существуют связи"});
           return;
         }
       }

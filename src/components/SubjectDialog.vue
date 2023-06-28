@@ -1,29 +1,53 @@
 <template>
   <v-dialog
-      max-width="400"
+      max-width="380"
       v-model="m_show"
       overlay-opacity="0.1"
+      persistent
   >
     <v-card>
-      <v-card-text class="pt-6">
+      <!-- Шапка -->
+      <v-toolbar
+          height="64"
+          flat
+          class="pr-1"
+      >
+        <v-icon color="primary" class="mr-1 pb-1">{{ mode === 'create' ? "library_add" : "edit" }}</v-icon>
+        <v-toolbar-title class="ml-1" v-text="mode === 'create' ? 'Добавление дисциплины' : 'Изменение дисциплины'"/>
+        <v-spacer/>
+        <v-btn
+            icon
+            @click="$emit('update:show', false)"
+        >
+          <v-icon>close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-divider/>
+      <!-- Содержание -->
+      <div class="pa-6 pt-3">
         <v-form ref="form">
-          <h2 class="mb-6" style="color: rgba(0, 0, 0, 0.8)">
-            <v-icon color="primary" class="mr-1 pb-1">{{ mode === 'create' ? "create_new_folder" : "edit" }}</v-icon>
-            {{ mode === 'create' ? "Создание предмета" : "Изменение предмета" }}
-          </h2>
           <v-text-field
-              v-model="category.name"
+              v-if="mode=== 'edit' && old_subject"
+              v-model="old_subject.name"
+              label="Старое название"
+              disabled
+              required
+          />
+          <v-text-field
+              v-model="new_subject.name"
+              autofocus
               autocomplete="off"
-              label="Название"
+              :label="mode === 'edit' ? 'Новое название' : 'Название'"
               hide-details
               required
           />
         </v-form>
-      </v-card-text>
+      </div>
+      <!-- Действия -->
       <v-card-actions class="px-6 pb-4">
         <v-spacer/>
         <v-btn
-            class="h4 px-4 mr-1"
+            class="px-4 mr-1"
             text
             style="text-transform: none; background-color: rgba(0, 0, 0, 0.06)"
             @click="$emit('update:show', false)"
@@ -31,14 +55,14 @@
           Отмена
         </v-btn>
         <v-btn
-            class="h4 px-4"
+            class="px-4"
             color="primary"
             text
             style="text-transform: none;"
-            :style="category.name.trim() ? 'background-color: rgba(25, 118, 211, 0.1)' : 'background-color: rgba(0, 0, 0, 0.06)'"
+            :style="new_subject.name.trim() ? 'background-color: rgba(25, 118, 211, 0.1)' : 'background-color: rgba(0, 0, 0, 0.06)'"
             :loading="loading"
-            :disabled="!category.name.trim()"
-            @click="mode === 'create' ? lCreateCategory() : lUpdateCategory()"
+            :disabled="!new_subject.name.trim()"
+            @click="mode === 'create' ? lCreateSubject() : lUpdateSubject()"
         >
           Подтвердить
         </v-btn>
@@ -57,13 +81,14 @@ export default {
     return {
       mode: null,
       loading: false,
-      category: {
+      old_subject: null,
+      new_subject: {
         name: ""
       }
     }
   },
   computed: {
-    ...mapGetters('data', ['getCategoryById']),
+    ...mapGetters('data', ['getSubjectById']),
     m_show: {
       get() {
         return this.show === 'subject'
@@ -78,8 +103,9 @@ export default {
       handler(val) {
         if (val) {
           if (this.subject_id) {
-            Object.assign(this.category, this.getCategoryById(this.subject_id));
-            this.mode = "edit"
+            this.old_subject = this.getSubjectById(this.subject_id);
+            Object.assign(this.new_subject, this.old_subject);
+            this.mode = "edit";
           } else this.mode = "create"
         } else this.clear();
       },
@@ -87,32 +113,22 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
-    ...mapActions('data', ["updateCategory",'createCategory']),
-    lCreateCategory() {
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
+    ...mapActions('data', ['createSubject', 'updateSubject']),
+    lCreateSubject() {
       if (this.$refs.form.validate()) {
-        this.loading = true;
-        this.createCategory(this.category)
-            .then(() => {
-              this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Категория создана"});
-              this.$emit('update:show', false);
-            })
+        this.createSubject(this.new_subject)
+        this.$emit('update:show', false);
       }
     },
-    lUpdateCategory() {
+    lUpdateSubject() {
       if (this.$refs.form.validate()) {
-        this.loading = true;
-        this.updateCategory(this.category)
-            .then(() => {
-              this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
-              this.$emit('update:show', false);
-            })
+        this.updateSubject(this.new_subject);
+        this.$emit('update:show', false);
       }
     },
     clear() {
-      this.category = {
+      this.subject = {
         name: ""
       }
     }

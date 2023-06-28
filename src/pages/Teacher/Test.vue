@@ -55,7 +55,7 @@
                           required
                           hide-details
                           :items="test_types"
-                          item-value="name"
+                          item-value="id"
                           item-text="name"
                           :item-disabled="(v) => v.name !== 'Тест'"
                           :rules="[(v) => !!v ||  '']"
@@ -221,10 +221,10 @@
                           v-model="test.access_type"
                           required
                           hide-details
-                          :items="[{name: 'Доступ на группу', value: 'group'},{name: 'Доступ на студента (в разработке)', value: 'student'},{name: 'Доступ по ссылке (в разработке)', value: 'link'}]"
-                          item-value="value"
+                          :items="access_types"
+                          item-value="id"
                           item-text="name"
-                          :item-disabled="(v) => v.name !== 'Доступ на группу'"
+                          :item-disabled="(v) => v.name === 'Доступ для абитуриентов'"
                           :rules="[(v) => !!v ||  '']"
                           outlined
                           class="my-1 rounded-lg"
@@ -260,27 +260,29 @@
                           background-color="white"
                       />
                     </v-col>
-                    <!-- Выбранные группы -->
-                    <v-col cols="12" class="d-flex align-center flex-wrap" style="min-height: 56px">
-                      <h4 class="mr-4">Выбранные группы: <span class="red--text">*</span></h4>
-                      <h4 v-if="!test.attach_groups.length" class="text-decoration-underline">Не выбрано</h4>
-                      <template v-else>
-                        <v-chip
-                            v-for="(chip, i) in test.attach_groups"
-                            :key="i"
-                            class="mr-2"
-                            close
-                            @click:close="test.attach_groups.splice(i, 1)"
-                        >
-                          {{ chip }}
-                        </v-chip>
-                      </template>
-                    </v-col>
                     <!-- Выбор групп -->
-                    <v-col cols="12">
-                      <!-- Компонент будет менять состояние данных родителя -->
-                      <GroupSelection :attach_groups="test.attach_groups"/>
-                    </v-col>
+                    <template v-if="test.access_type === 1">
+                      <!-- Выбранные группы -->
+                      <v-col cols="12" class="d-flex align-center flex-wrap" style="min-height: 56px">
+                        <h4 class="mr-4">Выбранные группы: <span class="red--text">*</span></h4>
+                        <h4 v-if="!test.attach_groups.length" class="text-decoration-underline">Не выбрано</h4>
+                        <template v-else>
+                          <v-chip
+                              v-for="(chip, i) in test.attach_groups"
+                              :key="i"
+                              class="mr-2"
+                              close
+                              @click:close="test.attach_groups.splice(i, 1)"
+                          >
+                            {{ chip }}
+                          </v-chip>
+                        </template>
+                      </v-col>
+                      <v-col  cols="12">
+                        <!-- Компонент будет менять состояние данных родителя -->
+                        <GroupSelection :attach_groups="test.attach_groups"/>
+                      </v-col>
+                    </template>
                   </v-row>
                   <!-- Навигация -->
                   <div class="d-flex align-center justify-center justify-md-end pt-6">
@@ -340,11 +342,11 @@ export default {
     }
   },
   computed: {
-    ...mapState('data', ["categories", "test_types"]),
+    ...mapState('data', ["categories", "test_types", "access_types"]),
     ...mapGetters('data', ['getTestById']),
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     ...mapActions('data', ['createTest', 'updateTest']),
     lCreateTest() {
       if (this.$refs.form.validate()) {
@@ -355,7 +357,7 @@ export default {
         this.createTest(this.test)
             .then(() => {
               this.loading = false;
-              this.SHOW_MSG_DIALOG({
+              this.SHOW_ERROR_MSG_DIALOG({
                 type: 'primary',
                 text: this.test.type + ': "' + this.test.name + '" ' + (this.test.type === "Викторина" ? "создана" : "создан")
               });
@@ -372,7 +374,7 @@ export default {
         this.updateTest(this.test)
             .then(() => {
               this.loading = false;
-              this.SHOW_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
+              this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: "Изменения сохранены"});
               this.$router.push("/teacher/tests");
             })
       }
@@ -381,7 +383,7 @@ export default {
       return {
         // Общие настройки
         name: null,
-        type: null,
+        type: 1,
         testing_time: null,
         count_of_task: null,
         date_of_beginning: null,
@@ -391,7 +393,7 @@ export default {
         attached_subjects: [],
         attached_categories: [],
         // Настройки доступа
-        access_type: "group",
+        access_type: 1,
         attach_groups: [],
         password: null,
       }

@@ -2,9 +2,9 @@
   <!-- Desktop  -->
   <v-navigation-drawer
       v-if="$vuetify.breakpoint.smAndUp"
-      :width="$vuetify.breakpoint.lgAndUp ? 320 : 210"
+      :width="$vuetify.breakpoint.xlOnly ? 320 : 210"
       permanent
-      class="px-4 px-lg-8"
+      class="px-4 px-xl-8"
       app
   >
     <!-- Лого сайта -->
@@ -20,7 +20,7 @@
     <!-- Панель пользователя -->
     <v-divider class="mt-6"/>
     <v-list-item class="text-center mt-6 d-block">
-      <img :src="require('@/assets/avatar.png')" alt="avatar"/>
+      <img v-if="$vuetify.breakpoint.xlOnly" :src="require('@/assets/avatar.png')" alt="avatar"/>
       <div class="d-flex justify-center">
         <h4 v-text="user.login"/>
         <v-btn icon small @click="this['auth/logout']" style="margin-left: 4px; padding-bottom: 1px">
@@ -38,7 +38,7 @@
           v-for="route in user.role === 'teacher' ? teacher_links : user.role === 'student' ? student_links : []"
           :key="route.title"
           tag="li"
-          class="d-flex my-6 my-lg-9 navbar-link"
+          class="d-flex my-6 my-xl-9 navbar-link"
           active-class="navbar-active-link"
           :to="route.url"
       >
@@ -96,6 +96,11 @@ export default {
           url: "/teacher/groups",
           title: 'Учебные группы',
           icon: 'groups'
+        },
+        {
+          url: "/reports",
+          title: 'Отчёты',
+          icon: 'history'
         }
       ],
       student_links: [

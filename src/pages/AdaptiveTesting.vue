@@ -1,29 +1,21 @@
 <template>
   <v-container class="mt-4">
+    <LineChart styles="width: 100%"/>
+
     <v-stepper
         v-model="level"
         width="100%"
         height="100%"
+        class="mt-6"
     >
-      <!--  Levels   -->
-      <v-stepper-header>
-        <v-stepper-step step="1"
-        >
-          Лёгкий уровень знаний
-        </v-stepper-step>
-
-        <v-divider></v-divider>
-        <v-stepper-step step="2"
-        >
-          Средний уровень знаний
-        </v-stepper-step>
-        <v-divider></v-divider>
-        <v-stepper-step step="3">
-          Высокий уровень знаний
-        </v-stepper-step>
-      </v-stepper-header>
       <!--  Tasks -->
       <div class="ma-8 mb-0">
+        <div class="subtitle-2 mb-4">
+          <div>Номер вопроса: 15</div>
+          <div>Вероятность правильного ответа: 0.86</div>
+          <div>Текущая сложность задания: 6</div>
+        </div>
+        <v-divider></v-divider>
         <div v-if="currentTask" class="d-flex flex-column align-baseline mt-4">
           <!-- Type: singleradiobutton -->
           <template v-if="currentTask.type === 'singleradiobutton'">
@@ -111,8 +103,13 @@
 </template>
 
 <script>
+import LineChart from './Line.vue'
+
 export default {
   name: 'AdaptiveTesting',
+  components: {
+    LineChart
+  },
   data() {
     return {
       /* Config */

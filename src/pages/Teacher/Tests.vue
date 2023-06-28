@@ -265,28 +265,28 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     ...mapMutations('data', ['ARCHIVE_TEST', 'UNARCHIVE_TEST']),
     share(test) {
       try {
         navigator.clipboard.writeText(test.name)
-            .then(() => this.SHOW_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"}))
+            .then(() => this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: "Ссылка скопирована в буфер обмена"}))
       } catch (err) {
-        this.SHOW_MSG_DIALOG({type: 'error', text: "Ссылка не может быть скопирована. Используйте защищенное соединение"})
+        this.SHOW_ERROR_MSG_DIALOG({type: 'error', text: "Ссылка не может быть скопирована. Используйте защищенное соединение"})
       }
     },
     archiveTest(test) {
       this.ARCHIVE_TEST(test.id);
-      this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "перемещена" : "перемещён") + ' в архив'});
+      this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "перемещена" : "перемещён") + ' в архив'});
     },
     unarchiveTest(test) {
       this.UNARCHIVE_TEST(test.id);
-      this.SHOW_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "активна" : "активен")});
+      this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: test.type + ': "' + test.name + '" ' + (test.type === "Викторина" ? "активна" : "активен")});
     },
     sync() {
       this.loading = true;
       setTimeout(() => {
-        this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
         this.loading = false;
       }, 400);
     },

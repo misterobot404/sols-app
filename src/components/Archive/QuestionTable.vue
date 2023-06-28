@@ -106,13 +106,13 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('layout', ['SHOW_MSG_DIALOG']),
+    ...mapMutations('layout', ['SHOW_ERROR_MSG_DIALOG']),
     ...mapActions('data',['deleteTask']),
     sync() {
       this.loading = true;
       setTimeout(() => {
         this.loading = false;
-        this.SHOW_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
+        this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: 'Данные обновлены'});
       }, 1000);
     },
     openDeleteDialog(task) {
@@ -124,7 +124,7 @@ export default {
       this.deleteTask(this.selected_task_to_delete.id)
           .then(() => {
             this.loading = false;
-            this.SHOW_MSG_DIALOG({type: 'primary', text: 'Вопрос удален'});
+            this.SHOW_ERROR_MSG_DIALOG({type: 'primary', text: 'Вопрос удален'});
           });
       this.selected_task_to_delete = null;
     }

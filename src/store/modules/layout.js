@@ -4,13 +4,9 @@ export default {
         // show / hide feedback dialog
         feedback_dialog: false,
         // popup msg
-        popup_msg: {
+        popup_error_msg: {
             show: false,
-            defaultTimeout: 2400,
-            timeout: 2400,
-            text: "",
-            // primary or error
-            type: ""
+            text: ""
         },
     },
     mutations: {
@@ -20,15 +16,12 @@ export default {
         HIDE_FEEDBACK_DIALOG(state) {
             state.feedback_dialog = false;
         },
-        SHOW_MSG_DIALOG(state, payload) {
-            state.popup_msg.type = payload.type;
-            state.popup_msg.text = payload.text;
-            if (payload.timeout) state.popup_msg.timeout = payload.timeout;
-            state.popup_msg.show = true;
+        SHOW_ERROR_MSG_DIALOG(state, payload) {
+            state.popup_error_msg.text = payload.text;
+            state.popup_error_msg.show = true;
         },
-        HIDE_MSG_DIALOG(state) {
-            state.popup_msg.show = false;
-            state.popup_msg.timeout = state.popup_msg.defaultTimeout;
+        HIDE_ERROR_MSG_DIALOG(state) {
+            state.popup_error_msg.show = false;
         },
     }
 }

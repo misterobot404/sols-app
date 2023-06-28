@@ -67,6 +67,7 @@ export default {
   },
   data() {
     return {
+      host: "http://192.168.77.13",
       // Факультеты
       faculties: [],
       selected_faculty: null,
@@ -83,9 +84,7 @@ export default {
       groups: [],
     }
   },
-  computed: {
-    ...mapState('data', ['host'])
-  },
+  computed: {},
   watch: {
     // При выборе факультета, получаем кафедры
     selected_faculty(faculty) {
@@ -103,7 +102,7 @@ export default {
   methods: {
     getFaculties() {
       axios.get(this.host + '/api/faculties').then(response => {
-        this.faculties = response.data.data;
+        this.faculties = response.data;
       })
     },
     getDepartments(faculty) {
@@ -112,7 +111,7 @@ export default {
           faculty: faculty
         }
       }).then(response => {
-        this.departments = response.data.data;
+        this.departments = response.data;
       })
     },
     getGroups(department) {
@@ -123,7 +122,7 @@ export default {
         }
       }).then(response => {
         this.group_loading = false;
-        this.groups = response.data.data;
+        this.groups = response.data;
       })
     },
   },

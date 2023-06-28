@@ -1,14 +1,15 @@
 import axios from "axios";
 
+// Сервер ресурсов
+const host = "https://sols.do-edu.pro";
+
 export default {
     namespaced: true,
     state: {
-        host: "http://192.168.77.13",
-        // Признак загрузки данных
-        // При состоянии false будет производится переход на страницу получения данных /update
+        // Признак загрузки данных. Приложение готово к работе
         data_loaded: false,
 
-        // groups: [],
+        //// ОБЩИЕ ДАННЫЕ
         tests: [
             {
                 id: 1,
@@ -63,62 +64,13 @@ export default {
                 created_at: new Date("Thu Jul 29 2021 17:32:35 GMT+1000 (GMT+10:00)")
             },
         ],
-        subjects: [
-            {
-                id: 1,
-                name: 'Резание материалов',
-            },
-            {
-                id: 2,
-                name: 'Управление персоналом',
-            },
-            {
-                id: 3,
-                name: 'Психология и педагогика',
-            },
-        ],
-        categories: [
-            {
-                id: 1,
-                subject_id: 1,
-                name: 'Наростообразование',
-            },
-            {
-                id: 2,
-                subject_id: 1,
-                name: 'Геометрические параметры инструмента',
-            },
-            {
-                id: 3,
-                subject_id: 1,
-                name: 'Деформация стружки',
-            },
-            {
-                id: 4,
-                subject_id: 1,
-                name: 'Стужкообразование при резании',
-            },
-            {
-                id: 5,
-                subject_id: 2,
-                name: 'Наростообразование2',
-            },
-            {
-                id: 6,
-                subject_id: 2,
-                name: 'Геометрические параметры инструмента2',
-            },
-            {
-                id: 7,
-                subject_id: 2,
-                name: 'Деформация стружки2',
-            },
-            {
-                id: 8,
-                subject_id: 2,
-                name: 'Стужкообразование при резании2',
-            }
-        ],
+
+        //// ДАННЫЕ ПРЕПОДАВТЕЛЯ
+        // Все дисциплины, созданные преподавателем
+        subjects: [],
+        // Все темы, созданные преподавателем
+        categories: [],
+        // Все задания, созданные преподавателем
         tasks: [
             {
                 id: 1,
@@ -178,43 +130,22 @@ export default {
                 type_id: 5
             }
         ],
-
-        active_tests: [
+        // Типы тестов
+        test_types: [
             {
                 id: 1,
-                user_id: 1,
-                test_id: 4,
-                created_at: new Date(),
-                tasks: [
-                    {
-                        task_id: 1,
-                        answer: "Ключ ответа"
-                    },
-                    {
-                        task_id: 2,
-                        answer: null
-                    },
-                    {
-                        task_id: 3,
-                        answer: null
-                    },
-                    {
-                        task_id: 4,
-                        answer: null
-                    },
-                    {
-                        task_id: 5,
-                        answer: null
-                    },
-                ]
+                name: "Тест"
+            },
+            {
+                id: 2,
+                name: "Викторина (в разработке)"
+            },
+            {
+                id: 3,
+                name: "Опрос (в разработке)"
             }
         ],
-        test_types: [
-            {name: "Тест"},
-            {name: "Викторина (в разработке)"},
-            {name: "Опрос (в разработке)"}
-        ],
-
+        // Типы заданий
         task_types: [
             {
                 id: 1,
@@ -253,7 +184,23 @@ export default {
                 name: "Загрузка файла"
             }
         ],
-        task_levels: ["Лёгкий", "Средний", "Сложный"],
+        // Варианты сложности заданий
+        task_levels: [
+            {
+                id: 1,
+                name: 'Лёгкий'
+            },
+            {
+                id: 1,
+                name: 'Средний'
+            },
+            {
+                id: 1,
+                name: 'Сложный'
+            },
+        ],
+        // Правильные ответы на задания
+        // TODO Убрать отсюда непосредственно в компонент работы с этой логикой
         right_answers: [
             {
                 id: 1,
@@ -281,8 +228,210 @@ export default {
                 answer: [1, 1, 2],
             },
         ],
+        // Типы доступа к тесту
+        access_types: [
+            {
+                id: 1,
+                name: 'Доступ на учебную группу'
+            },
+            {
+                id: 2,
+                name: 'Публичный доступ'
+            },
+            {
+                id: 3,
+                name: 'Доступ для абитуриентов'
+            }
+        ],
+
+        //// ДАННЫЕ СТУДЕНТА
+        // Тесты, которые были начаты студентом. Состояние его текущих ответов
+        active_tests: [
+            {
+                id: 1,
+                user_id: 1,
+                test_id: 4,
+                created_at: new Date(),
+                tasks: [
+                    {
+                        task_id: 1,
+                        answer: "Ключ ответа"
+                    },
+                    {
+                        task_id: 2,
+                        answer: null
+                    },
+                    {
+                        task_id: 3,
+                        answer: null
+                    },
+                    {
+                        task_id: 4,
+                        answer: null
+                    },
+                    {
+                        task_id: 5,
+                        answer: null
+                    },
+                ]
+            }
+        ],
+
+        reports: [
+            {
+                id: 1,
+                user_id: 1,
+                test_id: 4,
+                name: "История России 1",
+                student: "Петров И.А",
+                mode: "Адаптивный тест",
+                q_count: "10",
+                created_at: new Date(),
+                time_rem_minut: 40,
+                result: "Отлично",
+                chartData: {
+                    labels: [
+                        'Вопрос 1',
+                        'Вопрос 2',
+                        'Вопрос 3',
+                        'Вопрос 4',
+                        'Вопрос 5',
+                        'Вопрос 6',
+                        'Вопрос 7',
+                        'Вопрос 8',
+                        'Вопрос 9',
+                        'Вопрос 10',
+                        'Вопрос 11',
+                        'Вопрос 12',
+                        'Вопрос 13',
+                        'Вопрос 14',
+                    ],
+                    datasets: [
+                        {
+                            label: 'Уровень знаний',
+                            backgroundColor: '#f87979',
+                            data: [4, 3, 3, 4, 5, 5, 6, 6, 7, 6, 6, 5, 6, 6]
+                        }
+                    ]
+                },
+            },
+            {
+                id: 2,
+                user_id: 1,
+                test_id: 4,
+                name: "История России 2",
+                student: "Дмитриев И.А",
+                mode: "Адаптивный тест",
+                q_count: "12",
+                created_at: new Date(),
+                time_rem_minut: 40,
+                result: "Отлично",
+                chartData: {
+                    labels: [
+                        'Вопрос 1',
+                        'Вопрос 2',
+                        'Вопрос 3',
+                        'Вопрос 4',
+                        'Вопрос 5',
+                        'Вопрос 6',
+                        'Вопрос 7',
+                        'Вопрос 8',
+                        'Вопрос 9',
+                        'Вопрос 10',
+                        'Вопрос 11',
+                        'Вопрос 12',
+                        'Вопрос 13',
+                        'Вопрос 14',
+                    ],
+                    datasets: [
+                        {
+                            label: 'Уровень знаний',
+                            backgroundColor: '#f87979',
+                            data: [4, 3, 3, 4, 5, 5, 6, 6, 7, 6, 6, 5, 6, 6]
+                        }
+                    ]
+                },
+            },
+            {
+                id: 3,
+                user_id: 1,
+                test_id: 4,
+                name: "История России 3",
+                student: "Толин И.А",
+                mode: "Адаптивный тест",
+                q_count: "8",
+                created_at: new Date(),
+                time_rem_minut: 40,
+                result: "Хорошо",
+                chartData: {
+                    labels: [
+                        'Вопрос 1',
+                        'Вопрос 2',
+                        'Вопрос 3',
+                        'Вопрос 4',
+                        'Вопрос 5',
+                        'Вопрос 6',
+                        'Вопрос 7',
+                        'Вопрос 8',
+                        'Вопрос 9',
+                        'Вопрос 10',
+                        'Вопрос 11',
+                        'Вопрос 12',
+                        'Вопрос 13',
+                        'Вопрос 14',
+                    ],
+                    datasets: [
+                        {
+                            label: 'Уровень знаний',
+                            backgroundColor: '#f87979',
+                            data: [4, 3, 3, 4, 5, 5, 6, 6, 7, 6, 6, 5, 6, 6]
+                        }
+                    ]
+                },
+            },
+            {
+                id: 4,
+                user_id: 1,
+                test_id: 4,
+                name: "История России 4",
+                student: "Васин И.А",
+                mode: "Адаптивный тест",
+                q_count: "6",
+                created_at: new Date(),
+                time_rem_minut: 40,
+                result: "Отлично",
+                chartData: {
+                    labels: [
+                        'Вопрос 1',
+                        'Вопрос 2',
+                        'Вопрос 3',
+                        'Вопрос 4',
+                        'Вопрос 5',
+                        'Вопрос 6',
+                        'Вопрос 7',
+                        'Вопрос 8',
+                        'Вопрос 9',
+                        'Вопрос 10',
+                        'Вопрос 11',
+                        'Вопрос 12',
+                        'Вопрос 13',
+                        'Вопрос 14',
+                    ],
+                    datasets: [
+                        {
+                            label: 'Уровень знаний',
+                            backgroundColor: '#f87979',
+                            data: [4, 3, 3, 4, 5, 5, 6, 6, 7, 6, 6, 5, 6, 6]
+                        }
+                    ]
+                },
+            }
+        ]
     },
     getters: {
+        getSubjectById: state => id => {
+            return state.subjects.find(subject => subject.id === id);
+        },
         getCategoryById: state => id => {
             return state.categories.find(category => category.id === id);
         },
@@ -308,23 +457,16 @@ export default {
     actions: {
         // Получить все данные пользователя
         getAllData({dispatch}) {
-            return dispatch('getTests');
+            return Promise.all([
+                // dispatch('getTests'),
+                // dispatch('getSubjects'),
+                // dispatch('getCategories'),
+                // dispatch('getTasks')
+            ])
         },
-
-        //// КАБИНЕТ ПРЕПОДОВАТЕЛЯ
-        // GROUP
-        /*getGroups({state, commit}) {
-            return axios.get(state.host + '/api/groups', {
-                params: {
-                    department: "ПУРИС"
-                }
-            }).then(response => {
-                commit('SET_GROUPS', response.data.data);
-            })
-        },*/
         // TEST
-        getTests({state, commit}) {
-            return axios.get(state.host + '/api/tests')
+        getTests({commit}) {
+            return axios.get(host + '/api/tests')
                 .then(response => {
                     //commit('SET_TESTS', response.data.info);
                 })
@@ -356,35 +498,81 @@ export default {
             )
         },
         // SUBJECT
+        getSubjects({commit}) {
+            return axios.get(host + '/api/subjects')
+                .then(response => {
+                    // Убираем удалённые дисциплины
+                    let subjects = response.data.filter(el => el.delete === 0);
+                    commit('SET_SUBJECTS', subjects);
+                })
+        },
+        createSubject({commit, dispatch}, subject) {
+            axios.post(host + '/api/subjects', {name: subject.name})
+                .then((response) => commit('CREATE_SUBJECT', response.data))
+                .catch(() => {
+                    commit('layout/SHOW_ERROR_MSG_DIALOG', {type: 'error', text: "Ошибка добавления дисциплины"}, {root: true});
+                    dispatch('getSubjects');
+                })
+        },
+        updateSubject({commit, dispatch}, subject) {
+            commit('UPDATE_SUBJECT', subject);
+            axios.put(host + '/api/subjects/' + subject.id, {name: subject.name})
+                .catch(() => {
+                    commit('SHOW_ERROR_MSG_DIALOG', {type: 'error', text: "Ошибка обновления дисциплины"}, {root: true});
+                    dispatch('getSubjects');
+                })
+        },
+        deleteSubject({commit, dispatch}, subject_id) {
+            commit('DELETE_SUBJECT', subject_id);
+            axios.delete(host + '/api/subjects/' + subject_id)
+                .catch(() => {
+                    commit('SHOW_ERROR_MSG_DIALOG', {type: 'error', text: "Ошибка удаления дисциплины"}, {root: true});
+                    dispatch('getSubjects');
+                })
+        },
         // CATEGORY
-        createCategory({commit}, category) {
-            return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('CREATE_CATEGORY', category);
-                        resolve();
-                    }, 400)
-                }
-            )
+        getCategories({commit}) {
+            return axios.get(host + '/api/categories')
+                .then(response => {
+                    // Убираем удалённые темы
+                    let categories = response.data.filter(el => el.delete === 0);
+                    commit('SET_CATEGORIES', categories);
+                })
         },
-        updateCategory({commit}, category) {
-            return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('UPDATE_CATEGORY', category);
-                        resolve();
-                    }, 400)
-                }
-            )
+        createCategory({commit, dispatch}, category) {
+            axios.post(host + '/api/categories', {
+                name: category.name,
+                subject_id: Number(category.subject_id)
+            })
+                .then((response) => commit('CREATE_SUBJECT', response.data))
+                .catch(() => {
+                    commit('layout/SHOW_ERROR_MSG_DIALOG', {type: 'error', text: "Ошибка добавления темы"}, {root: true});
+                    dispatch('getCategories');
+                })
         },
-        deleteCategory({commit}, id) {
-            return new Promise((resolve) => {
-                    setTimeout(() => {
-                        commit('DELETE_CATEGORY', id);
-                        resolve();
-                    }, 400)
-                }
-            )
+        updateCategory({commit, dispatch}, category) {
+            commit('UPDATE_CATEGORY', category);
+            axios.put(host + '/api/categories/' + category.id, {name: category.name})
+                .catch(() => {
+                    commit('SHOW_ERROR_MSG_DIALOG', {type: 'error', text: "Ошибка обновления темы"}, {root: true});
+                    dispatch('getCategories');
+                })
+        },
+        deleteCategory({commit, dispatch}, category_id) {
+            commit('DELETE_CATEGORY', category_id);
+            axios.delete(host + '/api/categories/' + category_id)
+                .catch(() => {
+                    commit('SHOW_ERROR_MSG_DIALOG', {type: 'error', text: "Ошибка удаления темы"}, {root: true});
+                    dispatch('getCategories');
+                })
         },
         // TASK
+        getTasks({state, commit}) {
+            return axios.get(host + '/api/questions_tree')
+                .then(response => {
+                    commit('SET_TASKS', response.data);
+                })
+        },
         createTask({state, commit}, {task, right_answer}) {
             return new Promise((resolve) => {
                     setTimeout(() => {
@@ -448,11 +636,6 @@ export default {
         SET_DATA_LOADED(state, status) {
             state.data_loaded = status;
         },
-
-        // GROUP
-        SET_GROUPS(state, groups) {
-            state.groups = groups;
-        },
         // TEST
         SET_TESTS(state, tests) {
             state.tests = tests;
@@ -478,12 +661,28 @@ export default {
             state.tests = state.tests.filter((item) => item.id !== id);
         },
         // SUBJECT
-
+        SET_SUBJECTS(state, subjects) {
+            state.subjects = subjects;
+        },
+        CREATE_SUBJECT(state, subject) {
+            state.subjects.push(subject);
+        },
+        UPDATE_SUBJECT(state, subject) {
+            Object.assign(state.subjects.find(el => el.id === subject.id), subject);
+        },
+        DELETE_SUBJECT(state, id) {
+            // удаление категории из тестов
+            // state.tests.forEach(el => el.category_ids = el.category_ids.filter((item) => item !== id));
+            // удаление вопросов относящихся к категории
+            // state.tasks = state.tasks.filter((item) => item.category_id !== id)
+            // удаление категории
+            state.subjects = state.subjects.filter((item) => item.id !== id);
+        },
         // CATEGORY
+        SET_CATEGORIES(state, categories) {
+            state.categories = categories;
+        },
         CREATE_CATEGORY(state, category) {
-            // data will be added to backend
-            category.id = Math.max(...state.categories.map(el => el.id)) + 1;
-
             state.categories.push(category);
         },
         UPDATE_CATEGORY(state, category) {
@@ -498,6 +697,9 @@ export default {
             state.categories = state.categories.filter((item) => item.id !== id);
         },
         // TASK
+        SET_TASKS(state, tasks) {
+            state.tasks = tasks;
+        },
         CREATE_TASK(state, task) {
             // data will be added to backend
             task.id = Math.max(...state.tasks.map(el => el.id)) + 1;
